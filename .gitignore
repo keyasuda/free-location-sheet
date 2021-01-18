@@ -1,0 +1,12 @@
+/.cache
+/public
+/deploy
+/node_modules
+/config
+/build
+
+/app.yaml
+/.firebaserc
+/.firebase/
+*.log
+/src/credentials.js
