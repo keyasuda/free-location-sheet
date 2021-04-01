@@ -11,6 +11,10 @@ export const Sheet = {
     // put header
   },
 
+  storages: {
+
+  },
+
   belongings: {
     add: (news: Belonging[]) => {
 

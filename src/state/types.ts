@@ -1,4 +1,5 @@
 export type WarehouseItem = {
+  klass: string,
   id: string,
   name: string,
   description: string
