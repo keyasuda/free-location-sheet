@@ -10,5 +10,5 @@
 /.firebase/
 *.log
 /src/credentials.js
-apiTest/api/secret.json
+/apiTest/api/secret.json
 /apiTest/api/token.json
