@@ -7,9 +7,10 @@ export const Sheet = {
     // create a new sheet
   },
 
-  init: (documentId: string, auth) => {
+  init: (documentId: string, auth, sheetsService) => {
     Sheet.documentId = documentId;
     Sheet.auth = auth;
+    Sheet.service = sheetsService;
 
     // check sheets
     // create sheet(s)
@@ -41,6 +42,16 @@ export const Sheet = {
         return e2.v
       }
     }))
+  },
+
+  add: (range: string, rows: array[]) => {
+    const params = {
+      spreadsheetId: Sheet.documentId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      resource: {values: rows}
+    }
+    return Sheet.service.spreadsheets.values.append(params)
   },
 
   storages: {
