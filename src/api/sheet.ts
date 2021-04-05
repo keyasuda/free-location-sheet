@@ -22,6 +22,28 @@ export const Sheet = {
       `/d/${Sheet.documentId}/gviz/tq`
   },
 
+  sheets: async () => {
+    const meta = await Sheet.service.spreadsheets.get({spreadsheetId: Sheet.documentId})
+    return meta.data.sheets.map((s) => s.properties.title)
+  },
+
+  createSheet: (title: string) => {
+    const params = {
+      spreadsheetId: Sheet.documentId,
+      resource: {
+        requests: [{
+          addSheet: {
+            properties: {
+              title
+            }
+          }
+        }]
+      }
+    }
+
+    return Sheet.service.spreadsheets.batchUpdate(params)
+  },
+
   query: async (query: string, sheet: string) => {
     const url =
       Sheet.endpoint() +

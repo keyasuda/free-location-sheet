@@ -21,8 +21,9 @@ beforeEach(() => {
 })
 
 describe('Sheet', () => {
-  describe('common methods', () => {
-    const api = Sheet;
+  const api = Sheet;
+
+  describe('cell manipulations', () => {
 
     beforeEach(async () => {
       // overwrite fixtures into the sheet
@@ -71,6 +72,45 @@ describe('Sheet', () => {
         const actual = await api.query('select C, D where B="storage-c"', 'storages')
         expect(actual[0]).toEqual(expected)
       })
+    })
+  })
+
+  describe('sheet manipulations', () => {
+    describe('sheets', () => {
+      it('should return a list of sheet names', async () => {
+        const actual = await api.sheets()
+        expect(actual).toEqual(['belongings', 'storages'])
+      })
+    })
+
+    describe('createSheet', () => {
+      it('should add a new sheet', async () => {
+        await api.createSheet('new sheet')
+        const actual = await api.sheets()
+        expect(actual[actual.length - 1]).toEqual('new sheet')
+      })
+    })
+
+    afterEach(async () => {
+      // remove added sheet if any
+      const meta = await sheetsService.spreadsheets.get({spreadsheetId: documentId})
+      if (meta.data.sheets.length > 2) {
+        const targets = meta.data.sheets.filter((s) => s.properties.title != 'belongings' && s.properties.title != 'storages')
+        const requests = targets.map((s) => {
+          return ({
+            deleteSheet: {
+              sheetId: s.properties.sheetId
+            }
+          })
+        })
+
+        await sheetsService.spreadsheets.batchUpdate({
+          spreadsheetId: documentId,
+          resource: {
+            requests
+          }
+        })
+      }
     })
   })
 })
