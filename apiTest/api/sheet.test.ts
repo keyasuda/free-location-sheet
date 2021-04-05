@@ -8,6 +8,7 @@ const { google } = require('googleapis');
 
 import { Sheet } from '../../src/api/sheet'
 
+const documentId = '1Dj0TubC0yY_nD80PUAIYezJQOW6XI2WJePcJaXMoViU'
 const secret = fs.readFileSync('apiTest/api/secret.json')
 const { client_secret, client_id, redirect_uris } = JSON.parse(secret).installed
 const token = fs.readFileSync('apiTest/api/token.json')
@@ -16,12 +17,33 @@ oAuth2Client.setCredentials(JSON.parse(token));
 const sheetsService = google.sheets({version: 'v4', auth: oAuth2Client})
 
 beforeEach(() => {
-  Sheet.init('1Dj0TubC0yY_nD80PUAIYezJQOW6XI2WJePcJaXMoViU', oAuth2Client, sheetsService)
+  Sheet.init(documentId, oAuth2Client, sheetsService)
 })
 
 describe('Sheet', () => {
   describe('common methods', () => {
     const api = Sheet;
+
+    beforeEach(async () => {
+      // overwrite fixtures into the sheet
+      const fixtures = [
+        ["row", "id", "name", "description", "printed"],
+        ["=ROW()", "storage-a", "storage aaaa", "", "FALSE"],
+        ["=ROW()", "storage-b", "storage aaaabbbb", "", "FALSE"],
+        ["=ROW()", "storage-c", "storage bbbb", "storage description", "FALSE"],
+        ["=ROW()", "storage-d", "storage cccc", "", "FALSE"],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""],
+        ["", "", "", "", ""]
+      ]
+      await sheetsService.spreadsheets.values.update({
+        spreadsheetId: documentId,
+        range: 'storages!A1:E9',
+        valueInputOption: 'USER_ENTERED',
+        resource: {values: fixtures}
+      })
+    })
 
     describe('query', () => {
       it('should find rows by ID', async () => {
@@ -35,34 +57,20 @@ describe('Sheet', () => {
       it('should add a row at the bottom', async () => {
         const row = ['=ROW()', 'new-item', 'new item', 'text', 'FALSE']
         await api.add('storages!A:A', [row])
+
         const actual = await api.query('select * where B = "new-item"', 'storages')
         expect(actual[0]).toEqual([6, 'new-item', 'new item', 'text', false])
       })
     })
-  })
-
-  describe('storages', () => {
 
     describe('update', () => {
+      it('should update C4 and D4', async () => {
+        const expected = ['updated name', 'updated text']
+        await api.update('storages!C4:D4', [expected])
 
-    })
-
-    describe('delete', () => {
-
-    })
-  })
-
-  describe('belongings', () => {
-    describe('add', () => {
-
-    })
-
-    describe('update', () => {
-
-    })
-
-    describe('delete', () => {
-
+        const actual = await api.query('select C, D where B="storage-c"', 'storages')
+        expect(actual[0]).toEqual(expected)
+      })
     })
   })
 })

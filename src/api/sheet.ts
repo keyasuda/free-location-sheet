@@ -54,6 +54,16 @@ export const Sheet = {
     return Sheet.service.spreadsheets.values.append(params)
   },
 
+  update: (range: string, rows: array[]) => {
+    const params = {
+      spreadsheetId: Sheet.documentId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      resource: {values: rows}
+    }
+    return Sheet.service.spreadsheets.values.update(params)
+  },
+
   storages: {
     add: (news: Storage[]) => {
 
