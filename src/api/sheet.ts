@@ -111,8 +111,9 @@ export const Sheet = {
   },
 
   belongings: {
-    add: (news: Belonging[]) => {
-
+    add: (newItems: Belonging[]) => {
+      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.quantities, i.storage_id, i.description, 'FALSE'])
+      return Sheet.add('belongings!A:A', payload)
     },
 
     get: () => {
