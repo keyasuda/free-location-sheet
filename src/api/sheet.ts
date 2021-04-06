@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid'
 import { Belonging } from '../state/types'
 
 export const Sheet = {
@@ -87,8 +88,9 @@ export const Sheet = {
   },
 
   storages: {
-    add: (news: Storage[]) => {
-
+    add: (newItems: Storage[]) => {
+      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, 'FALSE'])
+      return Sheet.add('storages!A:A', payload)
     },
 
     get: () => {
