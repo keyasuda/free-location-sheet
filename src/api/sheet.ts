@@ -93,8 +93,18 @@ export const Sheet = {
       return Sheet.add('storages!A:A', payload)
     },
 
-    get: () => {
+    get: async (id: string) => {
+      const ret = await Sheet.query(`select * where B='${id}'`, 'storages')
+      if(ret.length == 0) { return null }
 
+      const item = ret[0]
+      return ({
+        klass: 'storage',
+        id: item[1],
+        name: item[2],
+        description: item[3],
+        printed: item[4]
+      })
     },
 
     update: () => {

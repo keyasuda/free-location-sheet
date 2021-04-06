@@ -36,11 +36,29 @@ describe('Sheet', () => {
 
     describe('get', () => {
       it('should get single storage', async () => {
+        const expected = {
+          klass: 'storage',
+          id: 'storageuuid',
+          name: 'storage 1',
+          description: 'description 1',
+          printed: true
+        }
+        Sheet.query.mockReturnValue([[
+          2, expected.id, expected.name, expected.description, expected.printed
+        ]])
+        const actual = await api.get('storageuuid')
 
+        expect(Sheet.query).toHaveBeenCalledWith(
+          "select * where B='storageuuid'",
+          'storages'
+        )
+        expect(actual).toEqual(expected)
       })
 
       it('should get null with invalid ID', async () => {
-
+        Sheet.query.mockReturnValue([])
+        const actual = await api.get('nonexistent')
+        expect(actual).toBe(null)
       })
     })
 
