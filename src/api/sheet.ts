@@ -107,8 +107,12 @@ export const Sheet = {
       })
     },
 
-    update: () => {
+    update: async (content: Storage) => {
+      const row = await Sheet.query(`select A where B="${content.id}"`, 'storages')[0][0]
 
+      if (row != undefined) {
+        await Sheet.update(`storages!C${row}:E${row}`, [[content.name, content.description, content.printed]])
+      }
     },
 
     delete: () => {

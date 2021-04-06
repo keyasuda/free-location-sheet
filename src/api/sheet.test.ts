@@ -64,11 +64,33 @@ describe('Sheet', () => {
 
     describe('update', () => {
       it('should update a storage', async () => {
+        Sheet.query.mockReturnValue([[3]])
+        const content = {
+          klass: 'storage',
+          id: 'storageuuid',
+          name: 'new name',
+          description: 'new description',
+          printed: true
+        }
+        await api.update(content)
 
+        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
+        expect(Sheet.update).toHaveBeenCalledWith('storages!C3:E3', [[content.name, content.description, content.printed]])
       })
 
-      it('throw an error when ID is invalid', async () => {
+      it('do nothing when ID is invalid', async () => {
+        Sheet.query.mockReturnValue([[]]) // means no hit
+        const content = {
+          klass: 'storage',
+          id: 'storageuuid',
+          name: 'new name',
+          description: 'new description',
+          printed: true
+        }
+        await api.update(content)
 
+        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
+        expect(Sheet.update).not.toHaveBeenCalled()
       })
     })
 
