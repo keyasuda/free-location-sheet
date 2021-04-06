@@ -115,8 +115,12 @@ export const Sheet = {
       }
     },
 
-    delete: () => {
+    delete: async (id: string) => {
+      const row = await Sheet.query(`select A where B="${id}"`, 'storages')[0][0]
 
+      if (row != undefined) {
+        await Sheet.update(`storages!A${row}:E${row}`, [['', '', '' ,'', '']])
+      }
     },
 
     search: async (keyword: string) => {

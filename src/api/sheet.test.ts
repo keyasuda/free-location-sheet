@@ -94,6 +94,26 @@ describe('Sheet', () => {
       })
     })
 
+    describe('delete', () => {
+      it('should overwrite entire row with blank', async () => {
+        Sheet.query.mockReturnValue([[4]])
+
+        await api.delete('storageuuid')
+
+        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
+        expect(Sheet.update).toHaveBeenCalledWith('storages!A4:E4', [['', '', '', '', '']])
+      })
+
+      it('should do nothing when the id is nonexistent', async () => {
+        Sheet.query.mockReturnValue([[]])
+
+        await api.delete('storageuuid')
+
+        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
+        expect(Sheet.update).not.toHaveBeenCalled()
+      })
+    })
+
     describe('search', () => {
       it('should find storages by name', async () => {
 
