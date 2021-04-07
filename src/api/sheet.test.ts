@@ -12,6 +12,13 @@ describe('Sheet', () => {
 
   describe('storages', () => {
     const api = Sheet.storages
+    const expected = {
+      klass: 'storage',
+      id: 'storageuuid',
+      name: 'storage 1',
+      description: 'description 1',
+      printed: true
+    }
 
     describe('add', () => {
       it('should add new storages', async () => {
@@ -36,13 +43,6 @@ describe('Sheet', () => {
 
     describe('get', () => {
       it('should get single storage', async () => {
-        const expected = {
-          klass: 'storage',
-          id: 'storageuuid',
-          name: 'storage 1',
-          description: 'description 1',
-          printed: true
-        }
         Sheet.query.mockReturnValue([[
           2, expected.id, expected.name, expected.description, expected.printed
         ]])
@@ -115,14 +115,6 @@ describe('Sheet', () => {
     })
 
     describe('search', () => {
-      const expected = {
-        klass: 'storage',
-        id: 'storageuuid',
-        name: 'storagename',
-        description: 'description1',
-        printed: false
-      }
-
       beforeEach(() => {
         Sheet.query.mockReturnValue([[2, expected.id, expected.name, expected.description, expected.printed]])
       })
@@ -150,6 +142,19 @@ describe('Sheet', () => {
           const actual = await api.search('hoge"hoge')
           expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'storages')
         })
+      })
+    })
+
+    describe('findByPrinted', () => {
+      beforeEach(() => {
+        Sheet.query.mockReturnValue([[2, expected.id, expected.name, expected.description, expected.printed]])
+      })
+
+      it('should find printed=false', async () => {
+        const actual = await api.findByPrinted(false)
+
+        expect(Sheet.query).toHaveBeenCalledWith('select * where E=false', 'storages')
+        expect(actual).toEqual([expected])
       })
     })
   })

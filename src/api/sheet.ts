@@ -89,6 +89,14 @@ export const Sheet = {
   },
 
   storages: {
+    queryResultToStorage: (r) => ({
+      klass: 'storage',
+      id: r[1],
+      name: r[2],
+      description: r[3],
+      printed: r[4]
+    }),
+
     add: (newItems: Storage[]) => {
       const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, 'FALSE'])
       return Sheet.add('storages!A:A', payload)
@@ -98,14 +106,7 @@ export const Sheet = {
       const ret = await Sheet.query(`select * where B='${id}'`, 'storages')
       if(ret.length == 0) { return null }
 
-      const item = ret[0]
-      return ({
-        klass: 'storage',
-        id: item[1],
-        name: item[2],
-        description: item[3],
-        printed: item[4]
-      })
+      return Sheet.storages.queryResultToStorage(ret[0])
     },
 
     update: async (content: Storage) => {
@@ -139,13 +140,12 @@ export const Sheet = {
 
       const results = await Sheet.query(q, 'storages')
 
-      return results.map((r) => ({
-        klass: 'storage',
-        id: r[1],
-        name: r[2],
-        description: r[3],
-        printed: r[4]
-      }))
+      return results.map((r) => Sheet.storages.queryResultToStorage(r))
+    },
+
+    findByPrinted: async (printed) => {
+      const results = await Sheet.query(`select * where E=${printed}`, 'storages')
+      return results.map((r) => Sheet.storages.queryResultToStorage(r))
     }
   },
 
