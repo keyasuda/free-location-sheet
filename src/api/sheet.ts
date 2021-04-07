@@ -150,13 +150,26 @@ export const Sheet = {
   },
 
   belongings: {
+    queryResultToStorage: (r) => ({
+      klass: 'belonging',
+      id: r[1],
+      name: r[2],
+      description: r[3],
+      quantities: r[4],
+      storage: r[5],
+      printed: r[6]
+    }),
+
     add: (newItems: Belonging[]) => {
-      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.quantities, i.storage_id, i.description, 'FALSE'])
+      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storage_id, 'FALSE'])
       return Sheet.add('belongings!A:A', payload)
     },
 
-    get: () => {
+    get: async (id: string) => {
+      const ret = await Sheet.query(`select * where B='${id}'`, 'belongings')
+      if(ret.length == 0) { return null }
 
+      return Sheet.belongings.queryResultToStorage(ret[0])
     },
 
     update: () => {

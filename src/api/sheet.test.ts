@@ -161,6 +161,15 @@ describe('Sheet', () => {
 
   describe('belongings', () => {
     const api = Sheet.belongings
+    const expected = {
+      klass: 'belonging',
+      id: 'belonginguuid',
+      name: 'belonging 1',
+      quantities: 1,
+      storage: 'storageuuid',
+      description: 'belonging description',
+      printed: false
+    }
 
     describe('add', () => {
       it('should add new belongings', async () => {
@@ -176,8 +185,8 @@ describe('Sheet', () => {
         expect(Sheet.add).toHaveBeenCalledWith(
           'belongings!A:A',
           [
-            ['=ROW()', generateduuid, 'item 1', 1, 'storage-id', 'desc 1', 'FALSE'],
-            ['=ROW()', generateduuid, 'item 2', 2, '', 'desc 2', 'FALSE']
+            ['=ROW()', generateduuid, 'item 1', 'desc 1', 1, 'storage-id', 'FALSE'],
+            ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'FALSE']
           ]
         )
       })
@@ -185,11 +194,27 @@ describe('Sheet', () => {
 
     describe('get', () => {
       it('should get single belonging', async () => {
+        Sheet.query.mockReturnValue([[
+          2, expected.id,
+          expected.name,
+          expected.description,
+          expected.quantities,
+          expected.storage,
+          expected.printed
+        ]])
+        const actual = await api.get('belonginguuid')
 
+        expect(Sheet.query).toHaveBeenCalledWith(
+          "select * where B='belonginguuid'",
+          'belongings'
+        )
+        expect(actual).toEqual(expected)
       })
 
       it('should get null with invalid ID', async () => {
-
+        Sheet.query.mockReturnValue([])
+        const actual = await api.get('nonexistent')
+        expect(actual).toBe(null)
       })
     })
 
