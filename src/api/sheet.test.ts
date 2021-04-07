@@ -166,7 +166,7 @@ describe('Sheet', () => {
       id: 'belonginguuid',
       name: 'belonging 1',
       quantities: 1,
-      storage: 'storageuuid',
+      storageId: 'storageuuid',
       description: 'belonging description',
       printed: false
     }
@@ -177,8 +177,8 @@ describe('Sheet', () => {
         jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
 
         const newItems = [
-          {name: 'item 1', quantities: 1, description: 'desc 1', storage: 'storage-id'},
-          {name: 'item 2', quantities: 2, description: 'desc 2', storage: ''}
+          {name: 'item 1', quantities: 1, description: 'desc 1', storageId: 'storage-id'},
+          {name: 'item 2', quantities: 2, description: 'desc 2', storageId: ''}
         ]
         await api.add(newItems)
 
@@ -199,7 +199,7 @@ describe('Sheet', () => {
           expected.name,
           expected.description,
           expected.quantities,
-          expected.storage,
+          expected.storageId,
           expected.printed
         ]])
         const actual = await api.get('belonginguuid')
@@ -224,7 +224,7 @@ describe('Sheet', () => {
         await api.update(expected)
 
         expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
-        expect(Sheet.update).toHaveBeenCalledWith('belongings!C3:G3', [[expected.name, expected.description, expected.quantities, expected.storage, expected.printed]])
+        expect(Sheet.update).toHaveBeenCalledWith('belongings!C3:G3', [[expected.name, expected.description, expected.quantities, expected.storageId, expected.printed]])
       })
 
       it('do nothing when ID is invalid', async () => {
@@ -264,7 +264,7 @@ describe('Sheet', () => {
           expected.name,
           expected.description,
           expected.quantities,
-          expected.storage,
+          expected.storageId,
           expected.printed
         ]])
       })

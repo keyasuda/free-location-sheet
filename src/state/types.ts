@@ -9,6 +9,6 @@ export type WarehouseItem = {
 export type Storage = WarehouseItem & {}
 
 export type Belonging = WarehouseItem & {
-  storage: string,
+  storageId: string,
   quantities: number
 }

@@ -156,12 +156,12 @@ export const Sheet = {
       name: r[2],
       description: r[3],
       quantities: r[4],
-      storage: r[5],
+      storageId: r[5],
       printed: r[6]
     }),
 
     add: (newItems: Belonging[]) => {
-      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storage, 'FALSE'])
+      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storageId, 'FALSE'])
       return Sheet.add('belongings!A:A', payload)
     },
 
@@ -180,7 +180,7 @@ export const Sheet = {
           content.name,
           content.description,
           content.quantities,
-          content.storage,
+          content.storageId,
           content.printed
         ]])
       }
