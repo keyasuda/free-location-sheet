@@ -220,11 +220,19 @@ describe('Sheet', () => {
 
     describe('update', () => {
       it('should update a belonging', async () => {
+        Sheet.query.mockReturnValue([[3]])
+        await api.update(expected)
 
+        expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
+        expect(Sheet.update).toHaveBeenCalledWith('belongings!C3:G3', [[expected.name, expected.description, expected.quantities, expected.storage, expected.printed]])
       })
 
-      it('throw an error when ID is invalid', async () => {
+      it('do nothing when ID is invalid', async () => {
+        Sheet.query.mockReturnValue([[]]) // means no hit
+        await api.update(expected)
 
+        expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
+        expect(Sheet.update).not.toHaveBeenCalled()
       })
     })
 

@@ -172,8 +172,18 @@ export const Sheet = {
       return Sheet.belongings.queryResultToStorage(ret[0])
     },
 
-    update: () => {
+    update: async (content: Belonging) => {
+      const row = await Sheet.query(`select A where B="${content.id}"`, 'belongings')[0][0]
 
+      if (row != undefined) {
+        await Sheet.update(`belongings!C${row}:G${row}`, [[
+          content.name,
+          content.description,
+          content.quantities,
+          content.storage,
+          content.printed
+        ]])
+      }
     },
 
     delete: () => {
