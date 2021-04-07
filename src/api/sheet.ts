@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
+import { split, escape } from 'shellwords'
 import { Belonging } from '../state/types'
 
 export const Sheet = {
@@ -124,7 +125,27 @@ export const Sheet = {
     },
 
     search: async (keyword: string) => {
-      return byName + byDescription;
+      let words
+      try {
+        words = split(keyword)
+      } catch {
+        words = [keyword]
+      }
+
+      const q =
+        'select * where (' +
+        words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
+        words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+
+      const results = await Sheet.query(q, 'storages')
+
+      return results.map((r) => ({
+        klass: 'storage',
+        id: r[1],
+        name: r[2],
+        description: r[3],
+        printed: r[4]
+      }))
     }
   },
 

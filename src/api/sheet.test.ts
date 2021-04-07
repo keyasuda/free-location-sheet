@@ -115,12 +115,41 @@ describe('Sheet', () => {
     })
 
     describe('search', () => {
-      it('should find storages by name', async () => {
+      const expected = {
+        klass: 'storage',
+        id: 'storageuuid',
+        name: 'storagename',
+        description: 'description1',
+        printed: false
+      }
 
+      beforeEach(() => {
+        Sheet.query.mockReturnValue([[2, expected.id, expected.name, expected.description, expected.printed]])
       })
 
-      it('should find storages by description', async () => {
+      describe('with single word', () => {
+        it('should find storages by both name and description', async () => {
+          const actual = await api.search('storage')
 
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "storage")) or ((D contains "storage"))', 'storages')
+          expect(actual).toEqual([expected])
+        })
+      })
+
+      describe('with two words', () => {
+        it('should find storages by both name and description', async () => {
+          const actual = await api.search('storage name')
+
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "storage") and (C contains "name")) or ((D contains "storage") and (D contains "name"))', 'storages')
+          expect(actual).toEqual([expected])
+        })
+      })
+
+      describe('with word includes quote', () => {
+        it('should be escaped', async () => {
+          const actual = await api.search('hoge"hoge')
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'storages')
+        })
       })
     })
   })
