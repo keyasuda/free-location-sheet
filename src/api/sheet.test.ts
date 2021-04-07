@@ -177,8 +177,8 @@ describe('Sheet', () => {
         jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
 
         const newItems = [
-          {name: 'item 1', quantities: 1, description: 'desc 1', storage_id: 'storage-id'},
-          {name: 'item 2', quantities: 2, description: 'desc 2', storage_id: ''}
+          {name: 'item 1', quantities: 1, description: 'desc 1', storage: 'storage-id'},
+          {name: 'item 2', quantities: 2, description: 'desc 2', storage: ''}
         ]
         await api.add(newItems)
 
@@ -257,12 +257,41 @@ describe('Sheet', () => {
     })
 
     describe('search', () => {
-      it('should find belongings by name', async () => {
-
+      beforeEach(() => {
+        Sheet.query.mockReturnValue([[
+          2,
+          expected.id,
+          expected.name,
+          expected.description,
+          expected.quantities,
+          expected.storage,
+          expected.printed
+        ]])
       })
 
-      it('should find belongings by description', async () => {
+      describe('with single word', () => {
+        it('should find belongings by both name and description', async () => {
+          const actual = await api.search('belonging')
 
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "belonging")) or ((D contains "belonging"))', 'belongings')
+          expect(actual).toEqual([expected])
+        })
+      })
+
+      describe('with two words', () => {
+        it('should find belongings by both name and description', async () => {
+          const actual = await api.search('belonging name')
+
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "belonging") and (C contains "name")) or ((D contains "belonging") and (D contains "name"))', 'belongings')
+          expect(actual).toEqual([expected])
+        })
+      })
+
+      describe('with word includes quote', () => {
+        it('should be escaped', async () => {
+          const actual = await api.search('hoge"hoge')
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'belongings')
+        })
       })
     })
   })

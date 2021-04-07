@@ -150,7 +150,7 @@ export const Sheet = {
   },
 
   belongings: {
-    queryResultToStorage: (r) => ({
+    queryResultToBelonging: (r) => ({
       klass: 'belonging',
       id: r[1],
       name: r[2],
@@ -161,7 +161,7 @@ export const Sheet = {
     }),
 
     add: (newItems: Belonging[]) => {
-      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storage_id, 'FALSE'])
+      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storage, 'FALSE'])
       return Sheet.add('belongings!A:A', payload)
     },
 
@@ -169,7 +169,7 @@ export const Sheet = {
       const ret = await Sheet.query(`select * where B='${id}'`, 'belongings')
       if(ret.length == 0) { return null }
 
-      return Sheet.belongings.queryResultToStorage(ret[0])
+      return Sheet.belongings.queryResultToBelonging(ret[0])
     },
 
     update: async (content: Belonging) => {
@@ -195,13 +195,21 @@ export const Sheet = {
     },
 
     search: async (keyword: string) => {
-      const b = Sheet.belongings;
-      // select by name
-      const byName = await b.query(Columns.belongings.name, keyword);
-      // select by description
-      const byDescription = await b.query(Columns.belongings.description, keyword);
+      let words
+      try {
+        words = split(keyword)
+      } catch {
+        words = [keyword]
+      }
 
-      return byName + byDescription;
-    }
+      const q =
+        'select * where (' +
+        words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
+        words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+
+      const results = await Sheet.query(q, 'belongings')
+
+      return results.map((r) => Sheet.belongings.queryResultToBelonging(r))
+    },
   }
 }
