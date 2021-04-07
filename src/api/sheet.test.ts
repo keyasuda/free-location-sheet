@@ -294,5 +294,26 @@ describe('Sheet', () => {
         })
       })
     })
+
+    describe('findByPrinted', () => {
+      beforeEach(() => {
+        Sheet.query.mockReturnValue([[
+          2,
+          expected.id,
+          expected.name,
+          expected.description,
+          expected.quantities,
+          expected.storageId,
+          expected.printed
+        ]])
+      })
+
+      it('should find printed=false', async () => {
+        const actual = await api.findByPrinted(false)
+
+        expect(Sheet.query).toHaveBeenCalledWith('select * where E=false', 'belongings')
+        expect(actual).toEqual([expected])
+      })
+    })
   })
 })

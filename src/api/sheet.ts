@@ -143,7 +143,7 @@ export const Sheet = {
       return results.map((r) => Sheet.storages.queryResultToStorage(r))
     },
 
-    findByPrinted: async (printed) => {
+    findByPrinted: async (printed: boolean) => {
       const results = await Sheet.query(`select * where E=${printed}`, 'storages')
       return results.map((r) => Sheet.storages.queryResultToStorage(r))
     }
@@ -211,5 +211,10 @@ export const Sheet = {
 
       return results.map((r) => Sheet.belongings.queryResultToBelonging(r))
     },
+
+    findByPrinted: async (printed: boolean) => {
+      const results = await Sheet.query(`select * where E=${printed}`, 'belongings')
+      return results.map((r) => Sheet.belongings.queryResultToBelonging(r))
+    }
   }
 }
