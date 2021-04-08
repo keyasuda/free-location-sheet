@@ -10,6 +10,44 @@ describe('Sheet', () => {
     Sheet.update = jest.fn()
   })
 
+  describe('common methods', () => {
+    describe('format', () => {
+      it('should add two sheets, belongings and storages', async () => {
+        Sheet.sheets.mockReturnValue([])
+        await Sheet.format()
+
+        expect(Sheet.sheets).toHaveBeenCalled()
+        expect(Sheet.createSheet).toHaveBeenCalledWith('belongings')
+        expect(Sheet.createSheet).toHaveBeenCalledWith('storages')
+      })
+
+      it('should add missed sheet', async () => {
+        Sheet.sheets.mockReturnValue(['belongings'])
+        await Sheet.format()
+
+        expect(Sheet.sheets).toHaveBeenCalled()
+        expect(Sheet.createSheet).not.toHaveBeenCalledWith('belongings')
+        expect(Sheet.createSheet).toHaveBeenCalledWith('storages')
+      })
+
+      it('should (over)write headers to sheets', async () => {
+        Sheet.sheets.mockReturnValue(['belongings', 'storages'])
+        await Sheet.format()
+
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'belongings!A1:G1',
+            values: ['row', 'id', 'name', 'description', 'quantities', 'storageId', 'printed']
+          },
+          {
+            range: 'storages!A1:E1',
+            values: ['row', 'id', 'name', 'description', 'printed']
+          }
+        ])
+      })
+    })
+  })
+
   describe('storages', () => {
     const api = Sheet.storages
     const expected = {

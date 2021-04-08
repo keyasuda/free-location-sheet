@@ -1,12 +1,14 @@
 import { v4 as uuidv4 } from 'uuid'
 import { split, escape } from 'shellwords'
 import { Belonging } from '../state/types'
+import _ from 'lodash'
 
 export const Sheet = {
   documentId: null,
 
   create: () => {
     // create a new sheet
+    // format
   },
 
   init: (documentId: string, auth, sheetsService) => {
@@ -17,6 +19,30 @@ export const Sheet = {
     // check sheets
     // create sheet(s)
     // put header
+  },
+
+  validate: () => {
+    // check sheets
+    // check headers
+  },
+
+  format: async () => {
+    // add required sheets
+    const currentSheets = await Sheet.sheets()
+    const missing = _.difference(['belongings', 'storages'], currentSheets)
+    for(let n of missing) { await Sheet.createSheet(n) }
+
+    // add required headers
+    await Sheet.update([
+      {
+        range: 'belongings!A1:G1',
+        values: ['row', 'id', 'name', 'description', 'quantities', 'storageId', 'printed']
+      },
+      {
+        range: 'storages!A1:E1',
+        values: ['row', 'id', 'name', 'description', 'printed']
+      }
+    ])
   },
 
   endpoint: () => {
