@@ -236,19 +236,45 @@ describe('Sheet', () => {
     })
 
     describe('update', () => {
-      it('should update a belonging', async () => {
-        Sheet.query.mockReturnValue([[3]])
-        await api.update(expected)
+      const b1 = expected
+      const b2 = {...expected, id: 'b2uuid', name: 'b2'}
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
-        expect(Sheet.update).toHaveBeenCalledWith('belongings!C3:G3', [[expected.name, expected.description, expected.quantities, expected.storageId, expected.printed]])
+      it('should update a belonging', async () => {
+        Sheet.query.mockReturnValue([[3, b2.id], [5, b1.id]])
+
+        await api.update([b1, b2])
+
+        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${b1.id}") or (B="${b2.id}")`, 'belongings')
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'belongings!C5:G5',
+            values: [b1.name, b1.description, b1.quantities, b1.storageId, b1.printed]
+          },
+          {
+            range: 'belongings!C3:G3',
+            values: [b2.name, b2.description, b2.quantities, b2.storageId, b2.printed]
+          }
+        ])
       })
 
-      it('do nothing when ID is invalid', async () => {
-        Sheet.query.mockReturnValue([[]]) // means no hit
-        await api.update(expected)
+      it('should drop nonexistent record', async () => {
+        Sheet.query.mockReturnValue([[3, b2.id]])
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
+        await api.update([b1, b2])
+
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'belongings!C3:G3',
+            values: [b2.name, b2.description, b2.quantities, b2.storageId, b2.printed]
+          }
+        ])
+      })
+
+      it('should do nothing when all records are nonexistent', async () => {
+        Sheet.query.mockReturnValue([])
+
+        await api.update([b1, b2])
+
         expect(Sheet.update).not.toHaveBeenCalled()
       })
     })

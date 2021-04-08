@@ -183,18 +183,21 @@ export const Sheet = {
       return Sheet.belongings.queryResultToBelonging(ret[0])
     },
 
-    update: async (content: Belonging) => {
-      const row = await Sheet.query(`select A where B="${content.id}"`, 'belongings')[0][0]
+    update: async (updates: Belonging[]) => {
+      // retrieve ROW, ID
+      const rows = await Sheet.query('select A, B where ' + updates.map((u) => `(B="${u.id}")`).join(' or '), 'belongings')
 
-      if (row != undefined) {
-        await Sheet.update(`belongings!C${row}:G${row}`, [[
-          content.name,
-          content.description,
-          content.quantities,
-          content.storageId,
-          content.printed
-        ]])
-      }
+      const requests = updates.map((u) => {
+        const row = rows.find((r) => r[1] == u.id)
+        if (row != undefined) {
+          return ({
+            range: `belongings!C${row[0]}:G${row[0]}`,
+            values: [u.name, u.description, u.quantities, u.storageId, u.printed]
+          })
+        }
+      }).filter((e) => e)
+
+      if (requests.length > 0) { await Sheet.update(requests) }
     },
 
     delete: async (id: string) => {
