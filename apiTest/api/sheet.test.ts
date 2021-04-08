@@ -24,7 +24,6 @@ describe('Sheet', () => {
   const api = Sheet;
 
   describe('cell manipulations', () => {
-
     beforeEach(async () => {
       // overwrite fixtures into the sheet
       const fixtures = [
@@ -65,12 +64,18 @@ describe('Sheet', () => {
     })
 
     describe('update', () => {
-      it('should update C4 and D4', async () => {
-        const expected = ['updated name', 'updated text']
-        await api.update('storages!C4:D4', [expected])
+      it('should update C2:D2 and C4:D4', async () => {
+        const request = [
+          {range: 'storages!C2:D2', values: ['c2', 'd2']},
+          {range: 'storages!C4:D4', values: ['c4', 'd4']}
+        ]
+        await api.update(request)
 
-        const actual = await api.query('select C, D where B="storage-c"', 'storages')
-        expect(actual[0]).toEqual(expected)
+        const actual = await api.query('select C, D', 'storages')
+        expect(actual[0]).toEqual(request[0].values)
+        expect(actual[1]).toEqual(["storage aaaabbbb", null]) // not updated
+        expect(actual[2]).toEqual(request[1].values)
+        expect(actual[3]).toEqual(["storage cccc", null]) // not updated
       })
     })
   })

@@ -78,14 +78,16 @@ export const Sheet = {
     return Sheet.service.spreadsheets.values.append(params)
   },
 
-  update: (range: string, rows: array[]) => {
+  update: (request: array) => {
+    const data = request.map((r) => ({range: r.range, values: [r.values]}))
     const params = {
       spreadsheetId: Sheet.documentId,
-      range,
-      valueInputOption: 'USER_ENTERED',
-      resource: {values: rows}
+      resource: {
+        data: data,
+        valueInputOption: 'USER_ENTERED',
+      }
     }
-    return Sheet.service.spreadsheets.values.update(params)
+    return Sheet.service.spreadsheets.values.batchUpdate(params)
   },
 
   storages: {
@@ -109,12 +111,21 @@ export const Sheet = {
       return Sheet.storages.queryResultToStorage(ret[0])
     },
 
-    update: async (content: Storage) => {
-      const row = await Sheet.query(`select A where B="${content.id}"`, 'storages')[0][0]
+    update: async (updates: Storage[]) => {
+      // retrieve ROW, ID
+      const rows = await Sheet.query('select A, B where ' + updates.map((u) => `(B="${u.id}")`).join(' or '), 'storages')
 
-      if (row != undefined) {
-        await Sheet.update(`storages!C${row}:E${row}`, [[content.name, content.description, content.printed]])
-      }
+      const requests = updates.map((u) => {
+        const row = rows.find((r) => r[1] == u.id)
+        if (row != undefined) {
+          return ({
+            range: `storages!C${row[0]}:E${row[0]}`,
+            values: [u.name, u.description, u.printed]
+          })
+        }
+      }).filter((e) => e)
+
+      if (requests.length > 0) { await Sheet.update(requests) }
     },
 
     delete: async (id: string) => {

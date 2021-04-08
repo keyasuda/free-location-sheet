@@ -64,32 +64,49 @@ describe('Sheet', () => {
 
     describe('update', () => {
       it('should update a storage', async () => {
-        Sheet.query.mockReturnValue([[3]])
-        const content = {
-          klass: 'storage',
-          id: 'storageuuid',
-          name: 'new name',
-          description: 'new description',
-          printed: true
-        }
-        await api.update(content)
+        const s1 = expected
+        const s2 = {...expected, id: 's2uuid'}
+        Sheet.query.mockReturnValue([[3, s2.id], [5, s1.id]])
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
-        expect(Sheet.update).toHaveBeenCalledWith('storages!C3:E3', [[content.name, content.description, content.printed]])
+        await api.update([s1, s2])
+
+        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'storages!C5:E5',
+            values: [s1.name, s1.description, s1.printed]
+          },
+          {
+            range: 'storages!C3:E3',
+            values: [s2.name, s2.description, s2.printed]
+          }
+        ])
       })
 
-      it('do nothing when ID is invalid', async () => {
-        Sheet.query.mockReturnValue([[]]) // means no hit
-        const content = {
-          klass: 'storage',
-          id: 'storageuuid',
-          name: 'new name',
-          description: 'new description',
-          printed: true
-        }
-        await api.update(content)
+      it('should drop nonexistent record', async () => {
+        const s1 = expected
+        const s2 = {...expected, id: 's2uuid'}
+        Sheet.query.mockReturnValue([[3, s2.id]])
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
+        await api.update([s1, s2])
+
+        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'storages!C3:E3',
+            values: [s2.name, s2.description, s2.printed]
+          }
+        ])
+      })
+
+      it('should do nothing when all records are nonexistent', async () => {
+        const s1 = expected
+        const s2 = {...expected, id: 's2uuid'}
+        Sheet.query.mockReturnValue([])
+
+        await api.update([s1, s2])
+
+        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
         expect(Sheet.update).not.toHaveBeenCalled()
       })
     })
