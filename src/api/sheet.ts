@@ -180,7 +180,7 @@ export const Sheet = {
     },
 
     delete: async (id: string) => {
-      const row = await Sheet.query(`select A where B="${id}"`, 'storages')[0][0]
+      const row = (await Sheet.query(`select A where B="${id}"`, 'storages'))[0][0]
 
       if (row != undefined) {
         await Sheet.update(`storages!A${row}:E${row}`, [['', '', '' ,'', '']])
@@ -252,7 +252,7 @@ export const Sheet = {
     },
 
     delete: async (id: string) => {
-      const row = await Sheet.query(`select A where B="${id}"`, 'belongings')[0][0]
+      const row = (await Sheet.query(`select A where B="${id}"`, 'belongings'))[0][0]
 
       if (row != undefined) {
         await Sheet.update(`belongings!A${row}:G${row}`, [['', '', '' ,'', '', '', '']])

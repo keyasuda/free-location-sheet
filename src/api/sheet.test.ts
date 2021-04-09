@@ -23,7 +23,7 @@ describe('Sheet', () => {
   describe('common methods', () => {
     describe('validate', () => {
       it('should return true when its valid', async () => {
-        Sheet.sheets.mockReturnValue(['belongings', 'storages'])
+        Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
         Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
           data: {
             valueRanges: [
@@ -61,7 +61,7 @@ describe('Sheet', () => {
       })
 
       it('should return false when therere missed sheets', async () => {
-        Sheet.sheets.mockReturnValue(['belongings'])
+        Sheet.sheets.mockResolvedValue(['belongings'])
 
         const actual = await Sheet.validate()
 
@@ -105,7 +105,7 @@ describe('Sheet', () => {
 
     describe('format', () => {
       it('should add two sheets, belongings and storages', async () => {
-        Sheet.sheets.mockReturnValue([])
+        Sheet.sheets.mockResolvedValue([])
         await Sheet.format()
 
         expect(Sheet.sheets).toHaveBeenCalled()
@@ -114,7 +114,7 @@ describe('Sheet', () => {
       })
 
       it('should add missed sheet', async () => {
-        Sheet.sheets.mockReturnValue(['belongings'])
+        Sheet.sheets.mockResolvedValue(['belongings'])
         await Sheet.format()
 
         expect(Sheet.sheets).toHaveBeenCalled()
@@ -123,7 +123,7 @@ describe('Sheet', () => {
       })
 
       it('should (over)write headers to sheets', async () => {
-        Sheet.sheets.mockReturnValue(['belongings', 'storages'])
+        Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
         await Sheet.format()
 
         expect(Sheet.update).toHaveBeenCalledWith([
@@ -173,7 +173,7 @@ describe('Sheet', () => {
 
     describe('get', () => {
       it('should get single storage', async () => {
-        Sheet.query.mockReturnValue([[
+        Sheet.query.mockResolvedValue([[
           2, expected.id, expected.name, expected.description, expected.printed
         ]])
         const actual = await api.get('storageuuid')
@@ -186,7 +186,7 @@ describe('Sheet', () => {
       })
 
       it('should get null with invalid ID', async () => {
-        Sheet.query.mockReturnValue([])
+        Sheet.query.mockResolvedValue([])
         const actual = await api.get('nonexistent')
         expect(actual).toBe(null)
       })
@@ -196,7 +196,7 @@ describe('Sheet', () => {
       it('should update a storage', async () => {
         const s1 = expected
         const s2 = {...expected, id: 's2uuid'}
-        Sheet.query.mockReturnValue([[3, s2.id], [5, s1.id]])
+        Sheet.query.mockResolvedValue([[3, s2.id], [5, s1.id]])
 
         await api.update([s1, s2])
 
@@ -216,7 +216,7 @@ describe('Sheet', () => {
       it('should drop nonexistent record', async () => {
         const s1 = expected
         const s2 = {...expected, id: 's2uuid'}
-        Sheet.query.mockReturnValue([[3, s2.id]])
+        Sheet.query.mockResolvedValue([[3, s2.id]])
 
         await api.update([s1, s2])
 
@@ -232,7 +232,7 @@ describe('Sheet', () => {
       it('should do nothing when all records are nonexistent', async () => {
         const s1 = expected
         const s2 = {...expected, id: 's2uuid'}
-        Sheet.query.mockReturnValue([])
+        Sheet.query.mockResolvedValue([])
 
         await api.update([s1, s2])
 
@@ -243,7 +243,7 @@ describe('Sheet', () => {
 
     describe('delete', () => {
       it('should overwrite entire row with blank', async () => {
-        Sheet.query.mockReturnValue([[4]])
+        Sheet.query.mockResolvedValue([[4]])
 
         await api.delete('storageuuid')
 
@@ -252,7 +252,7 @@ describe('Sheet', () => {
       })
 
       it('should do nothing when the id is nonexistent', async () => {
-        Sheet.query.mockReturnValue([[]])
+        Sheet.query.mockResolvedValue([[]])
 
         await api.delete('storageuuid')
 
@@ -263,7 +263,7 @@ describe('Sheet', () => {
 
     describe('search', () => {
       beforeEach(() => {
-        Sheet.query.mockReturnValue([[2, expected.id, expected.name, expected.description, expected.printed]])
+        Sheet.query.mockResolvedValue([[2, expected.id, expected.name, expected.description, expected.printed]])
       })
 
       describe('with single word', () => {
@@ -294,7 +294,7 @@ describe('Sheet', () => {
 
     describe('findByPrinted', () => {
       beforeEach(() => {
-        Sheet.query.mockReturnValue([[2, expected.id, expected.name, expected.description, expected.printed]])
+        Sheet.query.mockResolvedValue([[2, expected.id, expected.name, expected.description, expected.printed]])
       })
 
       it('should find printed=false', async () => {
@@ -341,7 +341,7 @@ describe('Sheet', () => {
 
     describe('get', () => {
       it('should get single belonging', async () => {
-        Sheet.query.mockReturnValue([[
+        Sheet.query.mockResolvedValue([[
           2, expected.id,
           expected.name,
           expected.description,
@@ -359,7 +359,7 @@ describe('Sheet', () => {
       })
 
       it('should get null with invalid ID', async () => {
-        Sheet.query.mockReturnValue([])
+        Sheet.query.mockResolvedValue([])
         const actual = await api.get('nonexistent')
         expect(actual).toBe(null)
       })
@@ -370,7 +370,7 @@ describe('Sheet', () => {
       const b2 = {...expected, id: 'b2uuid', name: 'b2'}
 
       it('should update a belonging', async () => {
-        Sheet.query.mockReturnValue([[3, b2.id], [5, b1.id]])
+        Sheet.query.mockResolvedValue([[3, b2.id], [5, b1.id]])
 
         await api.update([b1, b2])
 
@@ -388,7 +388,7 @@ describe('Sheet', () => {
       })
 
       it('should drop nonexistent record', async () => {
-        Sheet.query.mockReturnValue([[3, b2.id]])
+        Sheet.query.mockResolvedValue([[3, b2.id]])
 
         await api.update([b1, b2])
 
@@ -401,7 +401,7 @@ describe('Sheet', () => {
       })
 
       it('should do nothing when all records are nonexistent', async () => {
-        Sheet.query.mockReturnValue([])
+        Sheet.query.mockResolvedValue([])
 
         await api.update([b1, b2])
 
@@ -411,7 +411,7 @@ describe('Sheet', () => {
 
     describe('delete', () => {
       it('should overwrite entire row with blank', async () => {
-        Sheet.query.mockReturnValue([[4]])
+        Sheet.query.mockResolvedValue([[4]])
 
         await api.delete('belonginguuid')
 
@@ -420,7 +420,7 @@ describe('Sheet', () => {
       })
 
       it('should do nothing when the id is nonexistent', async () => {
-        Sheet.query.mockReturnValue([[]])
+        Sheet.query.mockResolvedValue([[]])
 
         await api.delete('belonginguuid')
 
@@ -431,7 +431,7 @@ describe('Sheet', () => {
 
     describe('search', () => {
       beforeEach(() => {
-        Sheet.query.mockReturnValue([[
+        Sheet.query.mockResolvedValue([[
           2,
           expected.id,
           expected.name,
@@ -470,7 +470,7 @@ describe('Sheet', () => {
 
     describe('findByPrinted', () => {
       beforeEach(() => {
-        Sheet.query.mockReturnValue([[
+        Sheet.query.mockResolvedValue([[
           2,
           expected.id,
           expected.name,
