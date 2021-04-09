@@ -3,6 +3,11 @@ import { split, escape } from 'shellwords'
 import { Belonging } from '../state/types'
 import _ from 'lodash'
 
+const header = {
+  storages: ['row', 'id', 'name', 'description', 'printed'],
+  belongings: ['row', 'id', 'name', 'description', 'quantities', 'storageId', 'printed']
+}
+
 export const Sheet = {
   documentId: null,
 
@@ -21,9 +26,29 @@ export const Sheet = {
     // put header
   },
 
-  validate: () => {
+  validate: async () => {
     // check sheets
+    const currentSheets = await Sheet.sheets()
+    const missing = _.difference(['belongings', 'storages'], currentSheets)
+    if (missing.length > 0) { return false }
+
     // check headers
+    const range = {
+      storages: 'storages!A1:E1',
+      belongings: 'belongings!A1:G1'
+    }
+    const ret = await Sheet.service.spreadsheets.values.batchGet({
+      spreadsheetId: Sheet.documentId,
+      ranges: [range.storages, range.belongings]
+    })
+    const actual = {
+      storages: ret.data.valueRanges.find((v) => v.range == range.storages).values[0],
+      belongings: ret.data.valueRanges.find((v) => v.range == range.belongings).values[0]
+    }
+    if (_.difference(actual.storages, header.storages).length > 0) { return false }
+    if (_.difference(actual.belongings, header.belongings).length > 0) { return false }
+
+    return true
   },
 
   format: async () => {
@@ -36,11 +61,11 @@ export const Sheet = {
     await Sheet.update([
       {
         range: 'belongings!A1:G1',
-        values: ['row', 'id', 'name', 'description', 'quantities', 'storageId', 'printed']
+        values: header.belongings
       },
       {
         range: 'storages!A1:E1',
-        values: ['row', 'id', 'name', 'description', 'printed']
+        values: header.storages
       }
     ])
   },

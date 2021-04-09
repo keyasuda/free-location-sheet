@@ -1,8 +1,18 @@
 import uuid from 'uuid'
 import { Sheet } from './sheet'
 
+const spreadsheetId = 'spreadsheetid'
+
 describe('Sheet', () => {
   beforeEach(() => {
+    Sheet.documentId = spreadsheetId
+    Sheet.service = {
+      spreadsheets: {
+        values: {
+          batchGet: jest.fn()
+        }
+      }
+    }
     Sheet.sheets = jest.fn()
     Sheet.createSheet = jest.fn()
     Sheet.query = jest.fn()
@@ -11,6 +21,88 @@ describe('Sheet', () => {
   })
 
   describe('common methods', () => {
+    describe('validate', () => {
+      it('should return true when its valid', async () => {
+        Sheet.sheets.mockReturnValue(['belongings', 'storages'])
+        Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
+          data: {
+            valueRanges: [
+              {
+                range: 'storages!A1:E1',
+                majorDimension: 'ROWS',
+                values: [ [ 'row', 'id', 'name', 'description', 'printed' ] ]
+              },
+              {
+                range: 'belongings!A1:G1',
+                majorDimension: 'ROWS',
+                values: [
+                  [
+                    'row',
+                    'id',
+                    'name',
+                    'description',
+                    'quantities',
+                    'storageId',
+                    'printed'
+                  ]
+                ]
+              }
+            ]
+          }
+        })
+
+        const actual = await Sheet.validate()
+
+        expect(actual).toBe(true)
+        expect(Sheet.service.spreadsheets.values.batchGet).toHaveBeenCalledWith({
+          spreadsheetId,
+          ranges: ['storages!A1:E1', 'belongings!A1:G1']
+        })
+      })
+
+      it('should return false when therere missed sheets', async () => {
+        Sheet.sheets.mockReturnValue(['belongings'])
+
+        const actual = await Sheet.validate()
+
+        expect(actual).toBe(false)
+      })
+
+      it('should return false when any headers are missing', async () => {
+        Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
+        Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
+          data: {
+            valueRanges: [
+              {
+                range: 'storages!A1:E1',
+                majorDimension: 'ROWS',
+                values: [ [ 'row', 'id', 'name', 'description', 'printed' ] ]
+              },
+              {
+                range: 'belongings!A1:G1',
+                majorDimension: 'ROWS',
+                values: [
+                  [
+                    'ROW', // wrong case
+                    'ID', // wrong case
+                    'name',
+                    '', // description is missing
+                    'quantities',
+                    'storageId',
+                    'printed'
+                  ]
+                ]
+              }
+            ]
+          }
+        })
+
+        const actual = await Sheet.validate()
+
+        expect(actual).toBe(false)
+      })
+    })
+
     describe('format', () => {
       it('should add two sheets, belongings and storages', async () => {
         Sheet.sheets.mockReturnValue([])
