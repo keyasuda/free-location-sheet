@@ -8,6 +8,7 @@ describe('Sheet', () => {
     Sheet.documentId = spreadsheetId
     Sheet.service = {
       spreadsheets: {
+        create: jest.fn(),
         values: {
           batchGet: jest.fn()
         }
@@ -21,6 +22,32 @@ describe('Sheet', () => {
   })
 
   describe('common methods', () => {
+    describe('create', () => {
+      it('should create a new spreadsheet', async () => {
+        const id = 'newspreadsheetid'
+        Sheet.service.spreadsheets.create.mockResolvedValue({
+          spreadsheetId: id
+        })
+        const sheetFormat = Sheet.format
+        Sheet.format = jest.fn()
+
+        const actual = await Sheet.create('new sheet')
+
+        expect(actual).toEqual(id)
+        expect(Sheet.service.spreadsheets.create).toHaveBeenCalledWith({
+          resource: {
+            properties: {
+              title: 'new sheet'
+            }
+          },
+          fields: 'spreadsheetId'
+        })
+        expect(Sheet.format).toHaveBeenCalled()
+
+        Sheet.format = sheetFormat;
+      })
+    })
+
     describe('validate', () => {
       it('should return true when its valid', async () => {
         Sheet.sheets.mockResolvedValue(['belongings', 'storages'])

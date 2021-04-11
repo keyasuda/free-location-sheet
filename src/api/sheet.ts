@@ -11,9 +11,22 @@ const header = {
 export const Sheet = {
   documentId: null,
 
-  create: () => {
+  create: async (title: string) => {
     // create a new sheet
+    const newSheet = await Sheet.service.spreadsheets.create({
+      resource: {
+        properties: {
+          title
+        }
+      },
+      fields: 'spreadsheetId'
+    })
+    Sheet.documentId = newSheet.spreadsheetId
+
     // format
+    await Sheet.format()
+
+    return newSheet.spreadsheetId
   },
 
   init: (documentId: string, auth, sheetsService) => {
