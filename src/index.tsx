@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import App from './app'
 import SignInButton from './component/SignInButton'
 
-const App = () => {
+const IndexApp = () => {
   return (
     <div>
       <SignInButton afterSignedIn={ () => { console.log('hogehoge') } }>
@@ -15,7 +15,10 @@ const App = () => {
 }
 
 
-export default App;
-
-const root = document.getElementById('app')
-ReactDOM.render(<App />, root)
+const root = document.getElementById('index-app')
+if (root != null) {
+  ReactDOM.render(<IndexApp />, root)
+} else {
+  const appRoot = document.getElementById('app')
+  ReactDOM.render(<App />, appRoot)
+}
