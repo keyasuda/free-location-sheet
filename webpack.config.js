@@ -1,9 +1,15 @@
 const path = require('path');
-const rules = [{
-  test: /\.tsx?/,
-  exclude: /node_modules/,
-  loader: 'babel-loader',
-}];
+const rules = [
+  {
+    test: /\.tsx?/,
+    exclude: /node_modules/,
+    loader: 'babel-loader',
+  },
+  {
+    test: /\.(png|jpg|gif)$/,
+    type: 'asset/resource'
+  }
+];
 
 module.exports = {
   target: 'web',

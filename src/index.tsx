@@ -1,18 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-function App(): JSX.Element {
-  const sum = (a: number, b: number): number => a + b;
+import App from './app'
+import SignInButton from './component/SignInButton'
 
+const App = () => {
   return (
     <div>
-      <h1>React & TypeScript!</h1>
-      <p>Test: {sum(15, 10)} </p>
+      <SignInButton afterSignedIn={ () => { console.log('hogehoge') } }>
+        <div>signed in</div>
+      </SignInButton>
     </div>
-  );
+  )
 }
+
 
 export default App;
 
-const root = document.getElementById('app-root');
-ReactDOM.render(<App />, root);
+const root = document.getElementById('app')
+ReactDOM.render(<App />, root)
