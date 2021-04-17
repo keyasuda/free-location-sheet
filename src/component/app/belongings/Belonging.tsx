@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
+import Loader from '../Loader'
 
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
@@ -19,18 +20,15 @@ const Belonging = (props) => {
   }, [])
 
   return (
-    <div>
+    <Loader loading={ pending }>
       {
-        pending && <div>loading...</div>
-      }
-      {
-        !pending && item &&
+        item &&
         <div>
           <h1>{ item.name }</h1>
           <p>{ item.description }</p>
         </div>
       }
-    </div>
+    </Loader>
   )
 }
 export default Belonging

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
+import Loader from '../Loader'
 
 const Belongings = (props) => {
   const { fileId } = useParams()
@@ -20,23 +21,17 @@ const Belongings = (props) => {
   }, [])
 
   return (
-    <div>
-      {
-        pending && <div>loading...</div>
-      }
-      {
-        !pending &&
-        <ul>
-          {
-            (list || []).map((b) => (
-              <li key={ b.id }>
-                <Link to={ `${currentPath}/${b.id}` }>{ b.name }</Link>
-              </li>
-            ))
-          }
-        </ul>
-      }
-    </div>
+    <Loader loading={ pending }>
+      <ul>
+        {
+          (list || []).map((b) => (
+            <li key={ b.id }>
+            <Link to={ `${currentPath}/${b.id}` }>{ b.name }</Link>
+            </li>
+          ))
+        }
+      </ul>
+    </Loader>
   )
 }
 export default Belongings
