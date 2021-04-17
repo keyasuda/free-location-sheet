@@ -317,6 +317,13 @@ describe('Sheet', () => {
           expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'storages')
         })
       })
+
+      describe('without keywords', () => {
+        it('should return everything', async () => {
+          const actual = await api.search('')
+          expect(Sheet.query).toHaveBeenCalledWith('select *', 'storages')
+        })
+      })
     })
 
     describe('findByPrinted', () => {
@@ -491,6 +498,13 @@ describe('Sheet', () => {
         it('should be escaped', async () => {
           const actual = await api.search('hoge"hoge')
           expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'belongings')
+        })
+      })
+
+      describe('without keywords', () => {
+        it('should return everything', async () => {
+          const actual = await api.search('')
+          expect(Sheet.query).toHaveBeenCalledWith('select *', 'belongings')
         })
       })
     })

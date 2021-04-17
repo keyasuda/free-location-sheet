@@ -5,12 +5,14 @@ import { Route, Switch } from 'react-router-dom'
 
 import { store, history } from '../state/store'
 import AppMenu from './app/AppMenu'
+import Belongings from './app/belongings/Belongings'
 
 const App: React.FC = () => {
   return (
     <Provider store={ store }>
       <ConnectedRouter history={ history }>
         <Switch>
+          <Route path="/app/:fileId/belongings" component={ Belongings } />
           <Route path="/app/:fileId" component={ AppMenu } />
         </Switch>
       </ConnectedRouter>

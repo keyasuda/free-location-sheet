@@ -1,6 +1,8 @@
+const { gapi } = window;
+
 import { apiKey, clientId } from '../credentials'
 
-const { gapi } = window;
+import authorizedResource from '../api/authorizedResource'
 
 export const initAuth = async (setState) => {
   await new Promise((resolve,reject) => {
@@ -18,8 +20,14 @@ export const initAuth = async (setState) => {
   })
 
   gapi.auth2.getAuthInstance().isSignedIn.listen(setState)
-  setState(gapi.auth2.getAuthInstance().isSignedIn.get())
+
+  const state = gapi.auth2.getAuthInstance().isSignedIn.get()
+  setState(state)
+
+  return state
 }
 
 export const signIn = () => gapi.auth2.getAuthInstance().signIn()
 export const signOut = () => gapi.auth2.getAuthInstance().signOut()
+export const authorizedClient = () => authorizedResource(gapi.auth2.getAuthInstance().currentUser.get())
+export const authorizedSheet = () => gapi.client.sheets

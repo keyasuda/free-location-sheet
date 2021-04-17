@@ -89,8 +89,8 @@ export const Sheet = {
   },
 
   sheets: async () => {
-    const meta = await Sheet.service.spreadsheets.get({spreadsheetId: Sheet.documentId})
-    return meta.data.sheets.map((s) => s.properties.title)
+    const response = await Sheet.service.spreadsheets.get({spreadsheetId: Sheet.documentId})
+    return (response.data || response.result).sheets.map((s) => s.properties.title)
   },
 
   createSheet: (title: string) => {
@@ -117,7 +117,7 @@ export const Sheet = {
       `&sheet=${sheet}`
 
     const response = await Sheet.auth.request({ url })
-    const text = response.data
+    const text = (response.data || await response.text())
     // response will in JSONP formats - needs this before parsing
     const match = text.match(/google\.visualization\.Query\.setResponse\((.+)\)/)
     console.log(match[1])
@@ -208,10 +208,15 @@ export const Sheet = {
         words = [keyword]
       }
 
-      const q =
-        'select * where (' +
-        words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
-        words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+      let q
+      if (keyword.length == 0) {
+        q = 'select *'
+      }else{
+        q =
+          'select * where (' +
+          words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
+          words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+      }
 
       const results = await Sheet.query(q, 'storages')
 
@@ -280,10 +285,15 @@ export const Sheet = {
         words = [keyword]
       }
 
-      const q =
-        'select * where (' +
-        words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
-        words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+      let q
+      if (keyword.length == 0) {
+        q = 'select *'
+      }else{
+        q =
+          'select * where (' +
+          words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
+          words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+      }
 
       const results = await Sheet.query(q, 'belongings')
 
