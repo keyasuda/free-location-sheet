@@ -14,11 +14,18 @@ export const listSliceAndThunks = (params) => {
     }
   )
 
+  const get = createAsyncThunk(
+    `${baseName}/get`,
+    async (id: string, _thunkApi) => {
+      return await api.get(id);
+    }
+  )
+
   // search existing items
   const search = createAsyncThunk(
     `${baseName}/search`,
     async (keyword: string, _thunkApi) => {
-      return await api.search(keyword);
+      return await api.search(keyword)
     }
   )
 
@@ -38,7 +45,7 @@ export const listSliceAndThunks = (params) => {
     }
   )
 
-  const thunks = { add, search, update, remove }
+  const thunks = { add, get, search, update, remove }
 
   const pend = (state, _) => { state.pending = true }
   const fix = (state, _) => { state.pending = false }
@@ -47,7 +54,7 @@ export const listSliceAndThunks = (params) => {
     name: baseName,
     initialState,
     extraReducers: (builder) => {
-      [add, search, update, remove].forEach((t) => {
+      [add, get, search, update, remove].forEach((t) => {
         builder.addCase(t.pending, pend);
         builder.addCase(t.rejected, fix);
       })
@@ -55,6 +62,11 @@ export const listSliceAndThunks = (params) => {
       builder.addCase(add.fulfilled, (state, action) => {
         state.list = [...state.list, ...action.payload]
         state.pending = false;
+      })
+
+      builder.addCase(get.fulfilled, (state, action) => {
+        state.list = [action.payload]
+        state.pending = false
       })
 
       builder.addCase(search.fulfilled, (state, action) => {

@@ -87,6 +87,33 @@ describe('belongings slice', () => {
     })
   })
 
+  describe('get', () => {
+    const get = belongingsAsyncThunk.get
+    describe('pending', () => {
+      it('should set state pending=true', () => {
+        const action = get.pending()
+        expect(reducer({pending: false}, action).pending).toBe(true)
+      })
+    })
+
+    describe('fulfilled', () => {
+      it('should replace the current list with payload', () => {
+        const action = get.fulfilled(b1)
+        const actual = reducer({list: [], pending: true}, action)
+
+        expect(actual.list).toEqual([b1])
+        expect(actual.pending).toBe(false)
+      })
+    })
+
+    describe('rejected', () => {
+      it('should set state pending=false', () => {
+        const action = get.rejected()
+        expect(reducer({pending: true}, action).pending).toBe(false)
+      })
+    })
+  })
+
   describe('update', () => {
     const update = belongingsAsyncThunk.update;
 
@@ -179,6 +206,24 @@ describe('async thunks', () => {
 
       expect(Sheet.belongings.add).toHaveBeenCalledWith(args);
       expect(subject.payload).toEqual(args);
+    })
+  })
+
+  describe('get', () => {
+    const thunk = belongingsAsyncThunk.get;
+
+    beforeEach(() => {
+      args = 'id'
+      action = thunk(args)
+      Sheet.belongings.get = jest.fn()
+      Sheet.belongings.get.mockResolvedValue(b1)
+    })
+
+    it('calls Sheet.belongings.get', async () => {
+      subject = await action(jest.fn(), jest.fn(), undefined);
+
+      expect(Sheet.belongings.get).toHaveBeenCalledWith(args)
+      expect(subject.payload).toEqual(b1)
     })
   })
 
