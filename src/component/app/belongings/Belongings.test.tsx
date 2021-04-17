@@ -14,10 +14,9 @@ import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 
 describe('Belongings', () => {
-  let initAuth, sheetInit, searchThunk;
+  let sheetInit, searchThunk;
   beforeEach(() => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
-    initAuth = jest.spyOn(auth, 'initAuth').mockResolvedValue(true)
     sheetInit = jest.spyOn(Sheet, 'init').mockReturnValue('hogehoge')
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
@@ -41,25 +40,12 @@ describe('Belongings', () => {
   describe('without keywords', () => {
     beforeEach(() => renderIt())
 
-    it('initializes Google auth', () => {
-      expect(initAuth).toHaveBeenCalled()
-    })
-
-    it('initializes Sheet API accessor', async () => {
-      await waitFor(() => expect(sheetInit).toHaveBeenCalled())
+    it('initializes Sheet API accessor', () => {
+      expect(sheetInit).toHaveBeenCalled()
     })
 
     it('dispatch search action without keywords', async () => {
-      await waitFor(() => expect(searchThunk).toHaveBeenCalledWith(''))
-    })
-  })
-
-  describe('when its signed out', () => {
-    it('will dispatch nothing', async () => {
-      initAuth.mockResolvedValue(false)
-      renderIt('/app/file-id/belongings')
-
-      await waitFor(() => expect(sheetInit).not.toHaveBeenCalled())
+      expect(searchThunk).toHaveBeenCalledWith('')
     })
   })
 })
