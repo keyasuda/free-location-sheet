@@ -193,6 +193,8 @@ export const Sheet = {
       }).filter((e) => e)
 
       if (requests.length > 0) { await Sheet.update(requests) }
+
+      return updates
     },
 
     delete: async (id: string) => {
@@ -273,6 +275,8 @@ export const Sheet = {
       }).filter((e) => e)
 
       if (requests.length > 0) { await Sheet.update(requests) }
+
+      return updates
     },
 
     delete: async (id: string) => {

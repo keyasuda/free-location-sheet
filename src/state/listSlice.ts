@@ -75,14 +75,16 @@ export const listSliceAndThunks = (params) => {
       })
 
       builder.addCase(update.fulfilled, (state, action) => {
-        const payload = action.payload;
-        const index = state.list.map((b) => b.id).indexOf(payload.id);
+        const payload = action.payload
+        payload.map((item) => {
+          const index = state.list.map((b) => b.id).indexOf(item.id)
 
-        if (index > -1) {
-          state.list[index] = action.payload;
-        }
+          if (index > -1) {
+            state.list[index] = item
+          }
+        })
 
-        state.pending = false;
+        state.pending = false
       })
 
       builder.addCase(remove.fulfilled, (state, action) => {

@@ -130,7 +130,7 @@ describe('belongings slice', () => {
           ...b1,
           name: 'new name'
         }
-        const action = update.fulfilled(newBelongings);
+        const action = update.fulfilled([newBelongings])
         const actual = reducer({'list': [b1], 'pending': true}, action);
 
         expect(actual.list[0].name).toEqual('new name')
@@ -142,7 +142,7 @@ describe('belongings slice', () => {
           id: 'new id',
           name: 'new name'
         }
-        const action = update.fulfilled(newBelongings);
+        const action = update.fulfilled([newBelongings])
         const actual = reducer({'list': [b1], 'pending': true}, action);
 
         expect(actual.list).toEqual([b1]);
@@ -257,7 +257,7 @@ describe('async thunks', () => {
       result = b1;
       action = thunk(args);
       Sheet.belongings.update = jest.fn();
-      Sheet.belongings.update.mockReturnValue(result);
+      Sheet.belongings.update.mockResolvedValue(result)
     })
 
     it('calls Sheet.belongings.update', async () => {

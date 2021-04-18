@@ -227,7 +227,7 @@ describe('Sheet', () => {
         const s2 = {...expected, id: 's2uuid'}
         Sheet.query.mockResolvedValue([[3, s2.id], [5, s1.id]])
 
-        await api.update([s1, s2])
+        const actual = await api.update([s1, s2])
 
         expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
         expect(Sheet.update).toHaveBeenCalledWith([
@@ -240,6 +240,7 @@ describe('Sheet', () => {
             values: [s2.name, s2.description, s2.printed]
           }
         ])
+        expect(actual).toEqual([s1, s2])
       })
 
       it('should drop nonexistent record', async () => {
@@ -410,7 +411,7 @@ describe('Sheet', () => {
       it('should update a belonging', async () => {
         Sheet.query.mockResolvedValue([[3, b2.id], [5, b1.id]])
 
-        await api.update([b1, b2])
+        const actual = await api.update([b1, b2])
 
         expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${b1.id}") or (B="${b2.id}")`, 'belongings')
         expect(Sheet.update).toHaveBeenCalledWith([
@@ -423,6 +424,7 @@ describe('Sheet', () => {
             values: [b2.name, b2.description, b2.quantities, b2.storageId, b2.printed]
           }
         ])
+        expect(actual).toEqual([b1, b2])
       })
 
       it('should drop nonexistent record', async () => {
