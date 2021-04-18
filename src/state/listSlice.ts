@@ -9,8 +9,8 @@ export const listSliceAndThunks = (params) => {
   const add = createAsyncThunk(
     `${baseName}/add`,
     async (items, _thunkApi) => {
-      await api.add(items);
-      return items
+      const added = await api.add(items)
+      return added
     }
   )
 

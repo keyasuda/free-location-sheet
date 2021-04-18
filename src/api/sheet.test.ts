@@ -186,7 +186,7 @@ describe('Sheet', () => {
           {name: 'item 1', description: 'desc 1'},
           {name: 'item 2', description: 'desc 2'}
         ]
-        await api.add(newItems)
+        const actual = await api.add(newItems)
 
         expect(Sheet.add).toHaveBeenCalledWith(
           'storages!A:A',
@@ -195,6 +195,8 @@ describe('Sheet', () => {
             ['=ROW()', generateduuid, 'item 2', 'desc 2', 'FALSE']
           ]
         )
+
+        expect(actual[0].id).toEqual(generateduuid)
       })
     })
 
@@ -361,7 +363,7 @@ describe('Sheet', () => {
           {name: 'item 1', quantities: 1, description: 'desc 1', storageId: 'storage-id'},
           {name: 'item 2', quantities: 2, description: 'desc 2', storageId: ''}
         ]
-        await api.add(newItems)
+        const actual = await api.add(newItems)
 
         expect(Sheet.add).toHaveBeenCalledWith(
           'belongings!A:A',
@@ -370,6 +372,8 @@ describe('Sheet', () => {
             ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'FALSE']
           ]
         )
+
+        expect(actual[0].id).toEqual(generateduuid)
       })
     })
 

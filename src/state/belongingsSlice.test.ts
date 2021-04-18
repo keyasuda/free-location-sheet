@@ -195,17 +195,20 @@ describe('async thunks', () => {
     const thunk = belongingsAsyncThunk.add;
 
     beforeEach(() => {
-      args = [b1, b2];
+      args = [
+        {name: b1.name, description: b1.description},
+        {name: b2.name, description: b2.description}
+      ]
       action = thunk(args);
       Sheet.belongings.add = jest.fn();
-      Sheet.belongings.add.mockResolvedValue(args);
+      Sheet.belongings.add.mockResolvedValue([b1, b2])
     })
 
     it('calls Sheet.belongings.add', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined);
 
       expect(Sheet.belongings.add).toHaveBeenCalledWith(args);
-      expect(subject.payload).toEqual(args);
+      expect(subject.payload).toEqual([b1, b2])
     })
   })
 

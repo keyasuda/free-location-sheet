@@ -163,9 +163,12 @@ export const Sheet = {
       printed: r[4]
     }),
 
-    add: (newItems: Storage[]) => {
-      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, 'FALSE'])
-      return Sheet.add('storages!A:A', payload)
+    add: async (newItems: Storage[]) => {
+      const items = newItems.map((i) => ({...i, ...{id: uuidv4()}}))
+      const payload = items.map((i) => ['=ROW()', i.id, i.name, i.description, 'FALSE'])
+      await Sheet.add('storages!A:A', payload)
+
+      return items
     },
 
     get: async (id: string) => {
@@ -240,9 +243,12 @@ export const Sheet = {
       printed: r[6]
     }),
 
-    add: (newItems: Belonging[]) => {
-      const payload = newItems.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storageId, 'FALSE'])
-      return Sheet.add('belongings!A:A', payload)
+    add: async (newItems: Belonging[]) => {
+      const items = newItems.map((i) => ({...i, ...{id: uuidv4()}}))
+      const payload = items.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storageId, 'FALSE'])
+      await Sheet.add('belongings!A:A', payload)
+
+      return items
     },
 
     get: async (id: string) => {
