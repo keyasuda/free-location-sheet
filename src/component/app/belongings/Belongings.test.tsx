@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { MemoryRouter } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
+import * as ReactRedux from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 
 import Belongings from './Belongings'
@@ -14,6 +15,34 @@ import * as auth from '../../authentication'
 import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
+
+const setMockState = (keyword, belongings) => {
+  const mockState = {
+    router: {
+      location: {
+        query: {
+          keyword: keyword
+        },
+        pathname: '/app/file-id/belongings'
+      }
+    },
+    belongings: {
+      pending: false,
+      list: belongings
+    }
+  }
+
+  jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) => selector(mockState))
+}
+
+const mockItem = {
+  klass: 'belonging',
+  name: '',
+  description: '',
+  storageId: null,
+  quantities: 1,
+  printed: false
+}
 
 describe('Belongings', () => {
   let sheetInit, searchThunk;
@@ -40,15 +69,59 @@ describe('Belongings', () => {
     )
   }
 
-  describe('without keywords', () => {
-    beforeEach(() => renderIt())
+  describe('data to show', () => {
+    describe('without keywords', () => {
+      beforeEach(() => {
+        setMockState('', [])
+        renderIt()
+      })
 
-    it('initializes Sheet API accessor', () => {
-      expect(sheetInit).toHaveBeenCalled()
+      it('initializes Sheet API accessor', () => {
+        expect(sheetInit).toHaveBeenCalled()
+      })
+
+      it('dispatch search action without keywords', async () => {
+        expect(searchThunk).toHaveBeenCalledWith('')
+      })
     })
 
-    it('dispatch search action without keywords', async () => {
-      expect(searchThunk).toHaveBeenCalledWith('')
+    describe('with keywords', () => {
+      beforeEach(() => {
+        setMockState('searchword', [])
+        renderIt()
+      })
+
+      it('dispatch search action with keywords', async () => {
+        expect(searchThunk).toHaveBeenCalledWith('searchword')
+      })
+    })
+  })
+
+  describe('belongings list', () => {
+    describe('items with name', () => {
+      const items = [
+        {...mockItem, id: uuidv4(), name: 'itemname1'},
+        {...mockItem, id: uuidv4(), name: 'itemname2'},
+      ]
+      beforeEach(() => {
+        setMockState('', items)
+        renderIt()
+      })
+
+      it('should show item names', () => {
+        items.map((i) => screen.getByText(i.name))
+      })
+    })
+
+    describe('item without name', () => {
+      beforeEach(() => {
+        setMockState('', [{...mockItem, id: uuidv4()}])
+        renderIt()
+      })
+
+      it('should show "(no name)"', () => {
+        screen.getByText('(no name)')
+      })
     })
   })
 
@@ -62,47 +135,41 @@ describe('Belongings', () => {
       printed: false
     }
 
-    beforeEach(() => renderIt())
+    let addThunk
+    beforeEach(() => {
+      addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
+      renderIt()
+    })
 
     describe('add button', () => {
       it('should add an item', async () => {
-        const addApi = jest.spyOn(Sheet.belongings, 'add').mockResolvedValue([{...item, id: uuidv4()}])
-
         await waitFor(() => screen.findByText('数量'))
         await userEvent.click(screen.getAllByRole('button')[0])
         await waitFor(() => screen.findByText('数量'))
 
-        expect(addApi).toHaveBeenCalled()
-        expect(screen.getAllByText('(no name)').length).toBe(1)
+        expect(addThunk).toHaveBeenCalledWith([item])
       })
     })
 
     describe('bulk add button', () => {
       it('should add desired items', async () => {
         const num = 5
-        const apiArgs = _.times(num, () => item)
-        const apiResult = apiArgs.map((i) => ({...i, id: uuidv4()}))
-        const api = jest.spyOn(Sheet.belongings, 'add').mockResolvedValue(apiResult)
 
         await waitFor(() => screen.findByText('数量'))
         userEvent.type(screen.getByRole('textbox'), String(num))
         userEvent.click(screen.getAllByRole('button')[1])
         await waitFor(() => screen.findByText('数量'))
 
-        expect(api).toHaveBeenCalledWith(apiArgs)
-        expect(screen.getAllByText('(no name)').length).toBe(num)
+        expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
       })
 
       it('should add nothing when the input is invalid', async () => {
-        const api = jest.spyOn(Sheet.belongings, 'add')
-
         await waitFor(() => screen.findByText('数量'))
         userEvent.type(screen.getByRole('textbox'), 'hogehoge') // invalid input
         userEvent.click(screen.getAllByRole('button')[1])
         await waitFor(() => screen.findByText('数量'))
 
-        expect(api).not.toHaveBeenCalled()
-        expect(screen.queryByText('(no name)')).toBeNull()
+        expect(addThunk).not.toHaveBeenCalled()
       })
     })
   })
