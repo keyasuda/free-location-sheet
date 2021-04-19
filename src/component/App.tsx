@@ -9,6 +9,7 @@ import Belongings from './app/belongings/Belongings'
 import Belonging from './app/belongings/Belonging'
 import Storages from './app/storages/Storages'
 import Storage from './app/storages/Storage'
+import PrintQueue from './app/print/PrintQueue'
 import { initAuth } from './authentication'
 
 const App: React.FC = () => {
@@ -27,6 +28,7 @@ const App: React.FC = () => {
     <Provider store={ store }>
       <ConnectedRouter history={ history }>
         <Switch>
+          <Route path="/app/:fileId/print" component={ PrintQueue } />
           <Route path="/app/:fileId/storages/:itemId" component={ Storage } />
           <Route path="/app/:fileId/storages" component={ Storages } />
           <Route path="/app/:fileId/belongings/:itemId" component={ Belonging } />

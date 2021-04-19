@@ -43,6 +43,11 @@ describe('print queue slice', () => {
     it('should add storages into the list', () => {
       expect(actual.list[2]).toEqual(s1)
     })
+
+    it('shouldnt add existing items', () => {
+      actual = reducer({list: [b2, s1]}, action)
+      expect(actual.list.length).toBe(2)
+    })
   })
 
   describe('remove', () => {

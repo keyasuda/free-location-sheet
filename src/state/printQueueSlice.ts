@@ -37,7 +37,12 @@ export const printQueueSlice = createSlice({
   initialState,
   reducers: {
     add(state, action: PayloadAction<WarehouseItem[]>) {
-      state.list = [...state.list, ...action.payload]
+      const list = state.list
+      action.payload.map((i) => {
+        if (!list.some((e) => e.id == i.id)) {
+          list.push(i)
+        }
+      })
     },
 
     remove(state) {
