@@ -13,7 +13,6 @@ import Loader from '../Loader'
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
-  const keyword = useSelector(s => s.router.location.query.keyword)
   const pending = useSelector(s => s.belongings.pending)
   const item = useSelector(s => s.belongings.list[0])
   const nameRef = useRef()
@@ -44,8 +43,16 @@ const Belonging = (props) => {
             <p>{ item.description }</p>
           </div>
           <div>
-            <TextField label="名称" inputRef={ nameRef } defaultValue={ item.name } />
-            <TextField label="説明" inputRef={ descriptionRef } defaultValue={ item.description } />
+            <TextField
+              aria-label="name"
+              label="名称"
+              inputRef={ nameRef }
+              defaultValue={ item.name } />
+            <TextField
+              aria-label="description"
+              label="説明"
+              inputRef={ descriptionRef }
+              defaultValue={ item.description } />
             <IconButton aria-label="update" onClick={ update }>
               <DoneIcon />
             </IconButton>
