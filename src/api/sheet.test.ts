@@ -314,17 +314,17 @@ describe('Sheet', () => {
         })
       })
 
-      describe('with word includes quote', () => {
-        it('should be escaped', async () => {
-          const actual = await api.search('hoge"hoge')
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'storages')
-        })
-      })
-
       describe('without keywords', () => {
         it('should return everything', async () => {
           const actual = await api.search('')
           expect(Sheet.query).toHaveBeenCalledWith('select *', 'storages')
+        })
+      })
+
+      describe('non ascii word', () => {
+        it('should be in raw', async () => {
+          const actual = await api.search('猫ベッド')
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド"))', 'storages')
         })
       })
     })
@@ -500,17 +500,17 @@ describe('Sheet', () => {
         })
       })
 
-      describe('with word includes quote', () => {
-        it('should be escaped', async () => {
-          const actual = await api.search('hoge"hoge')
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "hoge\\"hoge")) or ((D contains "hoge\\"hoge"))', 'belongings')
-        })
-      })
-
       describe('without keywords', () => {
         it('should return everything', async () => {
           const actual = await api.search('')
           expect(Sheet.query).toHaveBeenCalledWith('select *', 'belongings')
+        })
+      })
+
+      describe('non ascii word', () => {
+        it('should be in raw', async () => {
+          const actual = await api.search('猫ベッド')
+          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド"))', 'belongings')
         })
       })
     })

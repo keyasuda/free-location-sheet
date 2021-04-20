@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { split, escape } from 'shellwords'
+import { split } from 'shellwords'
 import { Belonging } from '../state/types'
 import _ from 'lodash'
 
@@ -219,8 +219,8 @@ export const Sheet = {
       }else{
         q =
           'select * where (' +
-          words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
-          words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+          words.map((w) => `(C contains "${w}")`).join(' and ') + ') or (' +
+          words.map((w) => `(D contains "${w}")`).join(' and ') + ')'
       }
 
       const results = await Sheet.query(q, 'storages')
@@ -301,8 +301,8 @@ export const Sheet = {
       }else{
         q =
           'select * where (' +
-          words.map((w) => `(C contains "${escape(w)}")`).join(' and ') + ') or (' +
-          words.map((w) => `(D contains "${escape(w)}")`).join(' and ') + ')'
+          words.map((w) => `(C contains "${w}")`).join(' and ') + ') or (' +
+          words.map((w) => `(D contains "${w}")`).join(' and ') + ')'
       }
 
       const results = await Sheet.query(q, 'belongings')
