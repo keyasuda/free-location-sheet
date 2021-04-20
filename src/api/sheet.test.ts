@@ -531,7 +531,7 @@ describe('Sheet', () => {
       it('should find printed=false', async () => {
         const actual = await api.findByPrinted(false)
 
-        expect(Sheet.query).toHaveBeenCalledWith('select * where E=false', 'belongings')
+        expect(Sheet.query).toHaveBeenCalledWith('select * where G=false', 'belongings')
         expect(actual).toEqual([expected])
       })
     })

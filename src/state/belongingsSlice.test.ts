@@ -59,6 +59,34 @@ describe('belongings slice', () => {
     })
   })
 
+  describe('findByPrinted', () => {
+    const thunk = belongingsAsyncThunk.findByPrinted;
+
+    describe('pending', () => {
+      it('should set state pending=true', () => {
+        const action = thunk.pending();
+        expect(reducer({pending: false}, action).pending).toBe(true);
+      })
+    })
+
+    describe('fulfilled', () => {
+      it('should replace the current list with payload', () => {
+        const action = thunk.fulfilled([b1]);
+        const actual = reducer({list: [], pending: true}, action);
+
+        expect(actual.list).toEqual([b1]);
+        expect(actual.pending).toBe(false);
+      })
+    })
+
+    describe('rejected', () => {
+      it('should set state pending=false', () => {
+        const action = thunk.rejected();
+        expect(reducer({pending: true}, action).pending).toBe(false);
+      })
+    })
+  })
+
   describe('add', () => {
     const add = belongingsAsyncThunk.add;
 
@@ -245,6 +273,24 @@ describe('async thunks', () => {
       subject = await action(jest.fn(), jest.fn(), undefined);
 
       expect(Sheet.belongings.search).toHaveBeenCalledWith(args);
+      expect(subject.payload).toEqual(result);
+    })
+  })
+
+  describe('findByPrinted', () => {
+    const thunk = belongingsAsyncThunk.findByPrinted
+
+    beforeEach(() => {
+      result = [b1, b3]
+      action = thunk(true)
+      Sheet.belongings.findByPrinted = jest.fn()
+      Sheet.belongings.findByPrinted.mockResolvedValue(result)
+    })
+
+    it('calls Sheet.belongings.search', async () => {
+      subject = await action(jest.fn(), jest.fn(), undefined)
+
+      expect(Sheet.belongings.findByPrinted).toHaveBeenCalledWith(true);
       expect(subject.payload).toEqual(result);
     })
   })

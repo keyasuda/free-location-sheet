@@ -311,7 +311,7 @@ export const Sheet = {
     },
 
     findByPrinted: async (printed: boolean) => {
-      const results = await Sheet.query(`select * where E=${printed}`, 'belongings')
+      const results = await Sheet.query(`select * where G=${printed}`, 'belongings')
       return results.map((r) => Sheet.belongings.queryResultToBelonging(r))
     }
   }

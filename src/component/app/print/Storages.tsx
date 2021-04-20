@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 import LibraryAddIcon from '@material-ui/icons/LibraryAdd'
+import Button from '@material-ui/core/Button'
 
 import { Sheet } from '../../../api/sheet'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
@@ -26,10 +27,15 @@ const Storages = (props) => {
     dispatch(add(items))
   }
 
+  const findNotPrinted = () => {
+    dispatch(storagesAsyncThunk.findByPrinted(false))
+  }
+
   return (
     <Loader loading={ pending }>
       <div>
         <h2>保管場所</h2>
+        <Button onClick={ findNotPrinted }>未印刷</Button>
         <TextField label="検索語" inputRef={ keywordRef } />
         <IconButton aria-label="update" onClick={ search }>
           <SearchIcon />
