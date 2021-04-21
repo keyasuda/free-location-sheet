@@ -105,6 +105,10 @@ export const listSliceAndThunks = (params) => {
         state.list = state.list.filter((e) => e.id != payload.id);
         state.pending = false;
       })
+
+      builder.addCase('@@router/LOCATION_CHANGE', (state, action) => {
+        state.list = []
+      })
     }
   });
 

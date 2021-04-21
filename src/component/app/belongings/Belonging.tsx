@@ -8,7 +8,36 @@ import DoneIcon from '@material-ui/icons/Done'
 import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
+import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import Loader from '../Loader'
+
+const Storage = (props) => {
+  const { id } = props
+  const item = useSelector(s => s.storages.list[0])
+  const pending = useSelector(s => s.storages.pending)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (id){
+      dispatch(storagesAsyncThunk.get(id))
+    }
+  }, [id])
+
+  return (
+    <Loader loading={ pending }>
+      {
+        item && (
+          <div>
+            { item.name }
+          </div>
+        )
+      }
+      {
+        !item && <div>(not associated with any storages)</div>
+      }
+    </Loader>
+  )
+}
 
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
@@ -42,6 +71,9 @@ const Belonging = (props) => {
             <h1>{ item.name }</h1>
             <p>{ item.description }</p>
           </div>
+
+          <Storage id={ item.storageId } />
+
           <div>
             <TextField
               aria-label="name"

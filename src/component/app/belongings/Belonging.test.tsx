@@ -13,13 +13,15 @@ import * as auth from '../../authentication'
 import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
+import { storagesAsyncThunk } from '../../../state/storagesSlice'
 
 const setMockState = (belonging) => {
   const mockState = {
     belongings: {
       pending: false,
       list: [belonging]
-    }
+    },
+    storages: { pending: false, list: [] }
   }
 
   jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) => selector(mockState))
@@ -59,6 +61,10 @@ describe('Belonging', () => {
     setMockState(mockItem)
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('initialize', () => {
     it('should get belonging by provided ID', () => {
       renderIt()
@@ -85,6 +91,30 @@ describe('Belonging', () => {
         name: mockItem.name + 'addedname',
         description: mockItem.description + 'addeddescription'
       }])
+    })
+  })
+
+  describe('when it has storageId', () => {
+    beforeEach(() => {
+      setMockState({...mockItem, storageId: 'storageid'})
+    })
+
+    it('should get the storage', () => {
+      const thunk = jest.spyOn(storagesAsyncThunk, 'get')
+      renderIt()
+      expect(thunk).toHaveBeenCalledWith('storageid')
+    })
+  })
+
+  describe('when it doesnt have storageId', () => {
+    beforeEach(() => {
+      setMockState(mockItem)
+    })
+
+    it('should get the storage', () => {
+      const thunk = jest.spyOn(storagesAsyncThunk, 'get')
+      renderIt()
+      expect(thunk).not.toHaveBeenCalled()
     })
   })
 })

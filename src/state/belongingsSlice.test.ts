@@ -214,6 +214,13 @@ describe('belongings slice', () => {
       })
     })
   })
+
+  describe('@@router/LOCATION_CHANGE', () => {
+    it('should clear the list', () => {
+      const actual = reducer({list: [b1]}, {type: '@@router/LOCATION_CHANGE'})
+      expect(actual.list).toEqual([])
+    })
+  })
 })
 
 describe('async thunks', () => {
