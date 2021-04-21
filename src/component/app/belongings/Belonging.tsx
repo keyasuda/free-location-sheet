@@ -26,14 +26,14 @@ const Storage = (props) => {
   return (
     <Loader loading={ pending }>
       {
-        item && (
+        id && item && (
           <div>
             { item.name }
           </div>
         )
       }
       {
-        !item && <div>(not associated with any storages)</div>
+        (!id || !item) && <div>(not associated with any storages)</div>
       }
     </Loader>
   )
@@ -46,6 +46,7 @@ const Belonging = (props) => {
   const item = useSelector(s => s.belongings.list[0])
   const nameRef = useRef()
   const descriptionRef = useRef()
+  const storageIdRef = useRef()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
@@ -57,6 +58,17 @@ const Belonging = (props) => {
       ...item,
       name: nameRef.current.value,
       description: descriptionRef.current.value
+    }
+
+    dispatch(belongingsAsyncThunk.update([updatedItem]))
+  }
+
+  const setStorageId = () => {
+    const id = storageIdRef.current.value
+
+    const updatedItem = {
+      ...item,
+      storageId: id
     }
 
     dispatch(belongingsAsyncThunk.update([updatedItem]))
@@ -86,6 +98,17 @@ const Belonging = (props) => {
               inputRef={ descriptionRef }
               defaultValue={ item.description } />
             <IconButton aria-label="update" onClick={ update }>
+              <DoneIcon />
+            </IconButton>
+          </div>
+
+          <div>
+            <TextField
+              aria-label="storage-id"
+              label="storage ID"
+              inputRef={ storageIdRef }
+              defaultValue={ item.storageId } />
+            <IconButton aria-label="set-storage-id" onClick={ setStorageId }>
               <DoneIcon />
             </IconButton>
           </div>

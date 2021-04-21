@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { MemoryRouter } from 'react-router-dom'
@@ -115,6 +115,28 @@ describe('Belonging', () => {
       const thunk = jest.spyOn(storagesAsyncThunk, 'get')
       renderIt()
       expect(thunk).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('set storage ID', () => {
+    it('should set storage ID', () => {
+      const thunk = jest.spyOn(belongingsAsyncThunk, 'update')
+      setMockState(mockItem)
+      renderIt()
+      userEvent.type(screen.getByLabelText('storage-id').querySelector('input'), 'storageid')
+      userEvent.click(screen.getByLabelText('set-storage-id'))
+
+      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: 'storageid'}])
+    })
+
+    it('should set blank storage ID', () => {
+      const thunk = jest.spyOn(belongingsAsyncThunk, 'update')
+      setMockState({...mockItem, storageId: 'setstorageid'})
+      renderIt()
+      fireEvent.change(screen.getByLabelText('storage-id').querySelector('input'), {target: {value: ''}})
+      userEvent.click(screen.getByLabelText('set-storage-id'))
+
+      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: ''}])
     })
   })
 })
