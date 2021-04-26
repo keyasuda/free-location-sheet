@@ -1,5 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { act } from "@testing-library/react-hooks"
 import userEvent from '@testing-library/user-event'
 
 import { MemoryRouter } from 'react-router-dom'
@@ -14,6 +15,7 @@ import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
+import CodeReader from '../CodeReader'
 
 const setMockState = (belonging) => {
   const mockState = {
@@ -47,8 +49,26 @@ const renderIt = () => {
   )
 }
 
+let codeReaderOnRead
+const MockCodeReader = (props) => {
+  const { onRead } = props
+  codeReaderOnRead = onRead
+
+  return <>code reader</>
+}
+
+jest.mock('../CodeReader', () => ({
+  __esModule: true,
+  namedExport: jest.fn(),
+  default: jest.fn()
+}))
+
 describe('Belonging', () => {
   let getThunk
+
+  beforeAll(() => {
+    CodeReader.mockImplementation(MockCodeReader)
+  })
 
   beforeEach(() => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
@@ -119,24 +139,47 @@ describe('Belonging', () => {
   })
 
   describe('set storage ID', () => {
-    it('should set storage ID', () => {
-      const thunk = jest.spyOn(belongingsAsyncThunk, 'update')
+    const codeSrc = {
+      klass: 'storage',
+      id: 'storageuuid'
+    }
+
+    let thunk, closeFunc
+    beforeEach(() => {
+      thunk = jest.spyOn(belongingsAsyncThunk, 'update')
+      closeFunc = jest.fn()
       setMockState(mockItem)
       renderIt()
-      userEvent.type(screen.getByLabelText('storage-id').querySelector('input'), 'storageid')
-      userEvent.click(screen.getByLabelText('set-storage-id'))
-
-      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: 'storageid'}])
     })
 
-    it('should set blank storage ID', () => {
-      const thunk = jest.spyOn(belongingsAsyncThunk, 'update')
-      setMockState({...mockItem, storageId: 'setstorageid'})
-      renderIt()
-      fireEvent.change(screen.getByLabelText('storage-id').querySelector('input'), {target: {value: ''}})
-      userEvent.click(screen.getByLabelText('set-storage-id'))
+    it('should set storage ID', () => {
+      codeReaderOnRead(JSON.stringify(codeSrc), closeFunc)
 
-      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: ''}])
+      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: codeSrc.id}])
+      expect(closeFunc).toHaveBeenCalled()
+    })
+
+    it('shouldnt set ID when belongings code was read', () => {
+      act(() => codeReaderOnRead(JSON.stringify({...codeSrc, klass: 'belongings'}), closeFunc))
+
+      expect(thunk).not.toHaveBeenCalled()
+      expect(closeFunc).not.toHaveBeenCalled()
+      screen.getByText('not a storage!')
+    })
+
+    it('shouldnt set ID when unknown code was read', async () => {
+      act(() => codeReaderOnRead('unknowncode', closeFunc))
+
+      expect(thunk).not.toHaveBeenCalled()
+      expect(closeFunc).not.toHaveBeenCalled()
+      screen.getByText('not a storage!')
+    })
+
+    it('should set blank ID when clear button has clicked', () => {
+      const button = screen.getByLabelText('clear')
+      userEvent.click(button)
+
+      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: null}])
     })
   })
 })

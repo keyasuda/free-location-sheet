@@ -4,12 +4,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
 import DoneIcon from '@material-ui/icons/Done'
+import ClearIcon from '@material-ui/icons/Clear'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
 
 import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import Loader from '../Loader'
+import CodeReader from '../CodeReader'
+
+const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const Storage = (props) => {
   const { id } = props
@@ -47,6 +53,7 @@ const Belonging = (props) => {
   const nameRef = useRef()
   const descriptionRef = useRef()
   const storageIdRef = useRef()
+  const [alertOpen, setAlertOpen] = useState(false)
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
@@ -63,15 +70,35 @@ const Belonging = (props) => {
     dispatch(belongingsAsyncThunk.update([updatedItem]))
   }
 
-  const setStorageId = () => {
-    const id = storageIdRef.current.value
-
+  const setStorageId = (id) => {
     const updatedItem = {
       ...item,
       storageId: id
     }
 
     dispatch(belongingsAsyncThunk.update([updatedItem]))
+  }
+
+  const onCodeRead = (code, closeFunc) => {
+    try {
+      const payload = JSON.parse(code)
+      if (payload.klass == 'storage') {
+        setStorageId(payload.id)
+        closeFunc()
+      } else {
+        setAlertOpen(true)
+      }
+    } catch (e) {
+      setAlertOpen(true)
+    }
+  }
+
+  const alertClose = (_, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+
+    setAlertOpen(false)
   }
 
   return (
@@ -85,6 +112,9 @@ const Belonging = (props) => {
           </div>
 
           <Storage id={ item.storageId } />
+          <IconButton aria-label="clear" onClick={() => setStorageId(null) }>
+            <ClearIcon />
+          </IconButton>
 
           <div>
             <TextField
@@ -103,14 +133,17 @@ const Belonging = (props) => {
           </div>
 
           <div>
-            <TextField
-              aria-label="storage-id"
-              label="storage ID"
-              inputRef={ storageIdRef }
-              defaultValue={ item.storageId } />
-            <IconButton aria-label="set-storage-id" onClick={ setStorageId }>
-              <DoneIcon />
-            </IconButton>
+            storage update
+            <CodeReader onRead={ onCodeRead } />
+
+            <Snackbar
+              open={ alertOpen }
+              autoHideDuration={ 6000 }
+              onClose={ alertClose }>
+              <Alert onClose={ alertClose } severity="warning">
+                not a storage!
+              </Alert>
+            </Snackbar>
           </div>
         </>
       }
