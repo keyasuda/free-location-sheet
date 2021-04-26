@@ -4,16 +4,34 @@ import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 
+import CodeReader from './CodeReader'
+
 const AppMenu = (props) => {
   const { fileId } = useParams()
   const history = useHistory()
   const keywordRef = useRef()
 
   const basePath = `/app/${fileId}`
+
   const search = () => {
     const w = keywordRef.current.value
     if (w && w.length > 0) {
       history.push(`${basePath}/belongings?keyword=${encodeURIComponent(w)}`)
+    }
+  }
+
+  const onCodeRead = (code) => {
+    try {
+      const payload = JSON.parse(code)
+
+      if (payload.klass == 'belonging') {
+        history.push('./belongings/' + payload.id)
+      } else {
+        history.push('./storages/' + payload.id)
+      }
+
+    } catch (e) {
+      history.push('./belongings/' + code)
     }
   }
 
@@ -26,6 +44,9 @@ const AppMenu = (props) => {
         <IconButton color="primary" aria-label="search" onClick={ search }>
           <SearchIcon />
         </IconButton>
+      </div>
+      <div>
+        <CodeReader onRead={ onCodeRead } />
       </div>
     </div>
   )

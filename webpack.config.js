@@ -30,6 +30,7 @@ module.exports = {
     disableHostCheck: true,
     historyApiFallback: {
       rewrites: [{ from: /^\/*/, to: '/app.html' }],
-    }
+    },
+    https: true
   },
 };
