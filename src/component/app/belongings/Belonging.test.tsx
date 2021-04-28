@@ -75,7 +75,7 @@ describe('Belonging', () => {
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
       fileId: 'file-id',
-      itemId: 'itemid'
+      itemId: mockItem.id
     })
     getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
     setMockState(mockItem)
@@ -88,7 +88,7 @@ describe('Belonging', () => {
   describe('initialize', () => {
     it('should get belonging by provided ID', () => {
       renderIt()
-      expect(getThunk).toHaveBeenCalledWith('itemid')
+      expect(getThunk).toHaveBeenCalledWith(mockItem.id)
     })
   })
 
@@ -180,6 +180,39 @@ describe('Belonging', () => {
       userEvent.click(button)
 
       expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: null}])
+    })
+  })
+
+  describe('unknown ID', () => {
+    beforeEach(() => {
+      jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
+        fileId: 'file-id',
+        itemId: 'itemid'
+      })
+      setMockState(null, true)
+      renderIt()
+    })
+
+    it('should ask to add it or not', () => {
+      screen.getByLabelText('add')
+      expect(screen.queryByLabelText('update')).toBeNull()
+    })
+
+    it('should add the item as a new belonging', () => {
+      const button = screen.getByLabelText('add')
+      const addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
+      const getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
+      userEvent.click(button)
+
+      expect(addThunk).toHaveBeenCalledWith([{
+        ...mockItem,
+        id: 'itemid',
+        name: '',
+        description: '',
+        storageId: null,
+        quantities: 1,
+        printed: true // unknown code has scanned - the code is already on somewhare
+      }])
     })
   })
 })

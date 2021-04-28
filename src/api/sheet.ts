@@ -246,8 +246,8 @@ export const Sheet = {
     }),
 
     add: async (newItems: Belonging[]) => {
-      const items = newItems.map((i) => ({...i, ...{id: uuidv4()}}))
-      const payload = items.map((i) => ['=ROW()', uuidv4(), i.name, i.description, i.quantities, i.storageId, 'FALSE'])
+      const items = newItems.map((i) => ({...{id: uuidv4()}, ...i}))
+      const payload = items.map((i) => ['=ROW()', i.id, i.name, i.description, i.quantities, i.storageId, String(i.printed)])
       await Sheet.add('belongings!A:A', payload)
 
       return items

@@ -361,20 +361,42 @@ describe('Sheet', () => {
         jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
 
         const newItems = [
-          {name: 'item 1', quantities: 1, description: 'desc 1', storageId: 'storage-id'},
-          {name: 'item 2', quantities: 2, description: 'desc 2', storageId: ''}
+          {name: 'item 1', quantities: 1, description: 'desc 1', storageId: 'storage-id', printed: false},
+          {name: 'item 2', quantities: 2, description: 'desc 2', storageId: '', printed: false}
         ]
         const actual = await api.add(newItems)
 
         expect(Sheet.add).toHaveBeenCalledWith(
           'belongings!A:A',
           [
-            ['=ROW()', generateduuid, 'item 1', 'desc 1', 1, 'storage-id', 'FALSE'],
-            ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'FALSE']
+            ['=ROW()', generateduuid, 'item 1', 'desc 1', 1, 'storage-id', 'false'],
+            ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'false']
           ]
         )
 
         expect(actual[0].id).toEqual(generateduuid)
+      })
+
+      it('should add new belongings with fields', async () => {
+        const uuidgen = jest.spyOn(uuid, 'v4')
+
+        const newItem = {
+          id: 'definedid',
+          name: 'item 1',
+          quantities: 2,
+          description: 'desc 1',
+          storageId: 'storage-id',
+          printed: true
+        }
+
+        const actual = await api.add([newItem])
+
+        expect(Sheet.add).toHaveBeenCalledWith(
+          'belongings!A:A',
+          [
+            ['=ROW()', newItem.id, newItem.name, newItem.description, newItem.quantities, newItem.storageId, String(newItem.printed)]
+          ]
+        )
       })
     })
 

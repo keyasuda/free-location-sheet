@@ -49,7 +49,25 @@ const Belonging = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
   const pending = useSelector(s => s.belongings.pending)
-  const item = useSelector(s => s.belongings.list[0])
+  const { item, notFound } = useSelector(s => {
+    const inState = s.belongings.list.find((i) => i && i.id == itemId)
+    if (inState) {
+      return ({item: inState, notFound: false})
+    } else {
+      return ({
+        item: {
+          klass: 'belonging',
+          id: itemId,
+          name: '',
+          description: '',
+          printed: true,
+          storageId: null,
+          quantities: 1
+        },
+        notFound: true
+      })
+    }
+  })
   const nameRef = useRef()
   const descriptionRef = useRef()
   const storageIdRef = useRef()
@@ -59,6 +77,15 @@ const Belonging = (props) => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(belongingsAsyncThunk.get(itemId))
   }, [])
+
+  const add = async () => {
+    const addedItem = {
+      ...item,
+      name: nameRef.current.value,
+      description: descriptionRef.current.value
+    }
+    await dispatch(belongingsAsyncThunk.add([addedItem]))
+  }
 
   const update = () => {
     const updatedItem = {
@@ -103,50 +130,55 @@ const Belonging = (props) => {
 
   return (
     <Loader loading={ pending }>
-      {
-        item &&
-        <>
-          <div>
-            <h1>{ item.name }</h1>
-            <p>{ item.description }</p>
-          </div>
+      <div>
+        <h1>{ item.name }</h1>
+        <p>{ item.description }</p>
+      </div>
 
-          <Storage id={ item.storageId } />
-          <IconButton aria-label="clear" onClick={() => setStorageId(null) }>
-            <ClearIcon />
+      <Storage id={ item.storageId } />
+      <IconButton aria-label="clear" onClick={() => setStorageId(null) }>
+        <ClearIcon />
+      </IconButton>
+
+      <div>
+        <TextField
+          aria-label="name"
+          label="名称"
+          inputRef={ nameRef }
+          defaultValue={ item.name } />
+        <TextField
+          aria-label="description"
+          label="説明"
+          inputRef={ descriptionRef }
+          defaultValue={ item.description } />
+
+        {
+          !notFound &&
+          <IconButton aria-label="update" onClick={ update }>
+            <DoneIcon />
           </IconButton>
+        }
+        {
+          notFound &&
+          <IconButton aria-label="add" onClick={ add }>
+            <DoneIcon />
+          </IconButton>
+        }
+      </div>
 
-          <div>
-            <TextField
-              aria-label="name"
-              label="名称"
-              inputRef={ nameRef }
-              defaultValue={ item.name } />
-            <TextField
-              aria-label="description"
-              label="説明"
-              inputRef={ descriptionRef }
-              defaultValue={ item.description } />
-            <IconButton aria-label="update" onClick={ update }>
-              <DoneIcon />
-            </IconButton>
-          </div>
+      <div>
+        storage update
+        <CodeReader onRead={ onCodeRead } />
 
-          <div>
-            storage update
-            <CodeReader onRead={ onCodeRead } />
-
-            <Snackbar
-              open={ alertOpen }
-              autoHideDuration={ 6000 }
-              onClose={ alertClose }>
-              <Alert onClose={ alertClose } severity="warning">
-                not a storage!
-              </Alert>
-            </Snackbar>
-          </div>
-        </>
-      }
+        <Snackbar
+          open={ alertOpen }
+          autoHideDuration={ 6000 }
+          onClose={ alertClose }>
+          <Alert onClose={ alertClose } severity="warning">
+            not a storage!
+          </Alert>
+        </Snackbar>
+      </div>
     </Loader>
   )
 }

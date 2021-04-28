@@ -132,6 +132,13 @@ describe('belongings slice', () => {
         expect(actual.list).toEqual([b1])
         expect(actual.pending).toBe(false)
       })
+
+      it('should set notFound flag when therere no items', () => {
+        const action = get.fulfilled(null)
+        const actual = reducer({list: [], pending: true}, action)
+
+        expect(actual.list).toEqual([])
+      })
     })
 
     describe('rejected', () => {
