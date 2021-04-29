@@ -20,7 +20,7 @@ const SignInButton = (props) => {
 
   const onClick = async () => {
     await signIn()
-    afterSignedIn()
+    if(afterSignedIn) { afterSignedIn() }
   }
 
   return (

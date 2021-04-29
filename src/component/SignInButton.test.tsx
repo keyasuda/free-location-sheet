@@ -36,7 +36,7 @@ describe('SignInButton', () => {
     it('should kick signIn() when the buttton has clicked', async () => {
       initAuth.mockImplementationOnce((setState) => setState(false))
       renderIt()
-      await userEvent.type(screen.getByRole('button'), 'JavaScript')
+      await userEvent.click(screen.getByRole('button'))
 
       expect(signIn).toHaveBeenCalled()
     })

@@ -21,12 +21,14 @@ export const Sheet = {
       },
       fields: 'spreadsheetId'
     })
-    Sheet.documentId = newSheet.spreadsheetId
+
+    const id = newSheet.result.spreadsheetId
+    Sheet.documentId = id
 
     // format
     await Sheet.format()
 
-    return newSheet.spreadsheetId
+    return id
   },
 
   init: (documentId: string, auth, sheetsService) => {
@@ -77,8 +79,16 @@ export const Sheet = {
         values: header.belongings
       },
       {
+        range: 'belongings!A2:G2',
+        values: ['=ROW()', uuidv4(), '最初の物品', '', 1, '', false]
+      },
+      {
         range: 'storages!A1:E1',
         values: header.storages
+      },
+      {
+        range: 'storages!A2:E2',
+        values: ['=ROW()', uuidv4(), '最初の保管場所', '', false]
       }
     ])
   },

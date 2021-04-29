@@ -26,7 +26,7 @@ describe('Sheet', () => {
       it('should create a new spreadsheet', async () => {
         const id = 'newspreadsheetid'
         Sheet.service.spreadsheets.create.mockResolvedValue({
-          spreadsheetId: id
+          result: {spreadsheetId: id}
         })
         const sheetFormat = Sheet.format
         Sheet.format = jest.fn()
@@ -150,6 +150,9 @@ describe('Sheet', () => {
       })
 
       it('should (over)write headers to sheets', async () => {
+        const generateduuid = 'generateduuid'
+        jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
+
         Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
         await Sheet.format()
 
@@ -159,8 +162,16 @@ describe('Sheet', () => {
             values: ['row', 'id', 'name', 'description', 'quantities', 'storageId', 'printed']
           },
           {
+            range: 'belongings!A2:G2',
+            values: ['=ROW()', generateduuid, '最初の物品', '', 1, '', false]
+          },
+          {
             range: 'storages!A1:E1',
             values: ['row', 'id', 'name', 'description', 'printed']
+          },
+          {
+            range: 'storages!A2:E2',
+            values: ['=ROW()', generateduuid, '最初の保管場所', '', false]
           }
         ])
       })
