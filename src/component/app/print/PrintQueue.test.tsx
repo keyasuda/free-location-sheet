@@ -14,19 +14,15 @@ import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import { store, history } from '../../../state/store'
 import * as auth from '../../authentication'
 
-const setMockState = (items) => {
+const setMockState = (belongings, storages) => {
   const mockState = {
-    printQueue: {
-      pending: false,
-      list: items,
-    },
     storages: {
       pending: false,
-      list: [],
+      list: storages,
     },
     belongings: {
       pending: false,
-      list: [],
+      list: belongings,
     },
   }
 
@@ -53,8 +49,8 @@ const mockStorage = {
   printed: false,
 }
 
-const renderIt = (mockState) => {
-  setMockState(mockState)
+const renderIt = (belongings, storages) => {
+  setMockState(belongings, storages)
 
   render(
     <Provider store={store}>
@@ -66,6 +62,8 @@ const renderIt = (mockState) => {
 }
 
 describe('PrintQueue', () => {
+  let bFindByPrinted, sFindByPrinted
+
   beforeEach(() => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
@@ -73,6 +71,14 @@ describe('PrintQueue', () => {
       fileId: 'file-id',
       itemId: 'itemid',
     })
+    bFindByPrinted = jest.spyOn(belongingsAsyncThunk, 'findByPrinted')
+    sFindByPrinted = jest.spyOn(storagesAsyncThunk, 'findByPrinted')
+  })
+
+  it('should retreive unprinted items', () => {
+    renderIt([mockBelonging], [mockStorage])
+    expect(bFindByPrinted).toHaveBeenCalledWith(false)
+    expect(sFindByPrinted).toHaveBeenCalledWith(false)
   })
 
   describe('actions', () => {
@@ -80,7 +86,7 @@ describe('PrintQueue', () => {
       const belongingsUpdate = jest.spyOn(belongingsAsyncThunk, 'update')
       const storagesUpdate = jest.spyOn(storagesAsyncThunk, 'update')
 
-      renderIt([mockBelonging, mockStorage])
+      renderIt([mockBelonging], [mockStorage])
       const btn = screen.getByText('印刷済みにする')
       userEvent.click(btn)
 
