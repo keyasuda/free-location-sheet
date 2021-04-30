@@ -5,6 +5,13 @@ import ReactToPrint from 'react-to-print'
 import Button from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/styles'
 import { useReactToPrint } from 'react-to-print'
+import Fab from '@material-ui/core/Fab'
+import PrintIcon from '@material-ui/icons/Print'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
 
 import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
@@ -43,8 +50,18 @@ const PrintQueue = (props) => {
     content: () => sheetRef.current,
   })
   const dispatch = useDispatch()
+  const [dialogOpen, setDialogOpen] = useState(false)
 
-  const classes = makeStyles({})()
+  const classes = makeStyles({
+    fab: {
+      position: 'fixed',
+      right: '20px',
+      bottom: '20px',
+    },
+    actions: {
+      justifyContent: 'space-between',
+    },
+  })()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
@@ -63,16 +80,48 @@ const PrintQueue = (props) => {
     dispatch(storagesAsyncThunk.update(storages))
   }
 
+  const handleClose = () => {
+    setDialogOpen(false)
+  }
+
   return (
     <div>
-      <Button size="small" color="primary" onClick={print}>
-        印刷
-      </Button>
-      <Button size="small" onClick={updateAsPrinted}>
-        印刷済みにする
-      </Button>
+      <Fab
+        className={classes.fab}
+        color="primary"
+        aria-label="print"
+        onClick={() => {
+          print()
+          setDialogOpen(true)
+        }}
+      >
+        <PrintIcon />
+      </Fab>
 
       <Sheets items={items} ref={sheetRef} />
+
+      <Dialog open={dialogOpen} onClose={handleClose} disableBackdropClick>
+        <DialogTitle>印刷済みコード</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            物品・保管場所を印刷済みとして保存しますか?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions className={classes.actions}>
+          <Button onClick={handleClose}>いいえ</Button>
+          <Button
+            onClick={() => {
+              updateAsPrinted()
+              handleClose()
+            }}
+            color="primary"
+            aria-label="mark as printed"
+            autoFocus
+          >
+            はい
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

@@ -87,7 +87,8 @@ describe('PrintQueue', () => {
       const storagesUpdate = jest.spyOn(storagesAsyncThunk, 'update')
 
       renderIt([mockBelonging], [mockStorage])
-      const btn = screen.getByText('印刷済みにする')
+      userEvent.click(screen.getByLabelText('print'))
+      const btn = screen.getByLabelText('mark as printed')
       userEvent.click(btn)
 
       expect(belongingsUpdate).toHaveBeenCalledWith([
