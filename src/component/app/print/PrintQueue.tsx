@@ -3,6 +3,7 @@ import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ReactToPrint from 'react-to-print'
 import Button from '@material-ui/core/Button'
+import { makeStyles } from '@material-ui/styles'
 import { useReactToPrint } from 'react-to-print'
 
 import { authorizedClient, authorizedSheet } from '../../authentication'
@@ -10,6 +11,25 @@ import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import PrintSheet from './PrintSheet'
+
+const Sheets = React.forwardRef((props, ref) => {
+  const { items } = props
+
+  const size = 24
+  const chunks = items.reduce(
+    (acc, value, index) =>
+      index % size ? acc : [...acc, items.slice(index, index + size)],
+    []
+  )
+
+  return (
+    <div ref={ref}>
+      {chunks.map((c, i) => (
+        <PrintSheet items={c} key={i} />
+      ))}
+    </div>
+  )
+})
 
 const PrintQueue = (props) => {
   const { fileId } = useParams()
@@ -23,6 +43,8 @@ const PrintQueue = (props) => {
     content: () => sheetRef.current,
   })
   const dispatch = useDispatch()
+
+  const classes = makeStyles({})()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
@@ -42,27 +64,16 @@ const PrintQueue = (props) => {
   }
 
   return (
-    <>
-      <div>
-        <h2>印刷対象</h2>
-        <ul>
-          {items.map((i) => (
-            <li key={i.id}>
-              {i.name} {i.klass}
-            </li>
-          ))}
-        </ul>
-      </div>
-
+    <div>
       <Button size="small" color="primary" onClick={print}>
         印刷
       </Button>
-      <PrintSheet items={items} ref={sheetRef} />
-
       <Button size="small" onClick={updateAsPrinted}>
         印刷済みにする
       </Button>
-    </>
+
+      <Sheets items={items} ref={sheetRef} />
+    </div>
   )
 }
 export default PrintQueue
