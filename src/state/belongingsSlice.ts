@@ -1,22 +1,22 @@
-import { Belonging } from './types';
-import { Sheet } from '../api/sheet';
-import { listSliceAndThunks } from './listSlice';
+import { Belonging } from './types'
+import { Sheet } from '../api/sheet'
+import { listSliceAndThunks } from './listSlice'
 
 type State = {
-  list: Belonging[],
+  list: Belonging[]
   pending: boolean
 }
 
 const initialState: State = {
   list: [],
-  pending: false
+  pending: false,
 }
 
 const elements = listSliceAndThunks({
   initialState: initialState,
   baseName: 'belongings',
-  api: Sheet.belongings
+  api: Sheet.belongings,
 })
 
-export const belongingsAsyncThunk = elements.thunks;
-export const belongingsSlice = elements.slice;
+export const belongingsAsyncThunk = elements.thunks
+export const belongingsSlice = elements.slice

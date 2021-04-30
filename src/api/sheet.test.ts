@@ -10,9 +10,9 @@ describe('Sheet', () => {
       spreadsheets: {
         create: jest.fn(),
         values: {
-          batchGet: jest.fn()
-        }
-      }
+          batchGet: jest.fn(),
+        },
+      },
     }
     Sheet.sheets = jest.fn()
     Sheet.createSheet = jest.fn()
@@ -26,7 +26,7 @@ describe('Sheet', () => {
       it('should create a new spreadsheet', async () => {
         const id = 'newspreadsheetid'
         Sheet.service.spreadsheets.create.mockResolvedValue({
-          result: {spreadsheetId: id}
+          result: { spreadsheetId: id },
         })
         const sheetFormat = Sheet.format
         Sheet.format = jest.fn()
@@ -37,14 +37,14 @@ describe('Sheet', () => {
         expect(Sheet.service.spreadsheets.create).toHaveBeenCalledWith({
           resource: {
             properties: {
-              title: 'new sheet'
-            }
+              title: 'new sheet',
+            },
           },
-          fields: 'spreadsheetId'
+          fields: 'spreadsheetId',
         })
         expect(Sheet.format).toHaveBeenCalled()
 
-        Sheet.format = sheetFormat;
+        Sheet.format = sheetFormat
       })
     })
 
@@ -57,7 +57,7 @@ describe('Sheet', () => {
               {
                 range: 'storages!A1:E1',
                 majorDimension: 'ROWS',
-                values: [ [ 'row', 'id', 'name', 'description', 'printed' ] ]
+                values: [['row', 'id', 'name', 'description', 'printed']],
               },
               {
                 range: 'belongings!A1:G1',
@@ -70,21 +70,23 @@ describe('Sheet', () => {
                     'description',
                     'quantities',
                     'storageId',
-                    'printed'
-                  ]
-                ]
-              }
-            ]
-          }
+                    'printed',
+                  ],
+                ],
+              },
+            ],
+          },
         })
 
         const actual = await Sheet.validate()
 
         expect(actual).toBe(true)
-        expect(Sheet.service.spreadsheets.values.batchGet).toHaveBeenCalledWith({
-          spreadsheetId,
-          ranges: ['storages!A1:E1', 'belongings!A1:G1']
-        })
+        expect(Sheet.service.spreadsheets.values.batchGet).toHaveBeenCalledWith(
+          {
+            spreadsheetId,
+            ranges: ['storages!A1:E1', 'belongings!A1:G1'],
+          }
+        )
       })
 
       it('should return false when therere missed sheets', async () => {
@@ -103,7 +105,7 @@ describe('Sheet', () => {
               {
                 range: 'storages!A1:E1',
                 majorDimension: 'ROWS',
-                values: [ [ 'row', 'id', 'name', 'description', 'printed' ] ]
+                values: [['row', 'id', 'name', 'description', 'printed']],
               },
               {
                 range: 'belongings!A1:G1',
@@ -116,12 +118,12 @@ describe('Sheet', () => {
                     '', // description is missing
                     'quantities',
                     'storageId',
-                    'printed'
-                  ]
-                ]
-              }
-            ]
-          }
+                    'printed',
+                  ],
+                ],
+              },
+            ],
+          },
         })
 
         const actual = await Sheet.validate()
@@ -159,20 +161,28 @@ describe('Sheet', () => {
         expect(Sheet.update).toHaveBeenCalledWith([
           {
             range: 'belongings!A1:G1',
-            values: ['row', 'id', 'name', 'description', 'quantities', 'storageId', 'printed']
+            values: [
+              'row',
+              'id',
+              'name',
+              'description',
+              'quantities',
+              'storageId',
+              'printed',
+            ],
           },
           {
             range: 'belongings!A2:G2',
-            values: ['=ROW()', generateduuid, '最初の物品', '', 1, '', false]
+            values: ['=ROW()', generateduuid, '最初の物品', '', 1, '', false],
           },
           {
             range: 'storages!A1:E1',
-            values: ['row', 'id', 'name', 'description', 'printed']
+            values: ['row', 'id', 'name', 'description', 'printed'],
           },
           {
             range: 'storages!A2:E2',
-            values: ['=ROW()', generateduuid, '最初の保管場所', '', false]
-          }
+            values: ['=ROW()', generateduuid, '最初の保管場所', '', false],
+          },
         ])
       })
     })
@@ -185,7 +195,7 @@ describe('Sheet', () => {
       id: 'storageuuid',
       name: 'storage 1',
       description: 'description 1',
-      printed: true
+      printed: true,
     }
 
     describe('add', () => {
@@ -194,18 +204,15 @@ describe('Sheet', () => {
         jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
 
         const newItems = [
-          {name: 'item 1', description: 'desc 1'},
-          {name: 'item 2', description: 'desc 2'}
+          { name: 'item 1', description: 'desc 1' },
+          { name: 'item 2', description: 'desc 2' },
         ]
         const actual = await api.add(newItems)
 
-        expect(Sheet.add).toHaveBeenCalledWith(
-          'storages!A:A',
-          [
-            ['=ROW()', generateduuid, 'item 1', 'desc 1', 'FALSE'],
-            ['=ROW()', generateduuid, 'item 2', 'desc 2', 'FALSE']
-          ]
-        )
+        expect(Sheet.add).toHaveBeenCalledWith('storages!A:A', [
+          ['=ROW()', generateduuid, 'item 1', 'desc 1', 'FALSE'],
+          ['=ROW()', generateduuid, 'item 2', 'desc 2', 'FALSE'],
+        ])
 
         expect(actual[0].id).toEqual(generateduuid)
       })
@@ -213,9 +220,15 @@ describe('Sheet', () => {
 
     describe('get', () => {
       it('should get single storage', async () => {
-        Sheet.query.mockResolvedValue([[
-          2, expected.id, expected.name, expected.description, expected.printed
-        ]])
+        Sheet.query.mockResolvedValue([
+          [
+            2,
+            expected.id,
+            expected.name,
+            expected.description,
+            expected.printed,
+          ],
+        ])
         const actual = await api.get('storageuuid')
 
         expect(Sheet.query).toHaveBeenCalledWith(
@@ -235,49 +248,61 @@ describe('Sheet', () => {
     describe('update', () => {
       it('should update a storage', async () => {
         const s1 = expected
-        const s2 = {...expected, id: 's2uuid'}
-        Sheet.query.mockResolvedValue([[3, s2.id], [5, s1.id]])
+        const s2 = { ...expected, id: 's2uuid' }
+        Sheet.query.mockResolvedValue([
+          [3, s2.id],
+          [5, s1.id],
+        ])
 
         const actual = await api.update([s1, s2])
 
-        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          `select A, B where (B="${s1.id}") or (B="${s2.id}")`,
+          'storages'
+        )
         expect(Sheet.update).toHaveBeenCalledWith([
           {
             range: 'storages!C5:E5',
-            values: [s1.name, s1.description, s1.printed]
+            values: [s1.name, s1.description, s1.printed],
           },
           {
             range: 'storages!C3:E3',
-            values: [s2.name, s2.description, s2.printed]
-          }
+            values: [s2.name, s2.description, s2.printed],
+          },
         ])
         expect(actual).toEqual([s1, s2])
       })
 
       it('should drop nonexistent record', async () => {
         const s1 = expected
-        const s2 = {...expected, id: 's2uuid'}
+        const s2 = { ...expected, id: 's2uuid' }
         Sheet.query.mockResolvedValue([[3, s2.id]])
 
         await api.update([s1, s2])
 
-        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          `select A, B where (B="${s1.id}") or (B="${s2.id}")`,
+          'storages'
+        )
         expect(Sheet.update).toHaveBeenCalledWith([
           {
             range: 'storages!C3:E3',
-            values: [s2.name, s2.description, s2.printed]
-          }
+            values: [s2.name, s2.description, s2.printed],
+          },
         ])
       })
 
       it('should do nothing when all records are nonexistent', async () => {
         const s1 = expected
-        const s2 = {...expected, id: 's2uuid'}
+        const s2 = { ...expected, id: 's2uuid' }
         Sheet.query.mockResolvedValue([])
 
         await api.update([s1, s2])
 
-        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${s1.id}") or (B="${s2.id}")`, 'storages')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          `select A, B where (B="${s1.id}") or (B="${s2.id}")`,
+          'storages'
+        )
         expect(Sheet.update).not.toHaveBeenCalled()
       })
     })
@@ -288,8 +313,13 @@ describe('Sheet', () => {
 
         await api.delete('storageuuid')
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
-        expect(Sheet.update).toHaveBeenCalledWith('storages!A4:E4', [['', '', '', '', '']])
+        expect(Sheet.query).toHaveBeenCalledWith(
+          'select A where B="storageuuid"',
+          'storages'
+        )
+        expect(Sheet.update).toHaveBeenCalledWith('storages!A4:E4', [
+          ['', '', '', '', ''],
+        ])
       })
 
       it('should do nothing when the id is nonexistent', async () => {
@@ -297,21 +327,35 @@ describe('Sheet', () => {
 
         await api.delete('storageuuid')
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="storageuuid"', 'storages')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          'select A where B="storageuuid"',
+          'storages'
+        )
         expect(Sheet.update).not.toHaveBeenCalled()
       })
     })
 
     describe('search', () => {
       beforeEach(() => {
-        Sheet.query.mockResolvedValue([[2, expected.id, expected.name, expected.description, expected.printed]])
+        Sheet.query.mockResolvedValue([
+          [
+            2,
+            expected.id,
+            expected.name,
+            expected.description,
+            expected.printed,
+          ],
+        ])
       })
 
       describe('with single word', () => {
         it('should find storages by both name and description', async () => {
           const actual = await api.search('storage')
 
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "storage")) or ((D contains "storage"))', 'storages')
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where ((C contains "storage")) or ((D contains "storage"))',
+            'storages'
+          )
           expect(actual).toEqual([expected])
         })
       })
@@ -320,7 +364,10 @@ describe('Sheet', () => {
         it('should find storages by both name and description', async () => {
           const actual = await api.search('storage name')
 
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "storage") and (C contains "name")) or ((D contains "storage") and (D contains "name"))', 'storages')
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where ((C contains "storage") and (C contains "name")) or ((D contains "storage") and (D contains "name"))',
+            'storages'
+          )
           expect(actual).toEqual([expected])
         })
       })
@@ -335,20 +382,34 @@ describe('Sheet', () => {
       describe('non ascii word', () => {
         it('should be in raw', async () => {
           const actual = await api.search('猫ベッド')
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド"))', 'storages')
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド"))',
+            'storages'
+          )
         })
       })
     })
 
     describe('findByPrinted', () => {
       beforeEach(() => {
-        Sheet.query.mockResolvedValue([[2, expected.id, expected.name, expected.description, expected.printed]])
+        Sheet.query.mockResolvedValue([
+          [
+            2,
+            expected.id,
+            expected.name,
+            expected.description,
+            expected.printed,
+          ],
+        ])
       })
 
       it('should find printed=false', async () => {
         const actual = await api.findByPrinted(false)
 
-        expect(Sheet.query).toHaveBeenCalledWith('select * where E=false', 'storages')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          'select * where E=false',
+          'storages'
+        )
         expect(actual).toEqual([expected])
       })
     })
@@ -363,7 +424,7 @@ describe('Sheet', () => {
       quantities: 1,
       storageId: 'storageuuid',
       description: 'belonging description',
-      printed: false
+      printed: false,
     }
 
     describe('add', () => {
@@ -372,18 +433,35 @@ describe('Sheet', () => {
         jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
 
         const newItems = [
-          {name: 'item 1', quantities: 1, description: 'desc 1', storageId: 'storage-id', printed: false},
-          {name: 'item 2', quantities: 2, description: 'desc 2', storageId: '', printed: false}
+          {
+            name: 'item 1',
+            quantities: 1,
+            description: 'desc 1',
+            storageId: 'storage-id',
+            printed: false,
+          },
+          {
+            name: 'item 2',
+            quantities: 2,
+            description: 'desc 2',
+            storageId: '',
+            printed: false,
+          },
         ]
         const actual = await api.add(newItems)
 
-        expect(Sheet.add).toHaveBeenCalledWith(
-          'belongings!A:A',
+        expect(Sheet.add).toHaveBeenCalledWith('belongings!A:A', [
           [
-            ['=ROW()', generateduuid, 'item 1', 'desc 1', 1, 'storage-id', 'false'],
-            ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'false']
-          ]
-        )
+            '=ROW()',
+            generateduuid,
+            'item 1',
+            'desc 1',
+            1,
+            'storage-id',
+            'false',
+          ],
+          ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'false'],
+        ])
 
         expect(actual[0].id).toEqual(generateduuid)
       })
@@ -397,30 +475,38 @@ describe('Sheet', () => {
           quantities: 2,
           description: 'desc 1',
           storageId: 'storage-id',
-          printed: true
+          printed: true,
         }
 
         const actual = await api.add([newItem])
 
-        expect(Sheet.add).toHaveBeenCalledWith(
-          'belongings!A:A',
+        expect(Sheet.add).toHaveBeenCalledWith('belongings!A:A', [
           [
-            ['=ROW()', newItem.id, newItem.name, newItem.description, newItem.quantities, newItem.storageId, String(newItem.printed)]
-          ]
-        )
+            '=ROW()',
+            newItem.id,
+            newItem.name,
+            newItem.description,
+            newItem.quantities,
+            newItem.storageId,
+            String(newItem.printed),
+          ],
+        ])
       })
     })
 
     describe('get', () => {
       it('should get single belonging', async () => {
-        Sheet.query.mockResolvedValue([[
-          2, expected.id,
-          expected.name,
-          expected.description,
-          expected.quantities,
-          expected.storageId,
-          expected.printed
-        ]])
+        Sheet.query.mockResolvedValue([
+          [
+            2,
+            expected.id,
+            expected.name,
+            expected.description,
+            expected.quantities,
+            expected.storageId,
+            expected.printed,
+          ],
+        ])
         const actual = await api.get('belonginguuid')
 
         expect(Sheet.query).toHaveBeenCalledWith(
@@ -439,23 +525,41 @@ describe('Sheet', () => {
 
     describe('update', () => {
       const b1 = expected
-      const b2 = {...expected, id: 'b2uuid', name: 'b2'}
+      const b2 = { ...expected, id: 'b2uuid', name: 'b2' }
 
       it('should update a belonging', async () => {
-        Sheet.query.mockResolvedValue([[3, b2.id], [5, b1.id]])
+        Sheet.query.mockResolvedValue([
+          [3, b2.id],
+          [5, b1.id],
+        ])
 
         const actual = await api.update([b1, b2])
 
-        expect(Sheet.query).toHaveBeenCalledWith(`select A, B where (B="${b1.id}") or (B="${b2.id}")`, 'belongings')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          `select A, B where (B="${b1.id}") or (B="${b2.id}")`,
+          'belongings'
+        )
         expect(Sheet.update).toHaveBeenCalledWith([
           {
             range: 'belongings!C5:G5',
-            values: [b1.name, b1.description, b1.quantities, b1.storageId, b1.printed]
+            values: [
+              b1.name,
+              b1.description,
+              b1.quantities,
+              b1.storageId,
+              b1.printed,
+            ],
           },
           {
             range: 'belongings!C3:G3',
-            values: [b2.name, b2.description, b2.quantities, b2.storageId, b2.printed]
-          }
+            values: [
+              b2.name,
+              b2.description,
+              b2.quantities,
+              b2.storageId,
+              b2.printed,
+            ],
+          },
         ])
         expect(actual).toEqual([b1, b2])
       })
@@ -468,8 +572,14 @@ describe('Sheet', () => {
         expect(Sheet.update).toHaveBeenCalledWith([
           {
             range: 'belongings!C3:G3',
-            values: [b2.name, b2.description, b2.quantities, b2.storageId, b2.printed]
-          }
+            values: [
+              b2.name,
+              b2.description,
+              b2.quantities,
+              b2.storageId,
+              b2.printed,
+            ],
+          },
         ])
       })
 
@@ -488,8 +598,13 @@ describe('Sheet', () => {
 
         await api.delete('belonginguuid')
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
-        expect(Sheet.update).toHaveBeenCalledWith('belongings!A4:G4', [['', '', '', '', '', '', '']])
+        expect(Sheet.query).toHaveBeenCalledWith(
+          'select A where B="belonginguuid"',
+          'belongings'
+        )
+        expect(Sheet.update).toHaveBeenCalledWith('belongings!A4:G4', [
+          ['', '', '', '', '', '', ''],
+        ])
       })
 
       it('should do nothing when the id is nonexistent', async () => {
@@ -497,29 +612,37 @@ describe('Sheet', () => {
 
         await api.delete('belonginguuid')
 
-        expect(Sheet.query).toHaveBeenCalledWith('select A where B="belonginguuid"', 'belongings')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          'select A where B="belonginguuid"',
+          'belongings'
+        )
         expect(Sheet.update).not.toHaveBeenCalled()
       })
     })
 
     describe('search', () => {
       beforeEach(() => {
-        Sheet.query.mockResolvedValue([[
-          2,
-          expected.id,
-          expected.name,
-          expected.description,
-          expected.quantities,
-          expected.storageId,
-          expected.printed
-        ]])
+        Sheet.query.mockResolvedValue([
+          [
+            2,
+            expected.id,
+            expected.name,
+            expected.description,
+            expected.quantities,
+            expected.storageId,
+            expected.printed,
+          ],
+        ])
       })
 
       describe('with single word', () => {
         it('should find belongings by both name and description', async () => {
           const actual = await api.search('belonging')
 
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "belonging")) or ((D contains "belonging"))', 'belongings')
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where ((C contains "belonging")) or ((D contains "belonging"))',
+            'belongings'
+          )
           expect(actual).toEqual([expected])
         })
       })
@@ -528,7 +651,10 @@ describe('Sheet', () => {
         it('should find belongings by both name and description', async () => {
           const actual = await api.search('belonging name')
 
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "belonging") and (C contains "name")) or ((D contains "belonging") and (D contains "name"))', 'belongings')
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where ((C contains "belonging") and (C contains "name")) or ((D contains "belonging") and (D contains "name"))',
+            'belongings'
+          )
           expect(actual).toEqual([expected])
         })
       })
@@ -543,28 +669,36 @@ describe('Sheet', () => {
       describe('non ascii word', () => {
         it('should be in raw', async () => {
           const actual = await api.search('猫ベッド')
-          expect(Sheet.query).toHaveBeenCalledWith('select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド"))', 'belongings')
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド"))',
+            'belongings'
+          )
         })
       })
     })
 
     describe('findByPrinted', () => {
       beforeEach(() => {
-        Sheet.query.mockResolvedValue([[
-          2,
-          expected.id,
-          expected.name,
-          expected.description,
-          expected.quantities,
-          expected.storageId,
-          expected.printed
-        ]])
+        Sheet.query.mockResolvedValue([
+          [
+            2,
+            expected.id,
+            expected.name,
+            expected.description,
+            expected.quantities,
+            expected.storageId,
+            expected.printed,
+          ],
+        ])
       })
 
       it('should find printed=false', async () => {
         const actual = await api.findByPrinted(false)
 
-        expect(Sheet.query).toHaveBeenCalledWith('select * where G=false', 'belongings')
+        expect(Sheet.query).toHaveBeenCalledWith(
+          'select * where G=false',
+          'belongings'
+        )
         expect(actual).toEqual([expected])
       })
     })

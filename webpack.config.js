@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 const rules = [
   {
     test: /\.tsx?/,
@@ -7,23 +7,23 @@ const rules = [
   },
   {
     test: /\.(png|jpg|gif)$/,
-    type: 'asset/resource'
-  }
-];
+    type: 'asset/resource',
+  },
+]
 
 module.exports = {
   target: 'web',
   mode: 'development',
-  devtool: "inline-source-map",
+  devtool: 'inline-source-map',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
   },
   module: {
-    rules
+    rules,
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js']
+    extensions: ['.ts', '.tsx', '.js'],
   },
   devServer: {
     host: '0.0.0.0',
@@ -31,6 +31,6 @@ module.exports = {
     historyApiFallback: {
       rewrites: [{ from: /^\/*/, to: '/app.html' }],
     },
-    https: true
+    https: true,
   },
-};
+}

@@ -1,4 +1,4 @@
-const { gapi} = window
+const { gapi } = window
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
@@ -13,12 +13,11 @@ const IndexApp: React.FC = () => {
   return (
     <div>
       <SignInButton>
-        <SheetList gapi={ gapi } />
+        <SheetList gapi={gapi} />
       </SignInButton>
     </div>
   )
 }
-
 
 const root = document.getElementById('index-app')
 if (root != null) {

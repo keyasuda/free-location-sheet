@@ -1,9 +1,9 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { WarehouseItem } from './types';
-import { Sheet } from '../api/sheet';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { WarehouseItem } from './types'
+import { Sheet } from '../api/sheet'
 
 type State = {
-  list: WarehouseItem[],
+  list: WarehouseItem[]
   selected: number
 }
 
@@ -11,22 +11,22 @@ const initialState: State = {
   list: [],
   selected: -1,
   printed: false,
-  pending: false
+  pending: false,
 }
 
 // update all items as printed
 export const updateAsPrinted = createAsyncThunk(
   'printQueue/updateAsPrinted',
   async (items, _thunkApi) => {
-    for(let i of items) {
-      switch(i.klass) {
+    for (let i of items) {
+      switch (i.klass) {
         case 'belonging':
-          await Sheet.belongings.update(i);
-          break;
+          await Sheet.belongings.update(i)
+          break
 
         case 'storage':
-          await Sheet.storages.update(i);
-          break;
+          await Sheet.storages.update(i)
+          break
       }
     }
   }
@@ -46,11 +46,11 @@ export const printQueueSlice = createSlice({
     },
 
     remove(state) {
-      if(state.selected > -1) {
+      if (state.selected > -1) {
         state.list[state.selected] = null
         state.list = state.list.filter((e) => e)
 
-        if(state.list.length - 1 < state.selected) {
+        if (state.list.length - 1 < state.selected) {
           state.selected = state.list.length - 1
         }
       }
@@ -59,7 +59,7 @@ export const printQueueSlice = createSlice({
     clear(state) {
       state.list = []
       state.selected = -1
-    }
+    },
   },
 
   extraReducers: (builder) => {
@@ -68,12 +68,12 @@ export const printQueueSlice = createSlice({
     })
 
     builder.addCase(updateAsPrinted.fulfilled, (state, action) => {
-      state.pending = false;
-      state.printed = true;
+      state.pending = false
+      state.printed = true
     })
 
     builder.addCase(updateAsPrinted.rejected, (state, action) => {
-      state.pending = false;
+      state.pending = false
     })
-  }
+  },
 })

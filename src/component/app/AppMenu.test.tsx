@@ -19,7 +19,7 @@ const MockCodeReader = (props) => {
 jest.mock('./CodeReader', () => ({
   __esModule: true,
   namedExport: jest.fn(),
-  default: jest.fn()
+  default: jest.fn(),
 }))
 
 describe('AppMenu', () => {
@@ -29,7 +29,11 @@ describe('AppMenu', () => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
     history = { push: jest.fn() }
     jest.spyOn(ReactRouter, 'useHistory').mockReturnValue(history)
-    render(<MemoryRouter><AppMenu /></MemoryRouter>)
+    render(
+      <MemoryRouter>
+        <AppMenu />
+      </MemoryRouter>
+    )
   })
 
   beforeAll(() => {
@@ -42,8 +46,12 @@ describe('AppMenu', () => {
 
   describe('navigation', () => {
     it('should have links to lists', () => {
-      expect(screen.getByText('物品一覧').href).toEqual('http://localhost/app/file-id/belongings')
-      expect(screen.getByText('保管場所一覧').href).toEqual('http://localhost/app/file-id/storages')
+      expect(screen.getByText('物品一覧').href).toEqual(
+        'http://localhost/app/file-id/belongings'
+      )
+      expect(screen.getByText('保管場所一覧').href).toEqual(
+        'http://localhost/app/file-id/storages'
+      )
     })
   })
 
@@ -54,7 +62,9 @@ describe('AppMenu', () => {
       fireEvent.change(textField, { target: { value: keyword } })
       await userEvent.click(screen.getByLabelText('search'))
 
-      expect(history.push).toHaveBeenCalledWith('/app/file-id/belongings?keyword=' + encodeURIComponent(keyword))
+      expect(history.push).toHaveBeenCalledWith(
+        '/app/file-id/belongings?keyword=' + encodeURIComponent(keyword)
+      )
     })
 
     it('wont navigate to belongings when the keyword is blank', async () => {
@@ -69,7 +79,7 @@ describe('AppMenu', () => {
   describe('code reader search', () => {
     const code = JSON.stringify({
       klass: 'belonging',
-      id: 'belonginguuid'
+      id: 'belonginguuid',
     })
 
     describe('code is of belonging', () => {
@@ -82,7 +92,7 @@ describe('AppMenu', () => {
     describe('code is of storage', () => {
       const code = JSON.stringify({
         klass: 'storage',
-        id: 'storageuuid'
+        id: 'storageuuid',
       })
 
       it('should navigate to storage page', () => {

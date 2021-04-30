@@ -29,8 +29,8 @@ describe('Storages', () => {
 
   const renderIt = () => {
     render(
-      <Provider store={ store }>
-        <ConnectedRouter history={ history }>
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
           <Storages />
         </ConnectedRouter>
       </Provider>
@@ -42,14 +42,16 @@ describe('Storages', () => {
       klass: 'storage',
       name: '',
       description: '',
-      printed: false
+      printed: false,
     }
 
     beforeEach(() => renderIt())
 
     describe('add button', () => {
       it('should add an item', async () => {
-        const addApi = jest.spyOn(Sheet.storages, 'add').mockResolvedValue([{...item, id: uuidv4()}])
+        const addApi = jest
+          .spyOn(Sheet.storages, 'add')
+          .mockResolvedValue([{ ...item, id: uuidv4() }])
 
         await waitFor(() => screen.findByText('数量'))
         await userEvent.click(screen.getAllByRole('button')[0])
@@ -64,8 +66,10 @@ describe('Storages', () => {
       it('should add desired items', async () => {
         const num = 5
         const apiArgs = _.times(num, () => item)
-        const apiResult = apiArgs.map((i) => ({...i, id: uuidv4()}))
-        const api = jest.spyOn(Sheet.storages, 'add').mockResolvedValue(apiResult)
+        const apiResult = apiArgs.map((i) => ({ ...i, id: uuidv4() }))
+        const api = jest
+          .spyOn(Sheet.storages, 'add')
+          .mockResolvedValue(apiResult)
 
         await waitFor(() => screen.findByText('数量'))
         userEvent.type(screen.getByRole('textbox'), String(num))

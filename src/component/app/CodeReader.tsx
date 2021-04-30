@@ -20,14 +20,14 @@ const Reader = (props: Props) => {
       left: 0,
       width: '100vw',
       height: '100vh',
-      backgroundColor: 'white'
+      backgroundColor: 'white',
     },
     closeButton: {
       position: 'fixed',
       top: 0,
       left: 0,
-      zIndex: 1000
-    }
+      zIndex: 1000,
+    },
   })
   const classes = useStyles()
 
@@ -43,12 +43,17 @@ const Reader = (props: Props) => {
   return (
     <div>
       <video
-        ref={ videoRef }
-        onCanPlay={() => { videoRef.current.play() }}
-        autoPlay playsInline muted
-        className={ classes.video } />
+        ref={videoRef}
+        onCanPlay={() => {
+          videoRef.current.play()
+        }}
+        autoPlay
+        playsInline
+        muted
+        className={classes.video}
+      />
 
-      <IconButton className={ classes.closeButton } onClick={ close }>
+      <IconButton className={classes.closeButton} onClick={close}>
         <CancelIcon />
       </IconButton>
     </div>
@@ -68,7 +73,10 @@ const CodeReader = (props: Props) => {
     setDevices(devices)
 
     if (devices.length > 0) {
-      if (previousDeviceId && devices.map(d => d.deviceId).some(i => i == previousDeviceId.value)) {
+      if (
+        previousDeviceId &&
+        devices.map((d) => d.deviceId).some((i) => i == previousDeviceId.value)
+      ) {
         setSelectedDevice(previousDeviceId.value)
       } else {
         setSelectedDevice(devices[0].deviceId)
@@ -83,35 +91,36 @@ const CodeReader = (props: Props) => {
 
   return (
     <>
-    {
-      devices.length > 0 &&
-      <>
-      {
-        !scanning &&
-        <div>
-        {
-          <Select
-          value={ selectedDevice }
-          onChange={(e) => setSelectedDevice(e.target.value)}>
-          { devices.map((d) => (
-            <MenuItem value={ d.deviceId } key={ d.deviceId }>{ d.label }</MenuItem>
-          )) }
-          </Select>
-        }
-        <IconButton aria-label="scan" onClick={ scan }>
-        <Icon>qr_code_scanner</Icon>
-        </IconButton>
-        </div>
-      }
-      {
-        scanning &&
-        <Reader
-        onRead={ onRead }
-        deviceId={ selectedDevice }
-        close={() => setScanning(false)} />
-      }
-      </>
-    }
+      {devices.length > 0 && (
+        <>
+          {!scanning && (
+            <div>
+              {
+                <Select
+                  value={selectedDevice}
+                  onChange={(e) => setSelectedDevice(e.target.value)}
+                >
+                  {devices.map((d) => (
+                    <MenuItem value={d.deviceId} key={d.deviceId}>
+                      {d.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              }
+              <IconButton aria-label="scan" onClick={scan}>
+                <Icon>qr_code_scanner</Icon>
+              </IconButton>
+            </div>
+          )}
+          {scanning && (
+            <Reader
+              onRead={onRead}
+              deviceId={selectedDevice}
+              close={() => setScanning(false)}
+            />
+          )}
+        </>
+      )}
     </>
   )
 }

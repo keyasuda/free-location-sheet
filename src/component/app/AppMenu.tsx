@@ -29,7 +29,6 @@ const AppMenu = (props) => {
       } else {
         history.push('./storages/' + payload.id)
       }
-
     } catch (e) {
       history.push('./belongings/' + code)
     }
@@ -37,16 +36,16 @@ const AppMenu = (props) => {
 
   return (
     <div>
-      <Link to={ `${basePath}/belongings` }>物品一覧</Link>
-      <Link to={ `${basePath}/storages` }>保管場所一覧</Link>
+      <Link to={`${basePath}/belongings`}>物品一覧</Link>
+      <Link to={`${basePath}/storages`}>保管場所一覧</Link>
       <div>
-        <TextField id="search-word" label="キーワード" inputRef={ keywordRef } />
-        <IconButton color="primary" aria-label="search" onClick={ search }>
+        <TextField id="search-word" label="キーワード" inputRef={keywordRef} />
+        <IconButton color="primary" aria-label="search" onClick={search}>
           <SearchIcon />
         </IconButton>
       </div>
       <div>
-        <CodeReader onRead={ onCodeRead } />
+        <CodeReader onRead={onCodeRead} />
       </div>
     </div>
   )

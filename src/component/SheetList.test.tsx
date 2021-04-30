@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { act } from "@testing-library/react-hooks"
+import { act } from '@testing-library/react-hooks'
 
 import * as auth from './authentication'
 import { Sheet } from '../api/sheet'
@@ -14,26 +14,28 @@ describe('SheetList', () => {
     client: {
       drive: {
         files: {
-          list: jest.fn().mockReturnValue((new Promise((resolve, reject) => {
-            resolveList = (ret) => {
-              resolve(ret)
-            }
-          })))
-        }
-      }
-    }
+          list: jest.fn().mockReturnValue(
+            new Promise((resolve, reject) => {
+              resolveList = (ret) => {
+                resolve(ret)
+              }
+            })
+          ),
+        },
+      },
+    },
   }
 
   const mockFiles = [
-    {id: 'doc-1', name: 'doc 1'},
-    {id: 'doc-2', name: 'doc 2'}
+    { id: 'doc-1', name: 'doc 1' },
+    { id: 'doc-2', name: 'doc 2' },
   ]
 
   beforeEach(() => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
 
-    render(<SheetList gapi={ gapi } />)
+    render(<SheetList gapi={gapi} />)
   })
 
   afterEach(() => {
@@ -42,9 +44,9 @@ describe('SheetList', () => {
 
   it('should retrieve list of sheets', () => {
     expect(gapi.client.drive.files.list).toHaveBeenCalledWith({
-      fields: "files(id, name)",
-      orderBy: "modifiedTime desc",
-      q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false"
+      fields: 'files(id, name)',
+      orderBy: 'modifiedTime desc',
+      q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
     })
   })
 

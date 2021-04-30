@@ -19,28 +19,20 @@ const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const Storage = (props) => {
   const { id } = props
-  const item = useSelector(s => s.storages.list[0])
-  const pending = useSelector(s => s.storages.pending)
+  const item = useSelector((s) => s.storages.list[0])
+  const pending = useSelector((s) => s.storages.pending)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (id){
+    if (id) {
       dispatch(storagesAsyncThunk.get(id))
     }
   }, [id])
 
   return (
-    <Loader loading={ pending }>
-      {
-        id && item && (
-          <div>
-            { item.name }
-          </div>
-        )
-      }
-      {
-        (!id || !item) && <div>(not associated with any storages)</div>
-      }
+    <Loader loading={pending}>
+      {id && item && <div>{item.name}</div>}
+      {(!id || !item) && <div>(not associated with any storages)</div>}
     </Loader>
   )
 }
@@ -48,13 +40,13 @@ const Storage = (props) => {
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
-  const pending = useSelector(s => s.belongings.pending)
-  const { item, notFound } = useSelector(s => {
+  const pending = useSelector((s) => s.belongings.pending)
+  const { item, notFound } = useSelector((s) => {
     const inState = s.belongings.list.find((i) => i && i.id == itemId)
     if (inState) {
-      return ({item: inState, notFound: false})
+      return { item: inState, notFound: false }
     } else {
-      return ({
+      return {
         item: {
           klass: 'belonging',
           id: itemId,
@@ -62,10 +54,10 @@ const Belonging = (props) => {
           description: '',
           printed: true,
           storageId: null,
-          quantities: 1
+          quantities: 1,
         },
-        notFound: true
-      })
+        notFound: true,
+      }
     }
   })
   const nameRef = useRef()
@@ -82,7 +74,7 @@ const Belonging = (props) => {
     const addedItem = {
       ...item,
       name: nameRef.current.value,
-      description: descriptionRef.current.value
+      description: descriptionRef.current.value,
     }
     await dispatch(belongingsAsyncThunk.add([addedItem]))
   }
@@ -91,7 +83,7 @@ const Belonging = (props) => {
     const updatedItem = {
       ...item,
       name: nameRef.current.value,
-      description: descriptionRef.current.value
+      description: descriptionRef.current.value,
     }
 
     dispatch(belongingsAsyncThunk.update([updatedItem]))
@@ -100,7 +92,7 @@ const Belonging = (props) => {
   const setStorageId = (id) => {
     const updatedItem = {
       ...item,
-      storageId: id
+      storageId: id,
     }
 
     dispatch(belongingsAsyncThunk.update([updatedItem]))
@@ -129,14 +121,14 @@ const Belonging = (props) => {
   }
 
   return (
-    <Loader loading={ pending }>
+    <Loader loading={pending}>
       <div>
-        <h1>{ item.name }</h1>
-        <p>{ item.description }</p>
+        <h1>{item.name}</h1>
+        <p>{item.description}</p>
       </div>
 
-      <Storage id={ item.storageId } />
-      <IconButton aria-label="clear" onClick={() => setStorageId(null) }>
+      <Storage id={item.storageId} />
+      <IconButton aria-label="clear" onClick={() => setStorageId(null)}>
         <ClearIcon />
       </IconButton>
 
@@ -144,37 +136,33 @@ const Belonging = (props) => {
         <TextField
           aria-label="name"
           label="名称"
-          inputRef={ nameRef }
-          defaultValue={ item.name } />
+          inputRef={nameRef}
+          defaultValue={item.name}
+        />
         <TextField
           aria-label="description"
           label="説明"
-          inputRef={ descriptionRef }
-          defaultValue={ item.description } />
+          inputRef={descriptionRef}
+          defaultValue={item.description}
+        />
 
-        {
-          !notFound &&
-          <IconButton aria-label="update" onClick={ update }>
+        {!notFound && (
+          <IconButton aria-label="update" onClick={update}>
             <DoneIcon />
           </IconButton>
-        }
-        {
-          notFound &&
-          <IconButton aria-label="add" onClick={ add }>
+        )}
+        {notFound && (
+          <IconButton aria-label="add" onClick={add}>
             <DoneIcon />
           </IconButton>
-        }
+        )}
       </div>
 
       <div>
         storage update
-        <CodeReader onRead={ onCodeRead } />
-
-        <Snackbar
-          open={ alertOpen }
-          autoHideDuration={ 6000 }
-          onClose={ alertClose }>
-          <Alert onClose={ alertClose } severity="warning">
+        <CodeReader onRead={onCodeRead} />
+        <Snackbar open={alertOpen} autoHideDuration={6000} onClose={alertClose}>
+          <Alert onClose={alertClose} severity="warning">
             not a storage!
           </Alert>
         </Snackbar>

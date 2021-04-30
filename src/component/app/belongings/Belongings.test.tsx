@@ -21,18 +21,20 @@ const setMockState = (keyword, belongings) => {
     router: {
       location: {
         query: {
-          keyword: keyword
+          keyword: keyword,
         },
-        pathname: '/app/file-id/belongings'
-      }
+        pathname: '/app/file-id/belongings',
+      },
     },
     belongings: {
       pending: false,
-      list: belongings
-    }
+      list: belongings,
+    },
   }
 
-  jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) => selector(mockState))
+  jest
+    .spyOn(ReactRedux, 'useSelector')
+    .mockImplementation((selector) => selector(mockState))
 }
 
 const mockItem = {
@@ -41,11 +43,11 @@ const mockItem = {
   description: '',
   storageId: null,
   quantities: 1,
-  printed: false
+  printed: false,
 }
 
 describe('Belongings', () => {
-  let sheetInit, searchThunk;
+  let sheetInit, searchThunk
   beforeEach(() => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
     sheetInit = jest.spyOn(Sheet, 'init').mockReturnValue('hogehoge')
@@ -61,8 +63,8 @@ describe('Belongings', () => {
 
   const renderIt = () => {
     render(
-      <Provider store={ store }>
-        <ConnectedRouter history={ history }>
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
           <Belongings />
         </ConnectedRouter>
       </Provider>
@@ -100,8 +102,8 @@ describe('Belongings', () => {
   describe('belongings list', () => {
     describe('items with name', () => {
       const items = [
-        {...mockItem, id: uuidv4(), name: 'itemname1'},
-        {...mockItem, id: uuidv4(), name: 'itemname2'},
+        { ...mockItem, id: uuidv4(), name: 'itemname1' },
+        { ...mockItem, id: uuidv4(), name: 'itemname2' },
       ]
       beforeEach(() => {
         setMockState('', items)
@@ -115,7 +117,7 @@ describe('Belongings', () => {
 
     describe('item without name', () => {
       beforeEach(() => {
-        setMockState('', [{...mockItem, id: uuidv4()}])
+        setMockState('', [{ ...mockItem, id: uuidv4() }])
         renderIt()
       })
 
@@ -132,7 +134,7 @@ describe('Belongings', () => {
       description: '',
       storageId: null,
       quantities: 1,
-      printed: false
+      printed: false,
     }
 
     let addThunk

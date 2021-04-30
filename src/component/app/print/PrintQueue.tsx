@@ -19,7 +19,7 @@ const PrintQueue = (props) => {
   const items = useSelector((s) => s.printQueue.list)
   const sheetRef = useRef()
   const print = useReactToPrint({
-    content: () => sheetRef.current
+    content: () => sheetRef.current,
   })
   const dispatch = useDispatch()
 
@@ -28,9 +28,13 @@ const PrintQueue = (props) => {
   }, [])
 
   const updateAsPrinted = () => {
-    const belongings = items.filter((i) => i.klass == 'belonging').map((i) => ({...i, printed: true}))
+    const belongings = items
+      .filter((i) => i.klass == 'belonging')
+      .map((i) => ({ ...i, printed: true }))
     dispatch(belongingsAsyncThunk.update(belongings))
-    const storages = items.filter((i) => i.klass == 'storage').map((i) => ({...i, printed: true}))
+    const storages = items
+      .filter((i) => i.klass == 'storage')
+      .map((i) => ({ ...i, printed: true }))
     dispatch(storagesAsyncThunk.update(storages))
   }
 
@@ -39,27 +43,25 @@ const PrintQueue = (props) => {
       <div>
         <h2>印刷対象</h2>
         <ul>
-          {
-            items.map((i) => (
-              <li key={ i.id }>
-                { i.name } { i.klass }
-              </li>
-            ))
-          }
+          {items.map((i) => (
+            <li key={i.id}>
+              {i.name} {i.klass}
+            </li>
+          ))}
         </ul>
       </div>
 
-      <Button size="small" color="primary" onClick={ print }>
+      <Button size="small" color="primary" onClick={print}>
         印刷
       </Button>
-      <PrintSheet items={ items } ref={ sheetRef } />
+      <PrintSheet items={items} ref={sheetRef} />
 
-      <Button size="small" onClick={ updateAsPrinted }>
+      <Button size="small" onClick={updateAsPrinted}>
         印刷済みにする
       </Button>
 
-      <Belongings add={ printQueueSlice.actions.add } />
-      <Storages add={ printQueueSlice.actions.add } />
+      <Belongings add={printQueueSlice.actions.add} />
+      <Storages add={printQueueSlice.actions.add} />
     </>
   )
 }

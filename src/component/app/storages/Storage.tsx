@@ -13,8 +13,8 @@ import Loader from '../Loader'
 const Storage = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
-  const pending = useSelector(s => s.storages.pending)
-  const item = useSelector(s => s.storages.list[0])
+  const pending = useSelector((s) => s.storages.pending)
+  const item = useSelector((s) => s.storages.list[0])
   const nameRef = useRef()
   const descriptionRef = useRef()
 
@@ -27,30 +27,37 @@ const Storage = (props) => {
     const updatedItem = {
       ...item,
       name: nameRef.current.value,
-      description: descriptionRef.current.value
+      description: descriptionRef.current.value,
     }
 
     dispatch(storagesAsyncThunk.update([updatedItem]))
   }
 
   return (
-    <Loader loading={ pending }>
-      {
-        item &&
+    <Loader loading={pending}>
+      {item && (
         <>
           <div>
-            <h1>{ item.name }</h1>
-            <p>{ item.description }</p>
+            <h1>{item.name}</h1>
+            <p>{item.description}</p>
           </div>
           <div>
-            <TextField label="名称" inputRef={ nameRef } defaultValue={ item.name } />
-            <TextField label="説明" inputRef={ descriptionRef } defaultValue={ item.description } />
-            <IconButton aria-label="update" onClick={ update }>
+            <TextField
+              label="名称"
+              inputRef={nameRef}
+              defaultValue={item.name}
+            />
+            <TextField
+              label="説明"
+              inputRef={descriptionRef}
+              defaultValue={item.description}
+            />
+            <IconButton aria-label="update" onClick={update}>
               <DoneIcon />
             </IconButton>
           </div>
         </>
-      }
+      )}
     </Loader>
   )
 }

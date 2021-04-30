@@ -1,6 +1,6 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { act } from "@testing-library/react-hooks"
+import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 
 import { MemoryRouter } from 'react-router-dom'
@@ -21,12 +21,14 @@ const setMockState = (belonging) => {
   const mockState = {
     belongings: {
       pending: false,
-      list: [belonging]
+      list: [belonging],
     },
-    storages: { pending: false, list: [] }
+    storages: { pending: false, list: [] },
   }
 
-  jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) => selector(mockState))
+  jest
+    .spyOn(ReactRedux, 'useSelector')
+    .mockImplementation((selector) => selector(mockState))
 }
 
 const mockItem = {
@@ -36,13 +38,13 @@ const mockItem = {
   description: 'itemdescription',
   storageId: null,
   quantities: 1,
-  printed: false
+  printed: false,
 }
 
 const renderIt = () => {
   render(
-    <Provider store={ store }>
-      <ConnectedRouter history={ history }>
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
         <Belonging />
       </ConnectedRouter>
     </Provider>
@@ -60,7 +62,7 @@ const MockCodeReader = (props) => {
 jest.mock('../CodeReader', () => ({
   __esModule: true,
   namedExport: jest.fn(),
-  default: jest.fn()
+  default: jest.fn(),
 }))
 
 describe('Belonging', () => {
@@ -75,7 +77,7 @@ describe('Belonging', () => {
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
       fileId: 'file-id',
-      itemId: mockItem.id
+      itemId: mockItem.id,
     })
     getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
     setMockState(mockItem)
@@ -97,26 +99,30 @@ describe('Belonging', () => {
       const updateThunk = jest.spyOn(belongingsAsyncThunk, 'update')
       renderIt()
 
-      const nameField = screen.getByLabelText('name').querySelector("input")
+      const nameField = screen.getByLabelText('name').querySelector('input')
       userEvent.type(nameField, 'addedname')
 
-      const descriptionField = screen.getByLabelText('description').querySelector("input")
+      const descriptionField = screen
+        .getByLabelText('description')
+        .querySelector('input')
       userEvent.type(descriptionField, 'addeddescription')
 
       const updateButton = screen.getByLabelText('update')
       userEvent.click(updateButton)
 
-      expect(updateThunk).toHaveBeenCalledWith([{
-        ...mockItem,
-        name: mockItem.name + 'addedname',
-        description: mockItem.description + 'addeddescription'
-      }])
+      expect(updateThunk).toHaveBeenCalledWith([
+        {
+          ...mockItem,
+          name: mockItem.name + 'addedname',
+          description: mockItem.description + 'addeddescription',
+        },
+      ])
     })
   })
 
   describe('when it has storageId', () => {
     beforeEach(() => {
-      setMockState({...mockItem, storageId: 'storageid'})
+      setMockState({ ...mockItem, storageId: 'storageid' })
     })
 
     it('should get the storage', () => {
@@ -141,7 +147,7 @@ describe('Belonging', () => {
   describe('set storage ID', () => {
     const codeSrc = {
       klass: 'storage',
-      id: 'storageuuid'
+      id: 'storageuuid',
     }
 
     let thunk, closeFunc
@@ -155,12 +161,19 @@ describe('Belonging', () => {
     it('should set storage ID', () => {
       codeReaderOnRead(JSON.stringify(codeSrc), closeFunc)
 
-      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: codeSrc.id}])
+      expect(thunk).toHaveBeenCalledWith([
+        { ...mockItem, storageId: codeSrc.id },
+      ])
       expect(closeFunc).toHaveBeenCalled()
     })
 
     it('shouldnt set ID when belongings code was read', () => {
-      act(() => codeReaderOnRead(JSON.stringify({...codeSrc, klass: 'belongings'}), closeFunc))
+      act(() =>
+        codeReaderOnRead(
+          JSON.stringify({ ...codeSrc, klass: 'belongings' }),
+          closeFunc
+        )
+      )
 
       expect(thunk).not.toHaveBeenCalled()
       expect(closeFunc).not.toHaveBeenCalled()
@@ -179,7 +192,7 @@ describe('Belonging', () => {
       const button = screen.getByLabelText('clear')
       userEvent.click(button)
 
-      expect(thunk).toHaveBeenCalledWith([{...mockItem, storageId: null}])
+      expect(thunk).toHaveBeenCalledWith([{ ...mockItem, storageId: null }])
     })
   })
 
@@ -187,7 +200,7 @@ describe('Belonging', () => {
     beforeEach(() => {
       jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
         fileId: 'file-id',
-        itemId: 'itemid'
+        itemId: 'itemid',
       })
       setMockState(null, true)
       renderIt()
@@ -204,15 +217,17 @@ describe('Belonging', () => {
       const getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
       userEvent.click(button)
 
-      expect(addThunk).toHaveBeenCalledWith([{
-        ...mockItem,
-        id: 'itemid',
-        name: '',
-        description: '',
-        storageId: null,
-        quantities: 1,
-        printed: true // unknown code has scanned - the code is already on somewhare
-      }])
+      expect(addThunk).toHaveBeenCalledWith([
+        {
+          ...mockItem,
+          id: 'itemid',
+          name: '',
+          description: '',
+          storageId: null,
+          quantities: 1,
+          printed: true, // unknown code has scanned - the code is already on somewhare
+        },
+      ])
     })
   })
 })

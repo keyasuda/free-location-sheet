@@ -17,21 +17,21 @@ const newItem = {
   description: '',
   storageId: null,
   quantities: 1,
-  printed: false
+  printed: false,
 }
 
 const Belongings = (props) => {
   const { fileId } = useParams()
   const dispatch = useDispatch()
-  const keyword = useSelector(s => s.router.location.query.keyword)
-  const pending = useSelector(s => s.belongings.pending)
-  const list = useSelector(s => s.belongings.list)
-  const currentPath = useSelector(s => s.router.location.pathname)
+  const keyword = useSelector((s) => s.router.location.query.keyword)
+  const pending = useSelector((s) => s.belongings.pending)
+  const list = useSelector((s) => s.belongings.list)
+  const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
-    dispatch(belongingsAsyncThunk.search((keyword || '')))
+    dispatch(belongingsAsyncThunk.search(keyword || ''))
   }, [])
 
   const add = () => {
@@ -48,24 +48,22 @@ const Belongings = (props) => {
   }
 
   return (
-    <Loader loading={ pending }>
+    <Loader loading={pending}>
       <ul>
-        {
-          (list || []).map((b) => (
-            <li key={ b.id }>
-              <Link to={ `${currentPath}/${b.id}` }>{ b.name || '(no name)' }</Link>
-            </li>
-          ))
-        }
+        {(list || []).map((b) => (
+          <li key={b.id}>
+            <Link to={`${currentPath}/${b.id}`}>{b.name || '(no name)'}</Link>
+          </li>
+        ))}
       </ul>
       <div>
-        <IconButton aria-label="add" onClick={ add }>
+        <IconButton aria-label="add" onClick={add}>
           <AddIcon />
         </IconButton>
       </div>
       <div>
-        <TextField label="数量" inputRef={ bulkAmountRef } />
-        <IconButton aria-label="add" onClick={ bulkAdd }>
+        <TextField label="数量" inputRef={bulkAmountRef} />
+        <IconButton aria-label="add" onClick={bulkAdd}>
           <AddIcon />
         </IconButton>
       </div>

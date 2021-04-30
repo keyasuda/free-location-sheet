@@ -1,23 +1,20 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 
 export const listSliceAndThunks = (params) => {
-  const initialState = params.initialState;
-  const baseName = params.baseName;
-  const api = params.api;
+  const initialState = params.initialState
+  const baseName = params.baseName
+  const api = params.api
 
   // add new items
-  const add = createAsyncThunk(
-    `${baseName}/add`,
-    async (items, _thunkApi) => {
-      const added = await api.add(items)
-      return added
-    }
-  )
+  const add = createAsyncThunk(`${baseName}/add`, async (items, _thunkApi) => {
+    const added = await api.add(items)
+    return added
+  })
 
   const get = createAsyncThunk(
     `${baseName}/get`,
     async (id: string, _thunkApi) => {
-      return await api.get(id);
+      return await api.get(id)
     }
   )
 
@@ -41,7 +38,7 @@ export const listSliceAndThunks = (params) => {
   const update = createAsyncThunk(
     `${baseName}/update`,
     async (item, _thunkApi) => {
-      return await api.update(item);
+      return await api.update(item)
     }
   )
 
@@ -49,22 +46,26 @@ export const listSliceAndThunks = (params) => {
   const remove = createAsyncThunk(
     `${baseName}/remove`,
     async (item, _thunkApi) => {
-      return await api.update(item);
+      return await api.update(item)
     }
   )
 
   const thunks = { add, get, search, findByPrinted, update, remove }
 
-  const pend = (state, _) => { state.pending = true }
-  const fix = (state, _) => { state.pending = false }
+  const pend = (state, _) => {
+    state.pending = true
+  }
+  const fix = (state, _) => {
+    state.pending = false
+  }
 
   const slice = createSlice({
     name: baseName,
     initialState,
     extraReducers: (builder) => {
-      [add, get, search, findByPrinted, update, remove].forEach((t) => {
-        builder.addCase(t.pending, pend);
-        builder.addCase(t.rejected, fix);
+      ;[add, get, search, findByPrinted, update, remove].forEach((t) => {
+        builder.addCase(t.pending, pend)
+        builder.addCase(t.rejected, fix)
       })
 
       builder.addCase(add.fulfilled, (state, action) => {
@@ -83,8 +84,8 @@ export const listSliceAndThunks = (params) => {
       })
 
       builder.addCase(search.fulfilled, (state, action) => {
-        state.list = action.payload;
-        state.pending = false;
+        state.list = action.payload
+        state.pending = false
       })
 
       builder.addCase(findByPrinted.fulfilled, (state, action) => {
@@ -106,16 +107,16 @@ export const listSliceAndThunks = (params) => {
       })
 
       builder.addCase(remove.fulfilled, (state, action) => {
-        const payload = action.payload;
-        state.list = state.list.filter((e) => e.id != payload.id);
-        state.pending = false;
+        const payload = action.payload
+        state.list = state.list.filter((e) => e.id != payload.id)
+        state.pending = false
       })
 
       builder.addCase('@@router/LOCATION_CHANGE', (state, action) => {
         state.list = []
       })
-    }
-  });
+    },
+  })
 
   return { thunks, slice }
 }

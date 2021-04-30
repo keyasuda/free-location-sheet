@@ -14,8 +14,8 @@ import Loader from '../Loader'
 const Belongings = (props) => {
   const { add } = props
   const dispatch = useDispatch()
-  const items = useSelector(s => s.belongings.list)
-  const pending = useSelector(s => s.belongings.pending)
+  const items = useSelector((s) => s.belongings.list)
+  const pending = useSelector((s) => s.belongings.pending)
   const keywordRef = useRef()
 
   const search = () => {
@@ -32,26 +32,31 @@ const Belongings = (props) => {
   }
 
   return (
-    <Loader loading={ pending }>
+    <Loader loading={pending}>
       <div>
         <h2>物品</h2>
-        <Button onClick={ findNotPrinted }>未印刷</Button>
-        <TextField label="検索語" inputRef={ keywordRef } />
-        <IconButton aria-label="update" onClick={ search }>
+        <Button onClick={findNotPrinted}>未印刷</Button>
+        <TextField label="検索語" inputRef={keywordRef} />
+        <IconButton aria-label="update" onClick={search}>
           <SearchIcon />
         </IconButton>
-        <IconButton aria-label="update" onClick={ addAll }>
+        <IconButton aria-label="update" onClick={addAll}>
           <LibraryAddIcon />
         </IconButton>
         <ul>
-          { items.map((i) => (
-            <li key={ i.id }>
-              { i.name }
-              <IconButton aria-label="update" onClick={() => { dispatch(add([i])) }}>
+          {items.map((i) => (
+            <li key={i.id}>
+              {i.name}
+              <IconButton
+                aria-label="update"
+                onClick={() => {
+                  dispatch(add([i]))
+                }}
+              >
                 <LibraryAddIcon />
               </IconButton>
             </li>
-          )) }
+          ))}
         </ul>
       </div>
     </Loader>

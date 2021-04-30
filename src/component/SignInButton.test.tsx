@@ -1,5 +1,9 @@
 import React from 'react'
-import { render, screen, TestingLibraryElementError } from '@testing-library/react'
+import {
+  render,
+  screen,
+  TestingLibraryElementError,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import * as authModule from './authentication'
@@ -7,7 +11,6 @@ import SignInButton from './SignInButton'
 
 describe('SignInButton', () => {
   let afterSignedIn, initAuth, signIn
-
 
   beforeEach(() => {
     afterSignedIn = jest.fn()
@@ -18,7 +21,7 @@ describe('SignInButton', () => {
 
   const renderIt = () => {
     render(
-      <SignInButton afterSignedIn={ afterSignedIn }>
+      <SignInButton afterSignedIn={afterSignedIn}>
         <div>children</div>
       </SignInButton>
     )
@@ -48,9 +51,9 @@ describe('SignInButton', () => {
       renderIt()
 
       screen.getByText('children')
-      expect(
-        () => { screen.getByRole('button')}
-      ).toThrow(TestingLibraryElementError)
+      expect(() => {
+        screen.getByRole('button')
+      }).toThrow(TestingLibraryElementError)
     })
   })
 })

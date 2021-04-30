@@ -18,19 +18,21 @@ const setMockState = (items) => {
   const mockState = {
     printQueue: {
       pending: false,
-      list: items
+      list: items,
     },
     storages: {
       pending: false,
-      list: []
+      list: [],
     },
     belongings: {
       pending: false,
-      list: []
-    }
+      list: [],
+    },
   }
 
-  jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) => selector(mockState))
+  jest
+    .spyOn(ReactRedux, 'useSelector')
+    .mockImplementation((selector) => selector(mockState))
 }
 
 const mockBelonging = {
@@ -40,7 +42,7 @@ const mockBelonging = {
   description: 'itemdescription',
   storageId: null,
   quantities: 1,
-  printed: false
+  printed: false,
 }
 
 const mockStorage = {
@@ -48,15 +50,15 @@ const mockStorage = {
   klass: 'storage',
   name: 'itemname',
   description: 'itemdescription',
-  printed: false
+  printed: false,
 }
 
 const renderIt = (mockState) => {
   setMockState(mockState)
 
   render(
-    <Provider store={ store }>
-      <ConnectedRouter history={ history }>
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
         <PrintQueue />
       </ConnectedRouter>
     </Provider>
@@ -69,7 +71,7 @@ describe('PrintQueue', () => {
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
       fileId: 'file-id',
-      itemId: 'itemid'
+      itemId: 'itemid',
     })
   })
 
@@ -82,8 +84,12 @@ describe('PrintQueue', () => {
       const btn = screen.getByText('印刷済みにする')
       userEvent.click(btn)
 
-      expect(belongingsUpdate).toHaveBeenCalledWith([{...mockBelonging, printed: true}])
-      expect(storagesUpdate).toHaveBeenCalledWith([{...mockStorage, printed: true}])
+      expect(belongingsUpdate).toHaveBeenCalledWith([
+        { ...mockBelonging, printed: true },
+      ])
+      expect(storagesUpdate).toHaveBeenCalledWith([
+        { ...mockStorage, printed: true },
+      ])
     })
   })
 })

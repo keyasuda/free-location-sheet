@@ -14,7 +14,7 @@ const SheetList = (props) => {
     setLoading(true)
     const name = 'free-location-sheet'
     const newSheetId = await Sheet.create(name)
-    setSheetList([...sheetList, {id: newSheetId, name}])
+    setSheetList([...sheetList, { id: newSheetId, name }])
     setLoading(false)
   }
 
@@ -22,31 +22,32 @@ const SheetList = (props) => {
     setLoading(true)
     Sheet.init(null, authorizedClient(), authorizedSheet())
 
-    const list = (await gapi.client.drive.files.list({
-      q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
-      fields: "files(id, name)",
-      orderBy: "modifiedTime desc"
-    })).result.files
+    const list = (
+      await gapi.client.drive.files.list({
+        q:
+          "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
+        fields: 'files(id, name)',
+        orderBy: 'modifiedTime desc',
+      })
+    ).result.files
 
     setSheetList(list)
     setLoading(false)
   }, [])
 
   return (
-    <Loader loading={ loading }>
-      {
-        sheetList &&
+    <Loader loading={loading}>
+      {sheetList && (
         <ul>
-          {
-            sheetList.map((s) => (
-              <li key={ s.id }>
-                <a href={`./app/${ s.id }/`}>{ s.name }</a>
-              </li>))
-          }
+          {sheetList.map((s) => (
+            <li key={s.id}>
+              <a href={`./app/${s.id}/`}>{s.name}</a>
+            </li>
+          ))}
         </ul>
-      }
+      )}
 
-      <Button aria-label="create" onClick={ create }>
+      <Button aria-label="create" onClick={create}>
         create a sheet
       </Button>
     </Loader>

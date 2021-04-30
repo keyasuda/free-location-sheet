@@ -1,12 +1,12 @@
-import { printQueueSlice, updateAsPrinted } from './printQueueSlice';
-import { Storage, Belonging } from './types';
-import { Sheet } from '../api/sheet';
+import { printQueueSlice, updateAsPrinted } from './printQueueSlice'
+import { Storage, Belonging } from './types'
+import { Sheet } from '../api/sheet'
 
-const reducer = printQueueSlice.reducer;
-const actions = printQueueSlice.actions;
+const reducer = printQueueSlice.reducer
+const actions = printQueueSlice.actions
 
-let s1: Storage, s2: Storage, s3: Storage;
-let b1: Belonging, b2: Belonging, b3: Belonging;
+let s1: Storage, s2: Storage, s3: Storage
+let b1: Belonging, b2: Belonging, b3: Belonging
 beforeEach(() => {
   s1 = { klass: 'storage', id: 'storage-1', name: 'storage 1' }
   s2 = { klass: 'storage', id: 'storage-2', name: 'storage 2' }
@@ -23,16 +23,16 @@ describe('print queue slice', () => {
       list: [],
       selected: -1,
       printed: false,
-      pending: false
+      pending: false,
     })
   })
 
   describe('add', () => {
-    let action, actual;
+    let action, actual
 
     beforeEach(() => {
       action = actions.add([b2, s1])
-      actual = reducer({list: [b1]}, action)
+      actual = reducer({ list: [b1] }, action)
     })
 
     it('should add belongings into the list', () => {
@@ -45,24 +45,24 @@ describe('print queue slice', () => {
     })
 
     it('shouldnt add existing items', () => {
-      actual = reducer({list: [b2, s1]}, action)
+      actual = reducer({ list: [b2, s1] }, action)
       expect(actual.list.length).toBe(2)
     })
   })
 
   describe('remove', () => {
-    const action = actions.remove;
+    const action = actions.remove
 
     it('should do nothing when no item is selected', () => {
-      const actual = reducer({list: [b1, b2, b3], selected: -1}, action)
+      const actual = reducer({ list: [b1, b2, b3], selected: -1 }, action)
       expect(actual.selected).toBe(-1)
       expect(actual.list).toEqual([b1, b2, b3])
     })
 
     describe('when something is selected', () => {
-      let actual;
+      let actual
       beforeEach(() => {
-        actual = reducer({list: [b1, b2, b3], selected: 1}, action)
+        actual = reducer({ list: [b1, b2, b3], selected: 1 }, action)
       })
 
       it('should remove selected item', () => {
@@ -75,9 +75,9 @@ describe('print queue slice', () => {
     })
 
     describe('when bottom item is selected', () => {
-      let actual;
+      let actual
       beforeEach(() => {
-        actual = reducer({list: [b1, b2, b3], selected: 2}, action)
+        actual = reducer({ list: [b1, b2, b3], selected: 2 }, action)
       })
 
       it('should select the bottom item', () => {
@@ -86,7 +86,7 @@ describe('print queue slice', () => {
     })
 
     describe('when the only item is selected', () => {
-      const actual = reducer({list: [b1], selected: 0}, action)
+      const actual = reducer({ list: [b1], selected: 0 }, action)
 
       it('should select nothing', () => {
         expect(actual.selected).toBe(-1)
@@ -95,7 +95,7 @@ describe('print queue slice', () => {
   })
 
   describe('clear', () => {
-    const actual = reducer({list: [b1, b2], selected: 1}, actions.clear)
+    const actual = reducer({ list: [b1, b2], selected: 1 }, actions.clear)
 
     it('should clear the list', () => {
       expect(actual.list).toEqual([])
@@ -108,18 +108,18 @@ describe('print queue slice', () => {
 
   describe('updateAsPrinted', () => {
     describe('pending', () => {
-      const state = reducer({pending: false}, updateAsPrinted.pending())
+      const state = reducer({ pending: false }, updateAsPrinted.pending())
       expect(state.pending).toBe(true)
     })
 
     describe('fulfilled', () => {
-      const state = reducer({pending: false}, updateAsPrinted.fulfilled())
+      const state = reducer({ pending: false }, updateAsPrinted.fulfilled())
       expect(state.pending).toBe(false)
       expect(state.printed).toBe(true)
     })
 
     describe('rejected', () => {
-      const state = reducer({pending: false}, updateAsPrinted.rejected())
+      const state = reducer({ pending: false }, updateAsPrinted.rejected())
       expect(state.pending).toBe(false)
     })
   })

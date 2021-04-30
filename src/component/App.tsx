@@ -24,20 +24,24 @@ const App: React.FC = () => {
   }, [])
 
   return (
-    loaded &&
-    <Provider store={ store }>
-      <ConnectedRouter history={ history }>
-        <Switch>
-          <Route path="/app/:fileId/print" component={ PrintQueue } />
-          <Route path="/app/:fileId/storages/:itemId" component={ Storage } />
-          <Route path="/app/:fileId/storages" component={ Storages } />
-          <Route path="/app/:fileId/belongings/:itemId" component={ Belonging } />
-          <Route path="/app/:fileId/belongings" component={ Belongings } />
-          <Route path="/app/:fileId" component={ AppMenu } />
-        </Switch>
-      </ConnectedRouter>
-    </Provider>
+    loaded && (
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/app/:fileId/print" component={PrintQueue} />
+            <Route path="/app/:fileId/storages/:itemId" component={Storage} />
+            <Route path="/app/:fileId/storages" component={Storages} />
+            <Route
+              path="/app/:fileId/belongings/:itemId"
+              component={Belonging}
+            />
+            <Route path="/app/:fileId/belongings" component={Belongings} />
+            <Route path="/app/:fileId" component={AppMenu} />
+          </Switch>
+        </ConnectedRouter>
+      </Provider>
+    )
   )
 }
 
-export default App;
+export default App

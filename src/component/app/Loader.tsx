@@ -5,8 +5,8 @@ const Loader = (props) => {
 
   return (
     <>
-      { loading && <div>loading...</div> }
-      { !loading && children }
+      {loading && <div>loading...</div>}
+      {!loading && children}
     </>
   )
 }

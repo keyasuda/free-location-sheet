@@ -5,10 +5,12 @@ const authorizedResource = (u) => {
     if (Number(new Date()) > authorizedResponse.expires_at) {
       authorizedResponse = await u.reloadAuthResponse()
     }
-    return fetch(`${params.url}&access_token=${authorizedResponse.access_token}`)
+    return fetch(
+      `${params.url}&access_token=${authorizedResponse.access_token}`
+    )
   }
 
-  return ({ request })
+  return { request }
 }
 
 export default authorizedResource
