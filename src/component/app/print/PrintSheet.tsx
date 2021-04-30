@@ -20,6 +20,9 @@ const ItemElement = (props) => {
       textAlign: 'center',
       padding: '0.67vh',
       width: '17.5vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
     },
     code: {
       '&>svg': {
@@ -28,6 +31,8 @@ const ItemElement = (props) => {
         width: '6.73vh',
       },
     },
+    name: { wordWrap: 'break-word' },
+    banner: { fontSize: '1vh' },
   })()
 
   useEffect(() => {
@@ -40,11 +45,14 @@ const ItemElement = (props) => {
   return (
     <div className={classes.container}>
       <div>
-        {item.klass == 'belonging' && <>物品</>}
-        {item.klass == 'storage' && <>保管場所</>}
+        <div>
+          {item.klass == 'belonging' && <>物品</>}
+          {item.klass == 'storage' && <>保管場所</>}
+        </div>
+        <div className={classes.code} ref={codeRef}></div>
+        <div className={classes.name}>{item.name}</div>
       </div>
-      <div className={classes.code} ref={codeRef}></div>
-      <div>{item.name}</div>
+      <div className={classes.banner}>{location.origin}</div>
     </div>
   )
 }
