@@ -15,7 +15,7 @@ import CodeReader from './CodeReader'
 const AppBar = (props) => {
   const { fileId } = useParams()
   const history = useHistory()
-  const basePath = `/app/${fileId}`
+  const [openScanner, setOpenScanner] = useState(false)
   const keyword = useSelector((s) => {
     const k = s.router.location.query.keyword
     if (k) {
@@ -24,6 +24,8 @@ const AppBar = (props) => {
       return ''
     }
   })
+
+  const basePath = `/app/${fileId}`
 
   const classes = makeStyles((theme) => ({
     search: {
@@ -65,6 +67,20 @@ const AppBar = (props) => {
     }
   }
 
+  const onCodeRead = (code) => {
+    try {
+      const payload = JSON.parse(code)
+
+      if (payload.klass == 'belonging') {
+        history.push('./belongings/' + payload.id)
+      } else {
+        history.push('./storages/' + payload.id)
+      }
+    } catch (e) {
+      history.push('./belongings/' + code)
+    }
+  }
+
   return (
     <>
       <MUIAppBar position="static">
@@ -99,13 +115,19 @@ const AppBar = (props) => {
           <IconButton
             edge="end"
             color="inherit"
-            aria-label="home"
-            onClick={() => (location.href = '/')}
+            aria-label="scan"
+            onClick={() => setOpenScanner(true)}
           >
             <Icon>qr_code_scanner</Icon>
           </IconButton>
         </Toolbar>
       </MUIAppBar>
+      {openScanner && (
+        <CodeReader
+          onRead={onCodeRead}
+          closeFunc={() => setOpenScanner(false)}
+        />
+      )}
     </>
   )
 }

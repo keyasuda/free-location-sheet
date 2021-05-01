@@ -11,6 +11,21 @@ import { ConnectedRouter } from 'connected-react-router'
 
 import { store, history } from '../../state/store'
 import AppBar from './AppBar'
+import CodeReader from './CodeReader'
+
+let codeReaderOnRead
+const MockCodeReader = (props) => {
+  const { onRead } = props
+  codeReaderOnRead = onRead
+
+  return <>code reader</>
+}
+
+jest.mock('./CodeReader', () => ({
+  __esModule: true,
+  namedExport: jest.fn(),
+  default: jest.fn(),
+}))
 
 const renderIt = (query) => {
   jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) =>
@@ -37,6 +52,10 @@ describe('AppBar', () => {
   beforeEach(() => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
     renderIt({})
+  })
+
+  beforeAll(() => {
+    CodeReader.mockImplementation(MockCodeReader)
   })
 
   afterEach(() => {
@@ -66,6 +85,46 @@ describe('AppBar', () => {
       await userEvent.type(textField, '{enter}')
 
       expect(push).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('code reader search', () => {
+    const code = JSON.stringify({
+      klass: 'belonging',
+      id: 'belonginguuid',
+    })
+
+    beforeEach(() => {
+      const button = screen.getByLabelText('scan')
+      userEvent.click(button)
+    })
+
+    describe('code is of belonging', () => {
+      it('should navigate to belonging page', () => {
+        codeReaderOnRead(code)
+        expect(history.push).toHaveBeenCalledWith('./belongings/belonginguuid')
+      })
+    })
+
+    describe('code is of storage', () => {
+      const code = JSON.stringify({
+        klass: 'storage',
+        id: 'storageuuid',
+      })
+
+      it('should navigate to storage page', () => {
+        codeReaderOnRead(code)
+        expect(history.push).toHaveBeenCalledWith('./storages/storageuuid')
+      })
+    })
+
+    describe('code is unknown', () => {
+      const code = 'generalpurposebarcode'
+
+      it('should navigate to belonging page, code as ID', () => {
+        codeReaderOnRead(code)
+        expect(history.push).toHaveBeenCalledWith('./belongings/' + code)
+      })
     })
   })
 })

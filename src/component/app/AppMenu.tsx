@@ -21,20 +21,6 @@ const AppMenu = (props) => {
     }
   }
 
-  const onCodeRead = (code) => {
-    try {
-      const payload = JSON.parse(code)
-
-      if (payload.klass == 'belonging') {
-        history.push('./belongings/' + payload.id)
-      } else {
-        history.push('./storages/' + payload.id)
-      }
-    } catch (e) {
-      history.push('./belongings/' + code)
-    }
-  }
-
   return (
     <>
       <AppBar />
