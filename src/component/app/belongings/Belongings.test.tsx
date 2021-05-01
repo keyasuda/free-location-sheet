@@ -143,23 +143,18 @@ describe('Belongings', () => {
       renderIt()
     })
 
-    describe('add button', () => {
-      it('should add an item', async () => {
-        await waitFor(() => screen.findByText('数量'))
-        await userEvent.click(screen.getByLabelText('add'))
-        await waitFor(() => screen.findByText('数量'))
-
-        expect(addThunk).toHaveBeenCalledWith([item])
-      })
-    })
-
     describe('bulk add button', () => {
+      beforeEach(() => {
+        const fab = screen.getByLabelText('add')
+        userEvent.click(fab)
+      })
+
       it('should add desired items', async () => {
         const num = 5
 
         await waitFor(() => screen.findByText('数量'))
         const amount = screen.getByLabelText('amount').querySelector('input')
-        userEvent.type(amount, String(num))
+        fireEvent.change(amount, { target: { value: String(num) } })
         userEvent.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
