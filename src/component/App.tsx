@@ -10,6 +10,7 @@ import Belonging from './app/belongings/Belonging'
 import Storages from './app/storages/Storages'
 import Storage from './app/storages/Storage'
 import PrintQueue from './app/print/PrintQueue'
+import AppBar from './app/AppBar'
 import { initAuth } from './authentication'
 
 const App: React.FC = () => {

@@ -146,7 +146,7 @@ describe('Belongings', () => {
     describe('add button', () => {
       it('should add an item', async () => {
         await waitFor(() => screen.findByText('数量'))
-        await userEvent.click(screen.getAllByRole('button')[0])
+        await userEvent.click(screen.getByLabelText('add'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).toHaveBeenCalledWith([item])
@@ -158,8 +158,9 @@ describe('Belongings', () => {
         const num = 5
 
         await waitFor(() => screen.findByText('数量'))
-        userEvent.type(screen.getByRole('textbox'), String(num))
-        userEvent.click(screen.getAllByRole('button')[1])
+        const amount = screen.getByLabelText('amount').querySelector('input')
+        userEvent.type(amount, String(num))
+        userEvent.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
@@ -167,8 +168,9 @@ describe('Belongings', () => {
 
       it('should add nothing when the input is invalid', async () => {
         await waitFor(() => screen.findByText('数量'))
-        userEvent.type(screen.getByRole('textbox'), 'hogehoge') // invalid input
-        userEvent.click(screen.getAllByRole('button')[1])
+        const amount = screen.getByLabelText('amount').querySelector('input')
+        userEvent.type(amount, 'hogehoge') // invalid input
+        userEvent.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).not.toHaveBeenCalled()

@@ -4,6 +4,7 @@ import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
 import SearchIcon from '@material-ui/icons/Search'
 
+import AppBar from './AppBar'
 import CodeReader from './CodeReader'
 
 const AppMenu = (props) => {
@@ -35,19 +36,13 @@ const AppMenu = (props) => {
   }
 
   return (
-    <div>
-      <Link to={`${basePath}/belongings`}>物品一覧</Link>
-      <Link to={`${basePath}/storages`}>保管場所一覧</Link>
+    <>
+      <AppBar />
       <div>
-        <TextField id="search-word" label="キーワード" inputRef={keywordRef} />
-        <IconButton color="primary" aria-label="search" onClick={search}>
-          <SearchIcon />
-        </IconButton>
+        <Link to={`${basePath}/belongings`}>物品一覧</Link>
+        <Link to={`${basePath}/storages`}>保管場所一覧</Link>
       </div>
-      <div>
-        <CodeReader onRead={onCodeRead} />
-      </div>
-    </div>
+    </>
   )
 }
 export default AppMenu
