@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { makeStyles } from '@material-ui/core/styles'
 import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
 import AddIcon from '@material-ui/icons/Add'
@@ -22,6 +21,8 @@ import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import Loader from '../Loader'
 import AppBar from '../AppBar'
+import makeListStyles from '../hooks/makeListStyles'
+import useSearchword from '../hooks/useSearchword'
 
 const newItem = {
   klass: 'belonging',
@@ -36,36 +37,13 @@ const Belongings = (props) => {
   const { fileId } = useParams()
   const [dialogOpen, setDialogOpen] = useState(false)
   const dispatch = useDispatch()
-  const keyword = useSelector((s) => {
-    const k = s.router.location.query.keyword
-    if (k) {
-      return decodeURIComponent(k)
-    } else {
-      return ''
-    }
-  })
   const pending = useSelector((s) => s.belongings.pending)
   const list = useSelector((s) => s.belongings.list)
   const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
   const history = useHistory()
-
-  const classes = makeStyles({
-    link: {
-      cursor: 'pointer',
-      display: 'block',
-      margin: '1em',
-      textDecoration: 'none',
-    },
-    fab: {
-      position: 'fixed',
-      right: '20px',
-      bottom: '20px',
-    },
-    actions: {
-      justifyContent: 'space-between',
-    },
-  })()
+  const keyword = useSearchword()
+  const classes = makeListStyles()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
