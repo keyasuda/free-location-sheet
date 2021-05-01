@@ -102,7 +102,9 @@ describe('AppBar', () => {
     describe('code is of belonging', () => {
       it('should navigate to belonging page', () => {
         codeReaderOnRead(code)
-        expect(history.push).toHaveBeenCalledWith('./belongings/belonginguuid')
+        expect(history.push).toHaveBeenCalledWith(
+          '/app/file-id/belongings/belonginguuid'
+        )
       })
     })
 
@@ -114,7 +116,9 @@ describe('AppBar', () => {
 
       it('should navigate to storage page', () => {
         codeReaderOnRead(code)
-        expect(history.push).toHaveBeenCalledWith('./storages/storageuuid')
+        expect(history.push).toHaveBeenCalledWith(
+          '/app/file-id/storages/storageuuid'
+        )
       })
     })
 
@@ -123,7 +127,9 @@ describe('AppBar', () => {
 
       it('should navigate to belonging page, code as ID', () => {
         codeReaderOnRead(code)
-        expect(history.push).toHaveBeenCalledWith('./belongings/' + code)
+        expect(history.push).toHaveBeenCalledWith(
+          `/app/file-id/belongings/${code}`
+        )
       })
     })
   })
