@@ -1,32 +1,84 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory, Link } from 'react-router-dom'
-import TextField from '@material-ui/core/TextField'
-import IconButton from '@material-ui/core/IconButton'
-import SearchIcon from '@material-ui/icons/Search'
+import Button from '@material-ui/core/Button'
+import { makeStyles } from '@material-ui/core/styles'
+import Icon from '@material-ui/core/Icon'
 
 import AppBar from './AppBar'
 import CodeReader from './CodeReader'
+import { signOut } from '../authentication'
 
 const AppMenu = (props) => {
   const { fileId } = useParams()
   const history = useHistory()
-  const keywordRef = useRef()
 
   const basePath = `/app/${fileId}`
-
-  const search = () => {
-    const w = keywordRef.current.value
-    if (w && w.length > 0) {
-      history.push(`${basePath}/belongings?keyword=${encodeURIComponent(w)}`)
-    }
-  }
+  const classes = makeStyles({
+    menu: {
+      display: 'flex',
+      flexDirection: 'column',
+      height: 'calc(100vh - 70px)',
+      justifyContent: 'space-evenly',
+    },
+    menuItem: {
+      boxSizing: 'border-box',
+      flexGrow: 1,
+      margin: '20px auto',
+      width: 'calc(100vw - 60px)',
+    },
+  })()
 
   return (
     <>
       <AppBar />
-      <div>
-        <Link to={`${basePath}/belongings`}>物品一覧</Link>
-        <Link to={`${basePath}/storages`}>保管場所一覧</Link>
+      <div className={classes.menu}>
+        <Button
+          className={classes.menuItem}
+          variant="outlined"
+          onClick={() => history.push(`${basePath}/belongings`)}
+        >
+          <Icon>inventory</Icon>
+          物品一覧
+        </Button>
+
+        <Button
+          className={classes.menuItem}
+          variant="outlined"
+          onClick={() => history.push(`${basePath}/storages`)}
+        >
+          <Icon>folder</Icon>
+          保管場所一覧
+        </Button>
+
+        <Button
+          className={classes.menuItem}
+          variant="outlined"
+          onClick={() => history.push(`${basePath}/print`)}
+        >
+          <Icon>print</Icon>
+          コード印刷
+        </Button>
+
+        <Button
+          className={classes.menuItem}
+          variant="outlined"
+          onClick={() => (location.href = '/')}
+        >
+          <Icon>swap_horiz</Icon>
+          スプレッドシート変更
+        </Button>
+
+        <Button
+          className={classes.menuItem}
+          variant="outlined"
+          onClick={() => {
+            signOut()
+            location.href = '/'
+          }}
+        >
+          <Icon>logout</Icon>
+          ログアウト
+        </Button>
       </div>
     </>
   )

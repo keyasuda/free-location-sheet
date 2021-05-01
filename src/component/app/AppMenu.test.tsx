@@ -8,6 +8,7 @@ import * as ReactRedux from 'react-redux'
 
 import AppMenu from './AppMenu'
 import CodeReader from './CodeReader'
+import * as auth from '../authentication'
 
 let codeReaderOnRead
 const MockCodeReader = (props) => {
@@ -24,12 +25,13 @@ jest.mock('./CodeReader', () => ({
 }))
 
 describe('AppMenu', () => {
-  let history
+  let history, signOut
 
   beforeEach(() => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
     history = { push: jest.fn() }
     jest.spyOn(ReactRouter, 'useHistory').mockReturnValue(history)
+    signOut = jest.spyOn(auth, 'signOut').mockReturnValue()
 
     const mockState = {
       router: {
@@ -60,13 +62,10 @@ describe('AppMenu', () => {
   })
 
   describe('navigation', () => {
-    it('should have links to lists', () => {
-      expect(screen.getByText('物品一覧').href).toEqual(
-        'http://localhost/app/file-id/belongings'
-      )
-      expect(screen.getByText('保管場所一覧').href).toEqual(
-        'http://localhost/app/file-id/storages'
-      )
+    it('should be a menu to let user sign out', () => {
+      const button = screen.getByText('ログアウト')
+      userEvent.click(button)
+      expect(signOut).toHaveBeenCalled()
     })
   })
 })
