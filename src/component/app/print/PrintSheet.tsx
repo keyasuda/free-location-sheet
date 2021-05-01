@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { BrowserQRCodeSvgWriter } from '@zxing/library'
 import { makeStyles } from '@material-ui/styles'
+import Icon from '@material-ui/core/Icon'
 
 const ItemElement = (props) => {
   const { item } = props
@@ -24,6 +25,7 @@ const ItemElement = (props) => {
       flexDirection: 'column',
       justifyContent: 'space-between',
     },
+    icon: { width: '100%', textAlign: 'left' },
     code: {
       '&>svg': {
         height: '6.73vh',
@@ -45,9 +47,9 @@ const ItemElement = (props) => {
   return (
     <div className={classes.container}>
       <div>
-        <div>
-          {item.klass == 'belonging' && <>物品</>}
-          {item.klass == 'storage' && <>保管場所</>}
+        <div className={classes.icon}>
+          {item.klass == 'belonging' && <Icon>inventory</Icon>}
+          {item.klass == 'storage' && <Icon>folder</Icon>}
         </div>
         <div className={classes.code} ref={codeRef}></div>
         <div className={classes.name}>{item.name}</div>
