@@ -45,51 +45,38 @@ describe('Storages', () => {
       printed: false,
     }
 
-    beforeEach(() => renderIt())
-
-    describe('add button', () => {
-      it('should add an item', async () => {
-        const addApi = jest
-          .spyOn(Sheet.storages, 'add')
-          .mockResolvedValue([{ ...item, id: uuidv4() }])
-
-        await waitFor(() => screen.findByText('数量'))
-        await userEvent.click(screen.getAllByRole('button')[0])
-        await waitFor(() => screen.findByText('数量'))
-
-        expect(addApi).toHaveBeenCalled()
-        expect(screen.getAllByText('(no name)').length).toBe(1)
-      })
+    let addThunk
+    beforeEach(() => {
+      addThunk = jest.spyOn(storagesAsyncThunk, 'add')
+      renderIt()
     })
 
     describe('bulk add button', () => {
+      beforeEach(() => {
+        const fab = screen.getByLabelText('add')
+        userEvent.click(fab)
+      })
+
       it('should add desired items', async () => {
         const num = 5
-        const apiArgs = _.times(num, () => item)
-        const apiResult = apiArgs.map((i) => ({ ...i, id: uuidv4() }))
-        const api = jest
-          .spyOn(Sheet.storages, 'add')
-          .mockResolvedValue(apiResult)
 
         await waitFor(() => screen.findByText('数量'))
-        userEvent.type(screen.getByRole('textbox'), String(num))
-        userEvent.click(screen.getAllByRole('button')[1])
+        const amount = screen.getByLabelText('amount').querySelector('input')
+        fireEvent.change(amount, { target: { value: String(num) } })
+        userEvent.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
-        expect(api).toHaveBeenCalledWith(apiArgs)
-        expect(screen.getAllByText('(no name)').length).toBe(num)
+        expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
       })
 
       it('should add nothing when the input is invalid', async () => {
-        const api = jest.spyOn(Sheet.storages, 'add')
-
         await waitFor(() => screen.findByText('数量'))
-        userEvent.type(screen.getByRole('textbox'), 'hogehoge') // invalid input
-        userEvent.click(screen.getAllByRole('button')[1])
+        const amount = screen.getByLabelText('amount').querySelector('input')
+        userEvent.type(amount, 'hogehoge') // invalid input
+        userEvent.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
-        expect(api).not.toHaveBeenCalled()
-        expect(screen.queryByText('(no name)')).toBeNull()
+        expect(addThunk).not.toHaveBeenCalled()
       })
     })
   })
