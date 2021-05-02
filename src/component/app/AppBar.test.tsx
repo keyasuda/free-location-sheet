@@ -123,13 +123,14 @@ describe('AppBar', () => {
     })
 
     describe('code is unknown', () => {
-      const code = 'generalpurposebarcode'
-
-      it('should navigate to belonging page, code as ID', () => {
-        codeReaderOnRead(code)
-        expect(history.push).toHaveBeenCalledWith(
-          `/app/file-id/belongings/${code}`
-        )
+      const codes = ['generalpurposebarcode', '1234567890']
+      codes.map((code) => {
+        it('should navigate to belonging page, code as ID', () => {
+          codeReaderOnRead(code)
+          expect(history.push).toHaveBeenCalledWith(
+            `/app/file-id/belongings/${code}`
+          )
+        })
       })
     })
   })

@@ -70,10 +70,18 @@ const AppBar = (props) => {
   const onCodeRead = (code) => {
     try {
       const payload = JSON.parse(code)
-      if (payload.klass == 'belonging') {
-        history.push(`${basePath}/belongings/${payload.id}`)
-      } else {
-        history.push(`${basePath}/storages/${payload.id}`)
+
+      switch (payload.klass) {
+        case 'belonging':
+          history.push(`${basePath}/belongings/${payload.id}`)
+          break
+
+        case 'storage':
+          history.push(`${basePath}/storages/${payload.id}`)
+          break
+
+        default:
+          history.push(`${basePath}/belongings/${encodeURIComponent(code)}`)
       }
     } catch (e) {
       history.push(`${basePath}/belongings/${encodeURIComponent(code)}`)
