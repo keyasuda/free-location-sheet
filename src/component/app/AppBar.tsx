@@ -68,24 +68,30 @@ const AppBar = (props) => {
   }
 
   const onCodeRead = (code) => {
+    let destination
     try {
       const payload = JSON.parse(code)
 
       switch (payload.klass) {
         case 'belonging':
-          history.push(`${basePath}/belongings/${payload.id}`)
+          destination = `${basePath}/belongings/${payload.id}`
           break
 
         case 'storage':
-          history.push(`${basePath}/storages/${payload.id}`)
+          destination = `${basePath}/storages/${payload.id}`
           break
 
         default:
-          history.push(`${basePath}/belongings/${encodeURIComponent(code)}`)
+          destination = `${basePath}/belongings/${encodeURIComponent(code)}`
       }
     } catch (e) {
-      history.push(`${basePath}/belongings/${encodeURIComponent(code)}`)
+      destination = `${basePath}/belongings/${encodeURIComponent(code)}`
     }
+
+    if (history.location.pathname != destination) {
+      history.push(destination)
+    }
+    setOpenScanner(false)
   }
 
   return (

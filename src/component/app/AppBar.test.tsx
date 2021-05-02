@@ -101,7 +101,7 @@ describe('AppBar', () => {
 
     describe('code is of belonging', () => {
       it('should navigate to belonging page', () => {
-        codeReaderOnRead(code)
+        act(() => codeReaderOnRead(code))
         expect(history.push).toHaveBeenCalledWith(
           '/app/file-id/belongings/belonginguuid'
         )
@@ -115,7 +115,7 @@ describe('AppBar', () => {
       })
 
       it('should navigate to storage page', () => {
-        codeReaderOnRead(code)
+        act(() => codeReaderOnRead(code))
         expect(history.push).toHaveBeenCalledWith(
           '/app/file-id/storages/storageuuid'
         )
@@ -126,7 +126,7 @@ describe('AppBar', () => {
       const codes = ['generalpurposebarcode', '1234567890']
       codes.map((code) => {
         it('should navigate to belonging page, code as ID', () => {
-          codeReaderOnRead(code)
+          act(() => codeReaderOnRead(code))
           expect(history.push).toHaveBeenCalledWith(
             `/app/file-id/belongings/${code}`
           )
