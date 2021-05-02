@@ -54,6 +54,7 @@ const CodeReader = (props: Props) => {
       width: '100vw',
       height: '100vh',
       backgroundColor: 'white',
+      zIndex: 1,
     },
     video: {
       margin: 'auto',
