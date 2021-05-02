@@ -18,6 +18,7 @@ import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import PrintSheet from './PrintSheet'
+import AppBar from '../AppBar'
 
 const Sheets = React.forwardRef((props, ref) => {
   const { items } = props
@@ -61,6 +62,7 @@ const PrintQueue = (props) => {
     actions: {
       justifyContent: 'space-between',
     },
+    container: { margin: '10px' },
   })()
 
   useEffect(() => {
@@ -85,7 +87,8 @@ const PrintQueue = (props) => {
   }
 
   return (
-    <div>
+    <>
+      <AppBar />
       <Fab
         className={classes.fab}
         color="primary"
@@ -97,8 +100,9 @@ const PrintQueue = (props) => {
       >
         <PrintIcon />
       </Fab>
-
-      <Sheets items={items} ref={sheetRef} />
+      <div className={classes.container}>
+        <Sheets items={items} ref={sheetRef} />
+      </div>
 
       <Dialog open={dialogOpen} onClose={handleClose} disableBackdropClick>
         <DialogTitle>印刷済みコード</DialogTitle>
@@ -122,7 +126,7 @@ const PrintQueue = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   )
 }
 export default PrintQueue

@@ -13,6 +13,7 @@ import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import { store, history } from '../../../state/store'
 import * as auth from '../../authentication'
+import AppBar from '../AppBar'
 
 const setMockState = (belongings, storages) => {
   const mockState = {
@@ -61,8 +62,18 @@ const renderIt = (belongings, storages) => {
   )
 }
 
+jest.mock('../AppBar', () => ({
+  __esModule: true,
+  namedExport: jest.fn(),
+  default: jest.fn(),
+}))
+
 describe('PrintQueue', () => {
   let bFindByPrinted, sFindByPrinted
+
+  beforeAll(() => {
+    AppBar.mockImplementation(() => <></>)
+  })
 
   beforeEach(() => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
