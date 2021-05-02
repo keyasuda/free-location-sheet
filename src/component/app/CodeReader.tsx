@@ -20,11 +20,18 @@ const Reader = (props: Props) => {
 
   useEffect(() => {
     reader.reset()
+
+    let previous
+
     if (deviceId) {
       reader.decodeFromVideoDevice(deviceId, videoRef.current, (r, e) => {
         if (r) {
-          window.navigator.vibrate(500)
-          onRead(r.text)
+          const read = r.text
+          if (read != previous) {
+            window.navigator.vibrate(500)
+            previous = read
+            onRead(read)
+          }
         }
       })
     }
