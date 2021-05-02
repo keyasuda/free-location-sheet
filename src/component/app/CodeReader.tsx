@@ -25,7 +25,10 @@ const Reader = (props: Props) => {
     if (deviceId) {
       reader.decodeFromVideoDevice(deviceId, videoRef.current, (r, e) => {
         if (r) {
-          const read = r.text
+          let read = r.text
+          if (read.match(/^[0-9]+$/)) {
+            read = `barcode${read}`
+          }
           if (read != previous) {
             window.navigator.vibrate(500)
             previous = read
