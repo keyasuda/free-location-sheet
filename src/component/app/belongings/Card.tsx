@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import IconButton from '@material-ui/core/IconButton'
@@ -13,10 +13,12 @@ import Typography from '@material-ui/core/Typography'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 
 const StorageName = (props) => {
-  const { id } = props
+  const { id, className, fileId } = props
   const item = useSelector((s) => s.storages.list[0])
   const pending = useSelector((s) => s.storages.pending)
   const dispatch = useDispatch()
+  const history = useHistory()
+  const classes = makeStyles({ link: { cursor: 'pointer' } })()
 
   useEffect(() => {
     if (id) {
@@ -27,16 +29,22 @@ const StorageName = (props) => {
   return (
     <>
       {id && item && (
-        <>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          component="div"
+          className={`${className} ${classes.link}`}
+          onClick={() => history.push(`/app/${fileId}/storages/${id}`)}
+        >
           <Icon>place</Icon> {item.name}
-        </>
+        </Typography>
       )}
     </>
   )
 }
 
 const Card = (props) => {
-  const { item, classes, scan, edit, update } = props
+  const { item, classes, scan, edit, update, fileId } = props
 
   return (
     <MuiCard className={classes.card}>
@@ -57,14 +65,11 @@ const Card = (props) => {
           <Icon>layers</Icon> {item.quantities}
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          component="div"
+        <StorageName
+          id={item.storageId}
           className={classes.remark}
-        >
-          <StorageName id={item.storageId} />
-        </Typography>
+          fileId={fileId}
+        />
       </CardContent>
 
       <CardActions className={classes.actions}>

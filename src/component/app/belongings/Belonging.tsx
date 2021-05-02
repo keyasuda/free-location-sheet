@@ -114,6 +114,7 @@ const Belonging = (props) => {
       <Loader loading={pending}>
         <Card
           item={item}
+          fileId={fileId}
           classes={classes}
           scan={() => setOpenScanner(true)}
           edit={() => setDialogOpen(true)}
