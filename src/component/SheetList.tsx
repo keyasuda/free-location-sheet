@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
+import Button from '@material-ui/core/Button'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
@@ -55,9 +55,10 @@ const SheetList = (props) => {
       )}
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <IconButton aria-label="create" onClick={create}>
+        <Button aria-label="create" onClick={create}>
           <Icon>add_to_drive</Icon>
-        </IconButton>
+          新しいスプレッドシートを作成
+        </Button>
       </div>
     </Loader>
   )

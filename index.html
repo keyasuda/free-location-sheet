@@ -5,14 +5,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>持ち物管理表</title>
+  <title>家庭用物品フリーロケーション管理システム 持ち物管理表</title>
   <script src="https://apis.google.com/js/api.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+  <style>
+    body: {
+      max-width: 800px;
+    }
+    h1,h2 {
+      color: #555;
+    }
+  </style>
 </head>
 
-<body style="margin: 0">
+<body>
+  <h1>持ち物管理表</h1>
+
   <div id="index-app"></div>
   <script src="bundle.js"></script>
+
+  <div class="introduction">
+    <div>
+      <h2>フリーロケーション管理で、空間利用効率をアップ</h2>
+      <p>
+        本システムでは、物流倉庫等で用いられるフリーロケーション管理の考え方を家庭内で実現します。
+        物と置き場所を自由に設定できるため、空きスペースの有効活用につながります。
+      </p>
+    </div>
+    <div>
+      <h2>スマートフォンとプリンタだけで、今すぐ開始</h2>
+      <p>
+        管理用のQRコードラベルは家庭用のプリンタで印刷でき、読み取りはスマートフォンのカメラで行えます。
+        専用のバーコードリーダやラベルライターは必要ありません。
+      </p>
+    </div>
+    <div>
+      <h2>データは全て、スプレッドシートへ</h2>
+      <p>
+        物と保管場所のデータは全て、<a href="https://www.google.com/intl/ja_jp/sheets/about/">Googleスプレッドシート</a>へ保存されます。
+        本システムを通した読み書きと共に、通常のスプレッドシートとして扱えるため、オートフィルや並べ替えなど様々な操作が行なえます。
+        将来別の方法で管理したくなった場合にも無駄になりません。
+      </p>
+    </div>
+  </div>
 </body>
 
 </html>
