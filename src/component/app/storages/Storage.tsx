@@ -24,7 +24,7 @@ const Storage = (props) => {
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(storagesAsyncThunk.get(itemId))
-  }, [])
+  }, [itemId])
 
   return (
     <>

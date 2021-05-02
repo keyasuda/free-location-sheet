@@ -51,7 +51,7 @@ const Belonging = (props) => {
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(belongingsAsyncThunk.get(itemId))
-  }, [])
+  }, [itemId])
 
   const add = async (item) => {
     await dispatch(belongingsAsyncThunk.add([item]))
