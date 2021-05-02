@@ -1,11 +1,12 @@
 import React from 'react'
+import LinearProgress from '@material-ui/core/LinearProgress'
 
 const Loader = (props) => {
   const { loading, children } = props
 
   return (
     <>
-      {loading && <div>loading...</div>}
+      {loading && <LinearProgress />}
       {!loading && children}
     </>
   )
