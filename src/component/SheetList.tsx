@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import Button from '@material-ui/core/Button'
+import Icon from '@material-ui/core/Icon'
+import IconButton from '@material-ui/core/IconButton'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemText from '@material-ui/core/ListItemText'
 
 import { authorizedClient, authorizedSheet } from './authentication'
 import { Sheet } from '../api/sheet'
@@ -14,7 +18,7 @@ const SheetList = (props) => {
     setLoading(true)
     const name = 'free-location-sheet'
     const newSheetId = await Sheet.create(name)
-    setSheetList([...sheetList, { id: newSheetId, name }])
+    setSheetList([{ id: newSheetId, name }, ...sheetList])
     setLoading(false)
   }
 
@@ -38,18 +42,23 @@ const SheetList = (props) => {
   return (
     <Loader loading={loading}>
       {sheetList && (
-        <ul>
+        <List component="nav">
           {sheetList.map((s) => (
-            <li key={s.id}>
-              <a href={`./app/${s.id}/`}>{s.name}</a>
-            </li>
+            <ListItem key={s.id} button>
+              <ListItemText
+                primary={s.name}
+                onClick={() => (location.href = `/app/${s.id}/`)}
+              />
+            </ListItem>
           ))}
-        </ul>
+        </List>
       )}
 
-      <Button aria-label="create" onClick={create}>
-        create a sheet
-      </Button>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <IconButton aria-label="create" onClick={create}>
+          <Icon>add_to_drive</Icon>
+        </IconButton>
+      </div>
     </Loader>
   )
 }

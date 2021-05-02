@@ -6,8 +6,19 @@ import { act } from '@testing-library/react-hooks'
 import * as auth from './authentication'
 import { Sheet } from '../api/sheet'
 import SheetList from './SheetList'
+import AppBar from './app/AppBar'
+
+jest.mock('./app/AppBar', () => ({
+  __esModule: true,
+  namedExport: jest.fn(),
+  default: jest.fn(),
+}))
 
 describe('SheetList', () => {
+  beforeAll(() => {
+    AppBar.mockImplementation(() => <></>)
+  })
+
   let resolveList
 
   const gapi = {
