@@ -18,10 +18,9 @@ const Reader = (props: Props) => {
   const { onRead, deviceId, close, className } = props
   const videoRef = useRef()
 
+  let previous
   useEffect(() => {
     reader.reset()
-
-    let previous
 
     if (deviceId) {
       reader.decodeFromVideoDevice(deviceId, videoRef.current, (r, e) => {
@@ -34,6 +33,11 @@ const Reader = (props: Props) => {
           }
         }
       })
+    }
+
+    return () => {
+      reader.reset()
+      previous = null
     }
   }, [deviceId])
 
