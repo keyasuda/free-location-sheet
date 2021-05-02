@@ -121,8 +121,8 @@ describe('Belongings', () => {
         renderIt()
       })
 
-      it('should show "(no name)"', () => {
-        screen.getByText('(no name)')
+      it('should show "(名称未設定)"', () => {
+        screen.getByText('(名称未設定)')
       })
     })
   })

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { Helmet } from 'react-helmet'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
@@ -60,13 +61,16 @@ const Storages = (props) => {
 
   return (
     <>
+      <Helmet>
+        <title>保管場所一覧 - 持ち物管理表</title>
+      </Helmet>
       <AppBar />
       <Loader loading={pending}>
         <List component="nav">
           {(list || []).map((b) => (
             <ListItem key={b.id} button>
               <ListItemText
-                primary={b.name || '(no name)'}
+                primary={b.name || '(名称未設定)'}
                 onClick={() => history.push(`${currentPath}/${b.id}`)}
               />
             </ListItem>

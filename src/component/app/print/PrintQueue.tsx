@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { Helmet } from 'react-helmet'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ReactToPrint from 'react-to-print'
@@ -88,6 +89,9 @@ const PrintQueue = (props) => {
 
   return (
     <>
+      <Helmet>
+        <title>コード印刷 - 持ち物管理表</title>
+      </Helmet>
       <AppBar />
       <Fab
         className={classes.fab}

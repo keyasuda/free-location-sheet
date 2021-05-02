@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { Helmet } from 'react-helmet'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/core/styles'
@@ -30,6 +31,9 @@ const AppMenu = (props) => {
 
   return (
     <>
+      <Helmet>
+        <title>メニュー - 持ち物管理表</title>
+      </Helmet>
       <AppBar />
       <div className={classes.menu}>
         <Button

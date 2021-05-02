@@ -1,4 +1,5 @@
 import React from 'react'
+import { Helmet } from 'react-helmet'
 import IconButton from '@material-ui/core/IconButton'
 import { default as MuiCard } from '@material-ui/core/Card'
 import CardHeader from '@material-ui/core/CardHeader'
@@ -11,20 +12,25 @@ const Card = (props) => {
   const { item, classes, edit } = props
 
   return (
-    <MuiCard className={classes.card}>
-      <CardHeader avatar={<Icon>place</Icon>} title={item.name} />
-      <CardContent>
-        <Typography variant="body1" color="textPrimary" component="p">
-          {item.description}
-        </Typography>
-      </CardContent>
+    <>
+      <Helmet>
+        <title>{item.name || '(名称未設定)'} - 保管場所 - 持ち物管理表</title>
+      </Helmet>
+      <MuiCard className={classes.card}>
+        <CardHeader avatar={<Icon>place</Icon>} title={item.name} />
+        <CardContent>
+          <Typography variant="body1" color="textPrimary" component="p">
+            {item.description}
+          </Typography>
+        </CardContent>
 
-      <CardActions className={classes.actions}>
-        <IconButton aria-label="edit" onClick={edit}>
-          <Icon>edit</Icon>
-        </IconButton>
-      </CardActions>
-    </MuiCard>
+        <CardActions className={classes.actions}>
+          <IconButton aria-label="edit" onClick={edit}>
+            <Icon>edit</Icon>
+          </IconButton>
+        </CardActions>
+      </MuiCard>
+    </>
   )
 }
 export default Card

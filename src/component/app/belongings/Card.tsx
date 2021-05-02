@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import { Helmet } from 'react-helmet'
 import { useHistory } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
@@ -47,53 +48,58 @@ const Card = (props) => {
   const { item, classes, scan, edit, update, fileId } = props
 
   return (
-    <MuiCard className={classes.card}>
-      <CardHeader avatar={<Icon>inventory</Icon>} title={item.name} />
-      <CardContent>
-        <Typography variant="body1" color="textPrimary" component="p">
-          {item.description}
-        </Typography>
-      </CardContent>
+    <>
+      <Helmet>
+        <title>{item.name || '(名称未設定)'} - 物品 - 持ち物管理表</title>
+      </Helmet>
+      <MuiCard className={classes.card}>
+        <CardHeader avatar={<Icon>inventory</Icon>} title={item.name} />
+        <CardContent>
+          <Typography variant="body1" color="textPrimary" component="p">
+            {item.description}
+          </Typography>
+        </CardContent>
 
-      <CardContent className={classes.remarks}>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          component="div"
-          className={classes.remark}
-        >
-          <Icon>layers</Icon> {item.quantities}
-        </Typography>
+        <CardContent className={classes.remarks}>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            component="div"
+            className={classes.remark}
+          >
+            <Icon>layers</Icon> {item.quantities}
+          </Typography>
 
-        <StorageName
-          id={item.storageId}
-          className={classes.remark}
-          fileId={fileId}
-        />
-      </CardContent>
+          <StorageName
+            id={item.storageId}
+            className={classes.remark}
+            fileId={fileId}
+          />
+        </CardContent>
 
-      <CardActions className={classes.actions}>
-        <IconButton
-          aria-label="increment"
-          onClick={() => update({ ...item, quantities: item.quantities + 1 })}
-        >
-          <Icon>add</Icon>
-        </IconButton>
-        <IconButton
-          aria-label="decrement"
-          onClick={() => update({ ...item, quantities: item.quantities - 1 })}
-        >
-          <Icon>remove</Icon>
-        </IconButton>
+        <CardActions className={classes.actions}>
+          <IconButton
+            aria-label="increment"
+            onClick={() => update({ ...item, quantities: item.quantities + 1 })}
+          >
+            <Icon>add</Icon>
+          </IconButton>
+          <IconButton
+            aria-label="decrement"
+            onClick={() => update({ ...item, quantities: item.quantities - 1 })}
+          >
+            <Icon>remove</Icon>
+          </IconButton>
 
-        <IconButton aria-label="set storage" onClick={scan}>
-          <Icon>edit_location</Icon>
-        </IconButton>
-        <IconButton aria-label="edit" onClick={edit}>
-          <Icon>edit</Icon>
-        </IconButton>
-      </CardActions>
-    </MuiCard>
+          <IconButton aria-label="set storage" onClick={scan}>
+            <Icon>edit_location</Icon>
+          </IconButton>
+          <IconButton aria-label="edit" onClick={edit}>
+            <Icon>edit</Icon>
+          </IconButton>
+        </CardActions>
+      </MuiCard>
+    </>
   )
 }
 export default Card

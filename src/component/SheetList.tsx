@@ -16,7 +16,7 @@ const SheetList = (props) => {
 
   const create = async () => {
     setLoading(true)
-    const name = 'free-location-sheet'
+    const name = '持ち物管理表'
     const newSheetId = await Sheet.create(name)
     setSheetList([{ id: newSheetId, name }, ...sheetList])
     setLoading(false)
