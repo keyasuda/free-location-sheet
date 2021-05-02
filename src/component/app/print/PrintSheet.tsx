@@ -49,7 +49,7 @@ const ItemElement = (props) => {
       <div>
         <div className={classes.icon}>
           {item.klass == 'belonging' && <Icon>inventory</Icon>}
-          {item.klass == 'storage' && <Icon>folder</Icon>}
+          {item.klass == 'storage' && <Icon>place</Icon>}
         </div>
         <div className={classes.code} ref={codeRef}></div>
         <div className={classes.name}>{item.name}</div>

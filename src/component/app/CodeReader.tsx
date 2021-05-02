@@ -98,6 +98,7 @@ const CodeReader = (props: Props) => {
             <CancelIcon />
           </IconButton>
           <Select
+            aria-label="camera selector"
             value={selectedDevice}
             onChange={(e) => selectDevice(e.target.value)}
           >

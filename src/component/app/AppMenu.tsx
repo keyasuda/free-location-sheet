@@ -46,7 +46,7 @@ const AppMenu = (props) => {
           variant="outlined"
           onClick={() => history.push(`${basePath}/storages`)}
         >
-          <Icon>folder</Icon>
+          <Icon>place</Icon>
           保管場所一覧
         </Button>
 

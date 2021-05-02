@@ -1,10 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import TextField from '@material-ui/core/TextField'
-import IconButton from '@material-ui/core/IconButton'
-import DoneIcon from '@material-ui/icons/Done'
-import ClearIcon from '@material-ui/icons/Clear'
+import { makeStyles } from '@material-ui/core/styles'
 import Snackbar from '@material-ui/core/Snackbar'
 import MuiAlert from '@material-ui/lab/Alert'
 
@@ -14,28 +11,11 @@ import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import Loader from '../Loader'
 import CodeReader from '../CodeReader'
+import AppBar from '../AppBar'
+import Card from './Card'
+import EditDialog from './EditDialog'
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
-
-const Storage = (props) => {
-  const { id } = props
-  const item = useSelector((s) => s.storages.list[0])
-  const pending = useSelector((s) => s.storages.pending)
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    if (id) {
-      dispatch(storagesAsyncThunk.get(id))
-    }
-  }, [id])
-
-  return (
-    <Loader loading={pending}>
-      {id && item && <div>{item.name}</div>}
-      {(!id || !item) && <div>(not associated with any storages)</div>}
-    </Loader>
-  )
-}
 
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
@@ -60,33 +40,40 @@ const Belonging = (props) => {
       }
     }
   })
-  const nameRef = useRef()
-  const descriptionRef = useRef()
-  const storageIdRef = useRef()
+  const history = useHistory()
   const [alertOpen, setAlertOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [openScanner, setOpenScanner] = useState(false)
+
+  const classes = makeStyles({
+    card: {
+      margin: '10px',
+    },
+    input: {
+      width: '100%',
+    },
+    actions: {
+      justifyContent: 'space-between',
+    },
+    remarks: { display: 'flex' },
+    remark: {
+      display: 'flex',
+      alignItems: 'center',
+      margin: '0 0.5em 0 0',
+    },
+  })()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(belongingsAsyncThunk.get(itemId))
   }, [])
 
-  const add = async () => {
-    const addedItem = {
-      ...item,
-      name: nameRef.current.value,
-      description: descriptionRef.current.value,
-    }
-    await dispatch(belongingsAsyncThunk.add([addedItem]))
+  const add = async (item) => {
+    await dispatch(belongingsAsyncThunk.add([item]))
   }
 
-  const update = () => {
-    const updatedItem = {
-      ...item,
-      name: nameRef.current.value,
-      description: descriptionRef.current.value,
-    }
-
-    dispatch(belongingsAsyncThunk.update([updatedItem]))
+  const update = (item) => {
+    dispatch(belongingsAsyncThunk.update([item]))
   }
 
   const setStorageId = (id) => {
@@ -102,8 +89,8 @@ const Belonging = (props) => {
     try {
       const payload = JSON.parse(code)
       if (payload.klass == 'storage') {
+        setOpenScanner(false)
         setStorageId(payload.id)
-        closeFunc()
       } else {
         setAlertOpen(true)
       }
@@ -121,53 +108,41 @@ const Belonging = (props) => {
   }
 
   return (
-    <Loader loading={pending}>
-      <div>
-        <h1>{item.name}</h1>
-        <p>{item.description}</p>
-      </div>
+    <>
+      <AppBar />
 
-      <Storage id={item.storageId} />
-      <IconButton aria-label="clear" onClick={() => setStorageId(null)}>
-        <ClearIcon />
-      </IconButton>
-
-      <div>
-        <TextField
-          aria-label="name"
-          label="名称"
-          inputRef={nameRef}
-          defaultValue={item.name}
+      <Loader loading={pending}>
+        <Card
+          item={item}
+          classes={classes}
+          scan={() => setOpenScanner(true)}
+          edit={() => setDialogOpen(true)}
+          update={update}
         />
-        <TextField
-          aria-label="description"
-          label="説明"
-          inputRef={descriptionRef}
-          defaultValue={item.description}
+        <EditDialog
+          item={item}
+          classes={classes}
+          fileId={fileId}
+          history={history}
+          add={add}
+          update={update}
+          open={dialogOpen || notFound}
+          handleClose={() => setDialogOpen(false)}
+          newItem={notFound}
         />
-
-        {!notFound && (
-          <IconButton aria-label="update" onClick={update}>
-            <DoneIcon />
-          </IconButton>
+        {openScanner && (
+          <CodeReader
+            onRead={onCodeRead}
+            closeFunc={() => setOpenScanner(false)}
+          />
         )}
-        {notFound && (
-          <IconButton aria-label="add" onClick={add}>
-            <DoneIcon />
-          </IconButton>
-        )}
-      </div>
-
-      <div>
-        storage update
-        <CodeReader onRead={onCodeRead} />
         <Snackbar open={alertOpen} autoHideDuration={6000} onClose={alertClose}>
           <Alert onClose={alertClose} severity="warning">
-            not a storage!
+            保管場所のコードを読み取って下さい
           </Alert>
         </Snackbar>
-      </div>
-    </Loader>
+      </Loader>
+    </>
   )
 }
 export default Belonging

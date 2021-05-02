@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 
@@ -16,6 +16,7 @@ import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import CodeReader from '../CodeReader'
+import AppBar from '../AppBar'
 
 const setMockState = (belonging) => {
   const mockState = {
@@ -24,6 +25,12 @@ const setMockState = (belonging) => {
       list: [belonging],
     },
     storages: { pending: false, list: [] },
+    router: {
+      location: {
+        query: {},
+        pathname: '/app/file-id/',
+      },
+    },
   }
 
   jest
@@ -56,10 +63,16 @@ const MockCodeReader = (props) => {
   const { onRead } = props
   codeReaderOnRead = onRead
 
-  return <>code reader</>
+  return <div aria-label="camera selector">code reader</div>
 }
 
 jest.mock('../CodeReader', () => ({
+  __esModule: true,
+  namedExport: jest.fn(),
+  default: jest.fn(),
+}))
+
+jest.mock('../AppBar', () => ({
   __esModule: true,
   namedExport: jest.fn(),
   default: jest.fn(),
@@ -70,6 +83,7 @@ describe('Belonging', () => {
 
   beforeAll(() => {
     CodeReader.mockImplementation(MockCodeReader)
+    AppBar.mockImplementation(() => <></>)
   })
 
   beforeEach(() => {
@@ -95,9 +109,12 @@ describe('Belonging', () => {
   })
 
   describe('update operation', () => {
-    it('should update the item with input', () => {
+    it('should update with the dialog', async () => {
       const updateThunk = jest.spyOn(belongingsAsyncThunk, 'update')
       renderIt()
+      const editButton = screen.getByLabelText('edit')
+      userEvent.click(editButton)
+      await waitFor(() => screen.findByText('物品の編集'))
 
       const nameField = screen.getByLabelText('name').querySelector('input')
       userEvent.type(nameField, 'addedname')
@@ -150,65 +167,60 @@ describe('Belonging', () => {
       id: 'storageuuid',
     }
 
-    let thunk, closeFunc
-    beforeEach(() => {
+    let thunk
+    beforeEach(async () => {
       thunk = jest.spyOn(belongingsAsyncThunk, 'update')
-      closeFunc = jest.fn()
       setMockState(mockItem)
       renderIt()
+      const scanButton = screen.getByLabelText('set storage')
+      userEvent.click(scanButton)
     })
 
     it('should set storage ID', () => {
-      codeReaderOnRead(JSON.stringify(codeSrc), closeFunc)
-
+      act(() => codeReaderOnRead(JSON.stringify(codeSrc)))
       expect(thunk).toHaveBeenCalledWith([
         { ...mockItem, storageId: codeSrc.id },
       ])
-      expect(closeFunc).toHaveBeenCalled()
+      expect(screen.queryByRole('alert')).toBeNull()
+      expect(screen.queryByLabelText('camera selector')).toBeNull()
     })
 
-    it('shouldnt set ID when belongings code was read', () => {
+    it('shouldnt set ID when belongings code was read', async () => {
       act(() =>
-        codeReaderOnRead(
-          JSON.stringify({ ...codeSrc, klass: 'belongings' }),
-          closeFunc
-        )
+        codeReaderOnRead(JSON.stringify({ ...codeSrc, klass: 'belongings' }))
       )
 
       expect(thunk).not.toHaveBeenCalled()
-      expect(closeFunc).not.toHaveBeenCalled()
-      screen.getByText('not a storage!')
+      await waitFor(() => screen.findByRole('alert'))
+      screen.getByText('保管場所のコードを読み取って下さい')
+      screen.getByLabelText('camera selector')
     })
 
     it('shouldnt set ID when unknown code was read', async () => {
-      act(() => codeReaderOnRead('unknowncode', closeFunc))
+      act(() => codeReaderOnRead('unknowncode'))
 
       expect(thunk).not.toHaveBeenCalled()
-      expect(closeFunc).not.toHaveBeenCalled()
-      screen.getByText('not a storage!')
-    })
-
-    it('should set blank ID when clear button has clicked', () => {
-      const button = screen.getByLabelText('clear')
-      userEvent.click(button)
-
-      expect(thunk).toHaveBeenCalledWith([{ ...mockItem, storageId: null }])
+      await waitFor(() => screen.findByRole('alert'))
+      screen.getByText('保管場所のコードを読み取って下さい')
+      screen.getByLabelText('camera selector')
     })
   })
 
   describe('unknown ID', () => {
+    let push
     beforeEach(() => {
       jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
         fileId: 'file-id',
         itemId: 'itemid',
       })
+      push = jest.spyOn(history, 'push')
       setMockState(null, true)
       renderIt()
     })
 
-    it('should ask to add it or not', () => {
+    it('should show a register dialog', () => {
+      screen.getByText('物品の追加')
       screen.getByLabelText('add')
-      expect(screen.queryByLabelText('update')).toBeNull()
     })
 
     it('should add the item as a new belonging', () => {
@@ -225,9 +237,15 @@ describe('Belonging', () => {
           description: '',
           storageId: null,
           quantities: 1,
-          printed: true, // unknown code has scanned - the code is already on somewhare
+          printed: true, // unknown code has scanned - the code is already on somewhere
         },
       ])
+    })
+
+    it('should navigate to AppMenu when it has cancelled', () => {
+      const button = screen.getByLabelText('cancel')
+      userEvent.click(button)
+      expect(push).toHaveBeenCalledWith('/app/file-id')
     })
   })
 })
