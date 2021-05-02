@@ -9,6 +9,7 @@ import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
+import makeCardStyles from '../hooks/makeCardStyles'
 import Loader from '../Loader'
 import CodeReader from '../CodeReader'
 import AppBar from '../AppBar'
@@ -45,23 +46,7 @@ const Belonging = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [openScanner, setOpenScanner] = useState(false)
 
-  const classes = makeStyles({
-    card: {
-      margin: '10px',
-    },
-    input: {
-      width: '100%',
-    },
-    actions: {
-      justifyContent: 'space-between',
-    },
-    remarks: { display: 'flex' },
-    remark: {
-      display: 'flex',
-      alignItems: 'center',
-      margin: '0 0.5em 0 0',
-    },
-  })()
+  const classes = makeCardStyles()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
