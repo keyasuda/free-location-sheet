@@ -6,9 +6,13 @@ import Icon from '@material-ui/core/Icon'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
 import CancelIcon from '@material-ui/icons/Cancel'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
 
 const reader = new BrowserMultiFormatReader()
 const COOKIE_NAME = 'PREVIOUS_DEVICE_ID'
+
+const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const Reader = (props: Props) => {
   const { onRead, deviceId, close, className } = props
@@ -44,6 +48,7 @@ const CodeReader = (props: Props) => {
   const { onRead, closeFunc } = props
   const [devices, setDevices] = useState([])
   const [selectedDevice, setSelectedDevice] = useState('')
+  const [alert, setAlert] = useState(false)
   const deviceRef = useRef()
 
   const classes = makeStyles({
@@ -88,11 +93,23 @@ const CodeReader = (props: Props) => {
       } else {
         setSelectedDevice(devices[0].deviceId)
       }
+    } else {
+      setAlert(true)
     }
   }, [])
 
   return (
     <>
+      <Snackbar
+        open={alert}
+        autoHideDuration={6000}
+        onClose={() => {
+          setAlert(false)
+          closeFunc()
+        }}
+      >
+        <Alert severity="error">カメラがありません</Alert>
+      </Snackbar>
       {devices.length > 0 && (
         <div className={classes.container}>
           <IconButton aria-label="close" onClick={closeFunc}>
