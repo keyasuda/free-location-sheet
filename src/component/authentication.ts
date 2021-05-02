@@ -16,8 +16,7 @@ export const initAuth = async (setState) => {
       'https://sheets.googleapis.com/$discovery/rest?version=v4',
       'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
     ],
-    scope:
-      'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
+    scope: 'https://www.googleapis.com/auth/drive.file',
   })
 
   gapi.auth2.getAuthInstance().isSignedIn.listen(setState)
