@@ -4,7 +4,6 @@ import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
-import AddIcon from '@material-ui/icons/Add'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
@@ -14,6 +13,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Fab from '@material-ui/core/Fab'
+import Icon from '@material-ui/core/Icon'
 import Button from '@material-ui/core/Button'
 import _ from 'lodash'
 
@@ -85,7 +85,7 @@ const Storages = (props) => {
           setDialogOpen(true)
         }}
       >
-        <AddIcon />
+        <Icon>add</Icon>
       </Fab>
       <Dialog open={dialogOpen} onClose={handleClose} disableBackdropClick>
         <DialogTitle>新しい物品を作成</DialogTitle>
@@ -110,7 +110,7 @@ const Storages = (props) => {
             aria-label="add bulk"
             autoFocus
           >
-            <AddIcon />
+            <Icon>add</Icon>
             追加
           </Button>
         </DialogActions>

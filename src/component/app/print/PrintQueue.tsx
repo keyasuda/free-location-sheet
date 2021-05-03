@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/styles'
 import { useReactToPrint } from 'react-to-print'
 import Fab from '@material-ui/core/Fab'
-import PrintIcon from '@material-ui/icons/Print'
+import Icon from '@material-ui/core/Icon'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -102,7 +102,7 @@ const PrintQueue = (props) => {
           setDialogOpen(true)
         }}
       >
-        <PrintIcon />
+        <Icon>print</Icon>
       </Fab>
       <div className={classes.container}>
         <Sheets items={items} ref={sheetRef} />

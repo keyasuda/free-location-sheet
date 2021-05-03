@@ -5,7 +5,6 @@ import IconButton from '@material-ui/core/IconButton'
 import Icon from '@material-ui/core/Icon'
 import Select from '@material-ui/core/Select'
 import MenuItem from '@material-ui/core/MenuItem'
-import CancelIcon from '@material-ui/icons/Cancel'
 import Snackbar from '@material-ui/core/Snackbar'
 import MuiAlert from '@material-ui/lab/Alert'
 
@@ -127,7 +126,7 @@ const CodeReader = (props: Props) => {
       {devices.length > 0 && (
         <div className={classes.container}>
           <IconButton aria-label="close" onClick={closeFunc}>
-            <CancelIcon />
+            <Icon>close</Icon>
           </IconButton>
           <Select
             aria-label="camera selector"

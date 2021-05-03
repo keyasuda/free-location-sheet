@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
+import Icon from '@material-ui/core/Icon'
 import IconButton from '@material-ui/core/IconButton'
-import AddIcon from '@material-ui/icons/Add'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
@@ -95,7 +95,7 @@ const Belongings = (props) => {
           setDialogOpen(true)
         }}
       >
-        <AddIcon />
+        <Icon>add</Icon>
       </Fab>
       <Dialog open={dialogOpen} onClose={handleClose} disableBackdropClick>
         <DialogTitle>新しい物品を作成</DialogTitle>
@@ -120,7 +120,7 @@ const Belongings = (props) => {
             aria-label="add bulk"
             autoFocus
           >
-            <AddIcon />
+            <Icon>add</Icon>
             追加
           </Button>
         </DialogActions>

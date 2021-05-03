@@ -7,8 +7,6 @@ import Toolbar from '@material-ui/core/Toolbar'
 import InputBase from '@material-ui/core/InputBase'
 import Icon from '@material-ui/core/Icon'
 import IconButton from '@material-ui/core/IconButton'
-import SearchIcon from '@material-ui/icons/Search'
-import HomeIcon from '@material-ui/icons/Home'
 
 import CodeReader from './CodeReader'
 
@@ -104,11 +102,11 @@ const AppBar = (props) => {
             aria-label="home"
             onClick={() => history.push(basePath)}
           >
-            <HomeIcon />
+            <Icon>home</Icon>
           </IconButton>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
-              <SearchIcon />
+              <Icon>search</Icon>
             </div>
             <InputBase
               placeholder="検索"
