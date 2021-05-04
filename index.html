@@ -13,7 +13,6 @@
       display: flex;
       flex-direction: column;
       margin: 0;
-      max-width: 800px;
       min-height: 100vh;
     }
     body>div {
@@ -22,10 +21,12 @@
     h1,h2 {
       color: #555;
     }
+    .header {
+      flex-grow: 1;
+    }
     .footer {
       background-color: #555;
       color: #EEEEEE;
-      flex-grow: 1;
     }
     .footer a {
       color: #EEEEEE;
@@ -35,7 +36,7 @@
 </head>
 
 <body>
-  <div>
+  <div class="header">
     <h1>持ち物管理表</h1>
 
     <div id="index-app"></div>
