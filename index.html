@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
   <meta charset="UTF-8">
@@ -9,27 +9,45 @@
   <script src="https://apis.google.com/js/api.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
   <style>
-    body: {
+    body {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
       max-width: 800px;
+      min-height: 100vh;
+    }
+    body>div {
+      padding: 8px;
     }
     h1,h2 {
       color: #555;
+    }
+    .footer {
+      background-color: #555;
+      color: #EEEEEE;
+      flex-grow: 1;
+    }
+    .footer a {
+      color: #EEEEEE;
+      text-decoration: none;
     }
   </style>
 </head>
 
 <body>
-  <h1>持ち物管理表</h1>
+  <div>
+    <h1>持ち物管理表</h1>
 
-  <div id="index-app"></div>
-  <script src="bundle.js"></script>
+    <div id="index-app"></div>
+    <script src="bundle.js"></script>
+  </div>
 
   <div class="introduction">
     <div>
       <h2>フリーロケーション管理で、空間利用効率をアップ</h2>
       <p>
         本システムでは、物流倉庫等で用いられるフリーロケーション管理の考え方を家庭内で実現します。
-        物と置き場所を自由に設定できるため、空きスペースの有効活用につながります。
+        物と置き場所の関係を簡単に設定・更新できるため、空きスペースの有効活用につながります。
       </p>
     </div>
     <div>
@@ -47,6 +65,13 @@
         将来別の方法で管理したくなった場合にも無駄になりません。
       </p>
     </div>
+  </div>
+  <div class="footer">
+    <ul>
+      <li><a href="https://github.com/keyasuda/free-location-sheet">ソースコード</a></li>
+      <li><a href="/tos.html">利用規約</a></li>
+      <li><a href="/privacy.html">プライバシーポリシー</a></li>
+    </ul>
   </div>
 </body>
 
