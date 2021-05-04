@@ -10,7 +10,7 @@
     "api-test:watch": "npm run api-test -- --watch",
     "start": "webpack serve",
     "build": "webpack",
-    "build-prod": "cp *.html build && webpack --mode=production",
+    "build-prod": "cp *.html build && cp *.png build && webpack --mode=production",
     "deploy": "npm run test && npm run build-prod && firebase deploy"
   },
   "keywords": [],
