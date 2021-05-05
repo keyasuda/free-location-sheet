@@ -30,7 +30,7 @@ const EditDialog = (props) => {
   const [printed, setPrinted] = useState(item.printed)
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} disableBackdropClick>
       <DialogTitle>
         {newItem && <>物品の追加</>}
         {!newItem && <>物品の編集</>}

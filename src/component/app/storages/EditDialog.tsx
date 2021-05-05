@@ -19,7 +19,7 @@ const EditDialog = (props) => {
   const [printed, setPrinted] = useState(item.printed)
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} disableBackdropClick>
       <DialogTitle>保管場所の編集</DialogTitle>
       <DialogContent>
         <DialogContentText component="div">
