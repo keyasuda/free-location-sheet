@@ -40,6 +40,8 @@ const Belongings = (props) => {
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.belongings.pending)
   const list = useSelector((s) => s.belongings.list)
+  const nextPage = useSelector((s) => s.belongings.nextPage)
+  const page = useSelector((s) => s.belongings.page)
   const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
   const history = useHistory()
@@ -50,6 +52,15 @@ const Belongings = (props) => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(belongingsAsyncThunk.search(keyword || ''))
   }, [keyword])
+
+  const getNextPage = () => {
+    dispatch(
+      belongingsAsyncThunk.searchNext({
+        keyword: keyword || '',
+        page: page + 1,
+      })
+    )
+  }
 
   const add = () => {
     dispatch(belongingsAsyncThunk.add([newItem]))
@@ -85,6 +96,13 @@ const Belongings = (props) => {
             </ListItem>
           ))}
         </List>
+        {nextPage && (
+          <div className={classes.paginator}>
+            <IconButton onClick={getNextPage}>
+              <Icon>expand_more</Icon>
+            </IconButton>
+          </div>
+        )}
       </Loader>
 
       <Fab

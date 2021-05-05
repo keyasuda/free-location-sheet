@@ -7,6 +7,10 @@ const makeListStyles = makeStyles({
     margin: '1em',
     textDecoration: 'none',
   },
+  paginator: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
   fab: {
     position: 'fixed',
     right: '20px',

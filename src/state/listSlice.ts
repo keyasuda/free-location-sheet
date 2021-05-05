@@ -22,7 +22,14 @@ export const listSliceAndThunks = (params) => {
   const search = createAsyncThunk(
     `${baseName}/search`,
     async (keyword: string, _thunkApi) => {
-      return await api.search(keyword)
+      return await api.search(keyword, 0)
+    }
+  )
+  const searchNext = createAsyncThunk(
+    `${baseName}/searchNext`,
+    async (params, thunkApi) => {
+      const { keyword, page } = params
+      return await api.search(keyword, page)
     }
   )
 
@@ -50,7 +57,7 @@ export const listSliceAndThunks = (params) => {
     }
   )
 
-  const thunks = { add, get, search, findByPrinted, update, remove }
+  const thunks = { add, get, search, searchNext, findByPrinted, update, remove }
 
   const pend = (state, _) => {
     state.pending = true
@@ -84,7 +91,18 @@ export const listSliceAndThunks = (params) => {
       })
 
       builder.addCase(search.fulfilled, (state, action) => {
-        state.list = action.payload
+        const payload = action.payload
+        state.list = payload.items
+        state.page = payload.page
+        state.nextPage = payload.nextPage
+        state.pending = false
+      })
+
+      builder.addCase(searchNext.fulfilled, (state, action) => {
+        const payload = action.payload
+        state.list = [...state.list, ...payload.items]
+        state.page = payload.page
+        state.nextPage = payload.nextPage
         state.pending = false
       })
 

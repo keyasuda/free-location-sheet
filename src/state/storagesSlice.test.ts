@@ -1,32 +1,32 @@
-import { belongingsSlice, belongingsAsyncThunk } from './belongingsSlice'
-import { Belonging } from './types'
+import { storagesSlice, storagesAsyncThunk } from './storagesSlice'
+import { Storage } from './types'
 import { Sheet } from '../api/sheet'
 
 let b1, b2, b3
 beforeEach(() => {
   b1 = {
-    id: 'belonging-id-1',
-    name: 'belonging 1',
+    id: 'storage-id-1',
+    name: 'storage 1',
     description: '',
   }
 
   b2 = {
-    id: 'belonging-id-2',
-    name: 'belonging 2',
+    id: 'storage-id-2',
+    name: 'storage 2',
     description: '',
   }
 
   b3 = {
-    id: 'belonging-id-3',
-    name: 'belonging 3',
+    id: 'storage-id-3',
+    name: 'storage 3',
     description: '',
   }
 })
 
-const reducer = belongingsSlice.reducer
-const actions = belongingsSlice.actions
+const reducer = storagesSlice.reducer
+const actions = storagesSlice.actions
 
-describe('belongings slice', () => {
+describe('storages slice', () => {
   it('should return the initial state', () => {
     expect(reducer(undefined, {})).toEqual({
       list: [],
@@ -37,7 +37,7 @@ describe('belongings slice', () => {
   })
 
   describe('search', () => {
-    const search = belongingsAsyncThunk.search
+    const search = storagesAsyncThunk.search
 
     describe('pending', () => {
       it('should set state pending=true', () => {
@@ -76,7 +76,7 @@ describe('belongings slice', () => {
   })
 
   describe('searchNext', () => {
-    const thunk = belongingsAsyncThunk.searchNext
+    const thunk = storagesAsyncThunk.searchNext
 
     describe('pending', () => {
       it('shouldnt set state pending=true', () => {
@@ -104,7 +104,7 @@ describe('belongings slice', () => {
   })
 
   describe('findByPrinted', () => {
-    const thunk = belongingsAsyncThunk.findByPrinted
+    const thunk = storagesAsyncThunk.findByPrinted
 
     describe('pending', () => {
       it('should set state pending=true', () => {
@@ -132,7 +132,7 @@ describe('belongings slice', () => {
   })
 
   describe('add', () => {
-    const add = belongingsAsyncThunk.add
+    const add = storagesAsyncThunk.add
 
     describe('pending', () => {
       it('should set state pending=true', () => {
@@ -160,7 +160,7 @@ describe('belongings slice', () => {
   })
 
   describe('get', () => {
-    const get = belongingsAsyncThunk.get
+    const get = storagesAsyncThunk.get
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = get.pending()
@@ -194,7 +194,7 @@ describe('belongings slice', () => {
   })
 
   describe('update', () => {
-    const update = belongingsAsyncThunk.update
+    const update = storagesAsyncThunk.update
 
     describe('pending', () => {
       it('should set state pending=true', () => {
@@ -205,11 +205,11 @@ describe('belongings slice', () => {
 
     describe('fulfilled', () => {
       it('should update list item with payload if it exists', () => {
-        const newBelongings = {
+        const newStorages = {
           ...b1,
           name: 'new name',
         }
-        const action = update.fulfilled([newBelongings])
+        const action = update.fulfilled([newStorages])
         const actual = reducer({ list: [b1], pending: true }, action)
 
         expect(actual.list[0].name).toEqual('new name')
@@ -217,11 +217,11 @@ describe('belongings slice', () => {
       })
 
       it('shouldnt update list item if it doesnt exist', () => {
-        const newBelongings = {
+        const newStorages = {
           id: 'new id',
           name: 'new name',
         }
-        const action = update.fulfilled([newBelongings])
+        const action = update.fulfilled([newStorages])
         const actual = reducer({ list: [b1], pending: true }, action)
 
         expect(actual.list).toEqual([b1])
@@ -239,7 +239,7 @@ describe('belongings slice', () => {
   })
 
   describe('remove', () => {
-    const thunk = belongingsAsyncThunk.remove
+    const thunk = storagesAsyncThunk.remove
 
     describe('pending', () => {
       it('should set state pending=true', () => {
@@ -281,7 +281,7 @@ describe('async thunks', () => {
   let args, result, action, subject
 
   describe('add', () => {
-    const thunk = belongingsAsyncThunk.add
+    const thunk = storagesAsyncThunk.add
 
     beforeEach(() => {
       args = [
@@ -289,38 +289,38 @@ describe('async thunks', () => {
         { name: b2.name, description: b2.description },
       ]
       action = thunk(args)
-      Sheet.belongings.add = jest.fn()
-      Sheet.belongings.add.mockResolvedValue([b1, b2])
+      Sheet.storages.add = jest.fn()
+      Sheet.storages.add.mockResolvedValue([b1, b2])
     })
 
-    it('calls Sheet.belongings.add', async () => {
+    it('calls Sheet.storages.add', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.add).toHaveBeenCalledWith(args)
+      expect(Sheet.storages.add).toHaveBeenCalledWith(args)
       expect(subject.payload).toEqual([b1, b2])
     })
   })
 
   describe('get', () => {
-    const thunk = belongingsAsyncThunk.get
+    const thunk = storagesAsyncThunk.get
 
     beforeEach(() => {
       args = 'id'
       action = thunk(args)
-      Sheet.belongings.get = jest.fn()
-      Sheet.belongings.get.mockResolvedValue(b1)
+      Sheet.storages.get = jest.fn()
+      Sheet.storages.get.mockResolvedValue(b1)
     })
 
-    it('calls Sheet.belongings.get', async () => {
+    it('calls Sheet.storages.get', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.get).toHaveBeenCalledWith(args)
+      expect(Sheet.storages.get).toHaveBeenCalledWith(args)
       expect(subject.payload).toEqual(b1)
     })
   })
 
   describe('search', () => {
-    const thunk = belongingsAsyncThunk.search
+    const thunk = storagesAsyncThunk.search
 
     beforeEach(() => {
       args = 'keyword'
@@ -328,34 +328,34 @@ describe('async thunks', () => {
         items: [b1, b3],
         nextPage: false,
       }
-      action = thunk(args)
-      Sheet.belongings.search = jest.fn()
-      Sheet.belongings.search.mockResolvedValue(result)
+      action = thunk(args, 0)
+      Sheet.storages.search = jest.fn()
+      Sheet.storages.search.mockResolvedValue(result)
     })
 
-    it('calls Sheet.belongings.search', async () => {
+    it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.search).toHaveBeenCalledWith(args, 0)
+      expect(Sheet.storages.search).toHaveBeenCalledWith(args, 0)
       expect(subject.payload).toEqual(result)
     })
   })
 
   describe('searchNext', () => {
-    const thunk = belongingsAsyncThunk.searchNext
+    const thunk = storagesAsyncThunk.searchNext
 
     beforeEach(() => {
       args = { keyword: 'keyword', page: 2 }
       result = { items: [b1, b3], nextPage: true }
       action = thunk(args)
-      Sheet.belongings.search = jest.fn()
-      Sheet.belongings.search.mockResolvedValue(result)
+      Sheet.storages.search = jest.fn()
+      Sheet.storages.search.mockResolvedValue(result)
     })
 
-    it('calls Sheet.belongings.search', async () => {
+    it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.search).toHaveBeenCalledWith(
+      expect(Sheet.storages.search).toHaveBeenCalledWith(
         args.keyword,
         args.page
       )
@@ -364,38 +364,38 @@ describe('async thunks', () => {
   })
 
   describe('findByPrinted', () => {
-    const thunk = belongingsAsyncThunk.findByPrinted
+    const thunk = storagesAsyncThunk.findByPrinted
 
     beforeEach(() => {
       result = [b1, b3]
       action = thunk(true)
-      Sheet.belongings.findByPrinted = jest.fn()
-      Sheet.belongings.findByPrinted.mockResolvedValue(result)
+      Sheet.storages.findByPrinted = jest.fn()
+      Sheet.storages.findByPrinted.mockResolvedValue(result)
     })
 
-    it('calls Sheet.belongings.search', async () => {
+    it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.findByPrinted).toHaveBeenCalledWith(true)
+      expect(Sheet.storages.findByPrinted).toHaveBeenCalledWith(true)
       expect(subject.payload).toEqual(result)
     })
   })
 
   describe('update', () => {
-    const thunk = belongingsAsyncThunk.update
+    const thunk = storagesAsyncThunk.update
 
     beforeEach(() => {
       args = b1
       result = b1
       action = thunk(args)
-      Sheet.belongings.update = jest.fn()
-      Sheet.belongings.update.mockResolvedValue(result)
+      Sheet.storages.update = jest.fn()
+      Sheet.storages.update.mockResolvedValue(result)
     })
 
-    it('calls Sheet.belongings.update', async () => {
+    it('calls Sheet.storages.update', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.update).toHaveBeenCalledWith(args)
+      expect(Sheet.storages.update).toHaveBeenCalledWith(args)
       expect(subject.payload).toEqual(result)
     })
   })

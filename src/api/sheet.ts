@@ -259,7 +259,7 @@ export const Sheet = {
       }
     },
 
-    search: async (keyword: string) => {
+    search: async (keyword: string, page: number) => {
       let words
       try {
         words = split(keyword)
@@ -278,10 +278,18 @@ export const Sheet = {
           words.map((w) => `(D contains "${w}")`).join(' and ') +
           ')'
       }
+      q = `${q} order by A desc limit 51 offset ${50 * page}`
 
       const results = await Sheet.query(q, 'storages')
 
-      return results.map((r) => Sheet.storages.queryResultToStorage(r))
+      let items = results.map((r) => Sheet.storages.queryResultToStorage(r))
+      let nextPage = false
+      if (items.length > 50) {
+        items.pop()
+        nextPage = true
+      }
+
+      return { items, nextPage, page }
     },
 
     findByPrinted: async (printed: boolean) => {
@@ -373,7 +381,7 @@ export const Sheet = {
       }
     },
 
-    search: async (keyword: string) => {
+    search: async (keyword: string, page: number) => {
       let words
       try {
         words = split(keyword)
@@ -392,10 +400,17 @@ export const Sheet = {
           words.map((w) => `(D contains "${w}")`).join(' and ') +
           ')'
       }
+      q = `${q} order by A desc limit 51 offset ${50 * page}`
 
       const results = await Sheet.query(q, 'belongings')
+      let items = results.map((r) => Sheet.belongings.queryResultToBelonging(r))
+      let nextPage = false
+      if (items.length > 50) {
+        items.pop()
+        nextPage = true
+      }
 
-      return results.map((r) => Sheet.belongings.queryResultToBelonging(r))
+      return { items, nextPage, page }
     },
 
     findByPrinted: async (printed: boolean) => {

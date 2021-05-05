@@ -5,11 +5,15 @@ import { listSliceAndThunks } from './listSlice'
 type State = {
   list: Belonging[]
   pending: boolean
+  page: number
+  nextPage: boolean
 }
 
 const initialState: State = {
   list: [],
   pending: false,
+  page: 0,
+  nextPage: false,
 }
 
 const elements = listSliceAndThunks({

@@ -31,6 +31,8 @@ const Storages = (props) => {
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.storages.pending)
   const list = useSelector((s) => s.storages.list)
+  const nextPage = useSelector((s) => s.storages.nextPage)
+  const page = useSelector((s) => s.storages.page)
   const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
   const history = useHistory()
@@ -41,6 +43,15 @@ const Storages = (props) => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(storagesAsyncThunk.search(keyword || ''))
   }, [])
+
+  const getNextPage = () => {
+    dispatch(
+      storagesAsyncThunk.searchNext({
+        keyword: keyword || '',
+        page: page + 1,
+      })
+    )
+  }
 
   const bulkAdd = () => {
     const amount = Number(bulkAmountRef.current.value)
@@ -76,6 +87,13 @@ const Storages = (props) => {
             </ListItem>
           ))}
         </List>
+        {nextPage && (
+          <div className={classes.paginator}>
+            <IconButton onClick={getNextPage}>
+              <Icon>expand_more</Icon>
+            </IconButton>
+          </div>
+        )}
       </Loader>
       <Fab
         className={classes.fab}
