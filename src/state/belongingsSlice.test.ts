@@ -142,11 +142,11 @@ describe('belongings slice', () => {
     })
 
     describe('fulfilled', () => {
-      it('should replace the current list with payload', () => {
+      it('should append the payload in front of the list', () => {
         const action = add.fulfilled([b2])
         const actual = reducer({ list: [b1], pending: true }, action)
 
-        expect(actual.list).toEqual([b1, b2])
+        expect(actual.list).toEqual([b2, b1])
         expect(actual.pending).toBe(false)
       })
     })

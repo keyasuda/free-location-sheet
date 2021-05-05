@@ -76,7 +76,7 @@ export const listSliceAndThunks = (params) => {
       })
 
       builder.addCase(add.fulfilled, (state, action) => {
-        state.list = [...state.list, ...action.payload]
+        state.list = [...action.payload, ...state.list]
         state.pending = false
       })
 
