@@ -106,7 +106,7 @@ const Storages = (props) => {
         <Icon>add</Icon>
       </Fab>
       <Dialog open={dialogOpen} onClose={handleClose} disableBackdropClick>
-        <DialogTitle>新しい物品を作成</DialogTitle>
+        <DialogTitle>新しい保管場所を作成</DialogTitle>
         <DialogContent>
           <DialogContentText component="div">
             <TextField
