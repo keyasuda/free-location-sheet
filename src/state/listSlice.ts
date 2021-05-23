@@ -53,7 +53,8 @@ export const listSliceAndThunks = (params) => {
   const remove = createAsyncThunk(
     `${baseName}/remove`,
     async (item, _thunkApi) => {
-      return await api.update(item)
+      await api.delete(item.id)
+      return item
     }
   )
 

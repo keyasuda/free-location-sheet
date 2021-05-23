@@ -16,6 +16,7 @@ import CodeReader from '../CodeReader'
 import AppBar from '../AppBar'
 import Card from './Card'
 import EditDialog from './EditDialog'
+import RemoveDialog from './RemoveDialog'
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
@@ -45,6 +46,7 @@ const Belonging = (props) => {
   const history = useHistory()
   const [alertOpen, setAlertOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
   const [openScanner, setOpenScanner] = useState(false)
 
   const classes = makeCardStyles()
@@ -60,6 +62,11 @@ const Belonging = (props) => {
 
   const update = (item) => {
     dispatch(belongingsAsyncThunk.update([item]))
+  }
+
+  const remove = (item) => {
+    dispatch(belongingsAsyncThunk.remove(item))
+    history.push(`/app/${fileId}/belongings`)
   }
 
   const setStorageId = (id) => {
@@ -105,6 +112,7 @@ const Belonging = (props) => {
           scan={() => setOpenScanner(true)}
           edit={() => setDialogOpen(true)}
           update={update}
+          removeButtonClick={() => setRemoveDialogOpen(true)}
         />
         <EditDialog
           item={item}
@@ -116,6 +124,11 @@ const Belonging = (props) => {
           open={dialogOpen || notFound}
           handleClose={() => setDialogOpen(false)}
           newItem={notFound}
+        />
+        <RemoveDialog
+          handleClose={() => setRemoveDialogOpen(false)}
+          remove={() => remove(item)}
+          open={removeDialogOpen}
         />
         {openScanner && (
           <CodeReader

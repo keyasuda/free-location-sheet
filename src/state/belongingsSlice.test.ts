@@ -399,4 +399,23 @@ describe('async thunks', () => {
       expect(subject.payload).toEqual(result)
     })
   })
+
+  describe('remove', () => {
+    const thunk = belongingsAsyncThunk.remove
+
+    beforeEach(() => {
+      args = b1
+      result = b1
+      action = thunk(args)
+      Sheet.belongings.delete = jest.fn()
+      Sheet.belongings.delete.mockResolvedValue(result)
+    })
+
+    it('calls Sheet.belongings.delete', async () => {
+      subject = await action(jest.fn(), jest.fn(), undefined)
+
+      expect(Sheet.belongings.delete).toHaveBeenCalledWith(args.id)
+      expect(subject.payload).toEqual(result)
+    })
+  })
 })

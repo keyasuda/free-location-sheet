@@ -45,7 +45,7 @@ const StorageName = (props) => {
 }
 
 const Card = (props) => {
-  const { item, classes, scan, edit, update, fileId } = props
+  const { item, classes, scan, edit, update, removeButtonClick, fileId } = props
 
   return (
     <>
@@ -78,6 +78,9 @@ const Card = (props) => {
         </CardContent>
 
         <CardActions className={classes.actions}>
+          <IconButton aria-label="remove" onClick={removeButtonClick}>
+            <Icon>delete</Icon>
+          </IconButton>
           <IconButton
             aria-label="increment"
             onClick={() => update({ ...item, quantities: item.quantities + 1 })}

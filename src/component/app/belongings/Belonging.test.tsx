@@ -248,4 +248,24 @@ describe('Belonging', () => {
       expect(push).toHaveBeenCalledWith('/app/file-id')
     })
   })
+
+  describe('remove button', () => {
+    it('should remove item and redirect to belongings', async () => {
+      const removeThunk = jest.spyOn(belongingsAsyncThunk, 'remove')
+      const push = jest.spyOn(history, 'push')
+
+      renderIt()
+
+      const removeButton = screen.getByLabelText('remove')
+      userEvent.click(removeButton)
+
+      await waitFor(() => screen.findByText('物品の削除'))
+
+      const okButton = screen.getByLabelText('proceed-remove')
+      userEvent.click(okButton)
+
+      expect(removeThunk).toHaveBeenCalledWith(mockItem)
+      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+    })
+  })
 })

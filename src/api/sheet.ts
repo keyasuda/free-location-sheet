@@ -255,7 +255,9 @@ export const Sheet = {
       )[0][0]
 
       if (row != undefined) {
-        await Sheet.update(`storages!A${row}:E${row}`, [['', '', '', '', '']])
+        await Sheet.update([
+          { range: `storages!A${row}:E${row}`, values: ['', '', '', '', ''] },
+        ])
       }
     },
 
@@ -375,8 +377,11 @@ export const Sheet = {
       )[0][0]
 
       if (row != undefined) {
-        await Sheet.update(`belongings!A${row}:G${row}`, [
-          ['', '', '', '', '', '', ''],
+        await Sheet.update([
+          {
+            range: `belongings!A${row}:G${row}`,
+            values: ['', '', '', '', '', '', ''],
+          },
         ])
       }
     },

@@ -318,8 +318,8 @@ describe('Sheet', () => {
           'select A where B="storageuuid"',
           'storages'
         )
-        expect(Sheet.update).toHaveBeenCalledWith('storages!A4:E4', [
-          ['', '', '', '', ''],
+        expect(Sheet.update).toHaveBeenCalledWith([
+          { range: 'storages!A4:E4', values: ['', '', '', '', ''] },
         ])
       })
 
@@ -628,8 +628,11 @@ describe('Sheet', () => {
           'select A where B="belonginguuid"',
           'belongings'
         )
-        expect(Sheet.update).toHaveBeenCalledWith('belongings!A4:G4', [
-          ['', '', '', '', '', '', ''],
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'belongings!A4:G4',
+            values: ['', '', '', '', '', '', ''],
+          },
         ])
       })
 
