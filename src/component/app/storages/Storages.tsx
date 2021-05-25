@@ -80,11 +80,12 @@ const Storages = (props) => {
       <Loader loading={pending} updating={updating}>
         <List component="nav">
           {(list || []).map((b) => (
-            <ListItem key={b.id} button>
-              <ListItemText
-                primary={b.name || '(名称未設定)'}
-                onClick={() => history.push(`${currentPath}/${b.id}`)}
-              />
+            <ListItem
+              key={b.id}
+              button
+              onClick={() => history.push(`${currentPath}/${b.id}`)}
+            >
+              <ListItemText primary={b.name || '(名称未設定)'} />
             </ListItem>
           ))}
         </List>
