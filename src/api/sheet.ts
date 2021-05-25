@@ -155,7 +155,6 @@ export const Sheet = {
     const match = text.match(
       /google\.visualization\.Query\.setResponse\((.+)\)/
     )
-    console.log(match[1])
 
     // ret will in [[row1 col1, row1 col2...], [row2 col1, row2 col2...]]
     return JSON.parse(match[1]).table.rows.map((e) =>
