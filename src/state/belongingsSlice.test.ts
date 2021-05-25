@@ -31,6 +31,7 @@ describe('belongings slice', () => {
     expect(reducer(undefined, {})).toEqual({
       list: [],
       pending: false,
+      updating: false,
       page: 0,
       nextPage: false,
     })
@@ -42,7 +43,9 @@ describe('belongings slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = search.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        const actual = reducer({ pending: false, updating: false }, action)
+        expect(actual.pending).toBe(true)
+        expect(actual.updating).toBe(false)
       })
     })
 
@@ -54,13 +57,20 @@ describe('belongings slice', () => {
           page: 0,
         })
         const actual = reducer(
-          { list: [], pending: true, page: 5, nextPage: false },
+          {
+            list: [],
+            pending: true,
+            updating: false,
+            page: 5,
+            nextPage: false,
+          },
           action
         )
 
         expect(actual).toEqual({
           list: [b1],
           pending: false,
+          updating: false,
           page: 0,
           nextPage: true,
         })
@@ -81,7 +91,9 @@ describe('belongings slice', () => {
     describe('pending', () => {
       it('shouldnt set state pending=true', () => {
         const action = thunk.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(false)
+        const actual = reducer({ pending: false, updating: false }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(true)
       })
     })
 
@@ -93,12 +105,19 @@ describe('belongings slice', () => {
           page: 1,
         })
         const actual = reducer(
-          { list: [b2], pending: false, nextPage: true, page: 0 },
+          {
+            list: [b2],
+            pending: false,
+            updating: true,
+            nextPage: true,
+            page: 0,
+          },
           action
         )
 
         expect(actual.list).toEqual([b2, b1])
         expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
   })
@@ -137,24 +156,32 @@ describe('belongings slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = add.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        const actual = reducer({ pending: false, updating: false }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(true)
       })
     })
 
     describe('fulfilled', () => {
       it('should append the payload in front of the list', () => {
         const action = add.fulfilled([b2])
-        const actual = reducer({ list: [b1], pending: true }, action)
+        const actual = reducer(
+          { list: [b1], pending: false, updating: true },
+          action
+        )
 
         expect(actual.list).toEqual([b2, b1])
         expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
 
     describe('rejected', () => {
       it('should set state pending=false', () => {
         const action = add.rejected()
-        expect(reducer({ pending: true }, action).pending).toBe(false)
+        const actual = reducer({ pending: false, updating: true }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
   })
@@ -199,7 +226,9 @@ describe('belongings slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = update.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        const actual = reducer({ pending: false, updating: false }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(true)
       })
     })
 
@@ -210,10 +239,14 @@ describe('belongings slice', () => {
           name: 'new name',
         }
         const action = update.fulfilled([newBelongings])
-        const actual = reducer({ list: [b1], pending: true }, action)
+        const actual = reducer(
+          { list: [b1], pending: false, updating: true },
+          action
+        )
 
         expect(actual.list[0].name).toEqual('new name')
         expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
 
       it('shouldnt update list item if it doesnt exist', () => {
@@ -222,18 +255,24 @@ describe('belongings slice', () => {
           name: 'new name',
         }
         const action = update.fulfilled([newBelongings])
-        const actual = reducer({ list: [b1], pending: true }, action)
+        const actual = reducer(
+          { list: [b1], pending: false, updating: true },
+          action
+        )
 
         expect(actual.list).toEqual([b1])
         expect(actual.list[0].name).not.toEqual('new name')
         expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
 
     describe('rejected', () => {
       it('should set state pending=false', () => {
         const action = update.rejected()
-        expect(reducer({ pending: true }, action).pending).toBe(false)
+        const actual = reducer({ pending: false, updating: true }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
   })
@@ -244,24 +283,32 @@ describe('belongings slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = thunk.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        const actual = reducer({ pending: false, updating: false }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(true)
       })
     })
 
     describe('fulfilled', () => {
       it('should remove the payload from the list', () => {
         const action = thunk.fulfilled(b1)
-        const actual = reducer({ list: [b1, b2], pending: true }, action)
+        const actual = reducer(
+          { list: [b1, b2], pending: false, updating: true },
+          action
+        )
 
         expect(actual.list).toEqual([b2])
         expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
 
     describe('rejected', () => {
       it('should set state pending=false', () => {
         const action = thunk.rejected()
-        expect(reducer({ pending: true }, action).pending).toBe(false)
+        const actual = reducer({ pending: false, updating: true }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
   })

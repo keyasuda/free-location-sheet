@@ -30,6 +30,7 @@ const Storages = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.storages.pending)
+  const updating = useSelector((s) => s.storages.updating)
   const list = useSelector((s) => s.storages.list)
   const nextPage = useSelector((s) => s.storages.nextPage)
   const page = useSelector((s) => s.storages.page)
@@ -76,7 +77,7 @@ const Storages = (props) => {
         <title>保管場所一覧 - 持ち物管理表</title>
       </Helmet>
       <AppBar />
-      <Loader loading={pending}>
+      <Loader loading={pending} updating={updating}>
         <List component="nav">
           {(list || []).map((b) => (
             <ListItem key={b.id} button>

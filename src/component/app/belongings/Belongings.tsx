@@ -39,6 +39,7 @@ const Belongings = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.belongings.pending)
+  const updating = useSelector((s) => s.belongings.updating)
   const list = useSelector((s) => s.belongings.list)
   const nextPage = useSelector((s) => s.belongings.nextPage)
   const page = useSelector((s) => s.belongings.page)
@@ -85,7 +86,7 @@ const Belongings = (props) => {
         <title>物品一覧 - 持ち物管理表</title>
       </Helmet>
       <AppBar />
-      <Loader loading={pending}>
+      <Loader loading={pending} updating={updating}>
         <List component="nav">
           {(list || []).map((b) => (
             <ListItem key={b.id} button>

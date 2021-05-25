@@ -24,6 +24,7 @@ const Belonging = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.belongings.pending)
+  const updating = useSelector((s) => s.belongings.updating)
   const { item, notFound } = useSelector((s) => {
     const inState = s.belongings.list.find((i) => i && i.id == itemId)
     if (inState) {
@@ -104,7 +105,7 @@ const Belonging = (props) => {
     <>
       <AppBar />
 
-      <Loader loading={pending}>
+      <Loader loading={pending} updating={updating}>
         <Card
           item={item}
           fileId={fileId}

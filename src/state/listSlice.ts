@@ -66,19 +66,29 @@ export const listSliceAndThunks = (params) => {
   const fix = (state, _) => {
     state.pending = false
   }
+  const startUpdating = (state, _) => {
+    state.updating = true
+  }
+  const endUpdating = (state, _) => {
+    state.updating = false
+  }
 
   const slice = createSlice({
     name: baseName,
     initialState,
     extraReducers: (builder) => {
-      ;[add, get, search, findByPrinted, update, remove].forEach((t) => {
+      ;[get, search, findByPrinted].forEach((t) => {
         builder.addCase(t.pending, pend)
         builder.addCase(t.rejected, fix)
+      })
+      ;[add, update, remove, searchNext].forEach((t) => {
+        builder.addCase(t.pending, startUpdating)
+        builder.addCase(t.rejected, endUpdating)
       })
 
       builder.addCase(add.fulfilled, (state, action) => {
         state.list = [...action.payload, ...state.list]
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase(get.fulfilled, (state, action) => {
@@ -104,7 +114,7 @@ export const listSliceAndThunks = (params) => {
         state.list = [...state.list, ...payload.items]
         state.page = payload.page
         state.nextPage = payload.nextPage
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase(findByPrinted.fulfilled, (state, action) => {
@@ -122,13 +132,13 @@ export const listSliceAndThunks = (params) => {
           }
         })
 
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase(remove.fulfilled, (state, action) => {
         const payload = action.payload
         state.list = state.list.filter((e) => e.id != payload.id)
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase('@@router/LOCATION_CHANGE', (state, action) => {
