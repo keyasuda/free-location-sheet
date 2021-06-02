@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { split } from 'shellwords'
 import { Belonging } from '../state/types'
 import _ from 'lodash'
+import format from 'date-fns/format'
 
 const header = {
   storages: ['row', 'id', 'name', 'description', 'printed'],
@@ -13,6 +14,7 @@ const header = {
     'quantities',
     'storageId',
     'printed',
+    'deadline',
   ],
 }
 
@@ -60,7 +62,7 @@ export const Sheet = {
     // check headers
     const range = {
       storages: 'storages!A1:E1',
-      belongings: 'belongings!A1:G1',
+      belongings: 'belongings!A1:H1',
     }
     const ret = await Sheet.service.spreadsheets.values.batchGet({
       spreadsheetId: Sheet.documentId,
@@ -93,12 +95,12 @@ export const Sheet = {
     // add required headers
     await Sheet.update([
       {
-        range: 'belongings!A1:G1',
+        range: 'belongings!A1:H1',
         values: header.belongings,
       },
       {
-        range: 'belongings!A2:G2',
-        values: ['=ROW()', uuidv4(), '最初の物品', '', 1, '', false],
+        range: 'belongings!A2:H2',
+        values: ['=ROW()', uuidv4(), '最初の物品', '', 1, '', false, ''],
       },
       {
         range: 'storages!A1:E1',
@@ -311,6 +313,7 @@ export const Sheet = {
       quantities: r[4],
       storageId: r[5],
       printed: r[6],
+      deadline: r[7] ? format(eval('new ' + r[7]), 'yyyy/MM/dd') : null,
     }),
 
     add: async (newItems: Belonging[]) => {
@@ -323,6 +326,7 @@ export const Sheet = {
         i.quantities,
         i.storageId,
         String(i.printed),
+        i.deadline,
       ])
       await Sheet.add('belongings!A:A', payload)
 
@@ -350,13 +354,14 @@ export const Sheet = {
           const row = rows.find((r) => r[1] == u.id)
           if (row != undefined) {
             return {
-              range: `belongings!C${row[0]}:G${row[0]}`,
+              range: `belongings!C${row[0]}:H${row[0]}`,
               values: [
                 u.name,
                 u.description,
                 u.quantities,
                 u.storageId,
                 u.printed,
+                u.deadline,
               ],
             }
           }
@@ -378,8 +383,8 @@ export const Sheet = {
       if (row != undefined) {
         await Sheet.update([
           {
-            range: `belongings!A${row}:G${row}`,
-            values: ['', '', '', '', '', '', ''],
+            range: `belongings!A${row}:H${row}`,
+            values: ['', '', '', '', '', '', '', ''],
           },
         ])
       }

@@ -111,6 +111,7 @@ const Belonging = (props) => {
       description: values.description,
       quantities: Number(values.quantities),
       printed: values.printed,
+      deadline: values.deadline,
     }
     if (notFound) {
       add(payload)

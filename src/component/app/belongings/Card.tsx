@@ -75,6 +75,17 @@ const Card = (props) => {
             <Icon>layers</Icon> {item.quantities}
           </Typography>
 
+          {item.deadline && (
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              component="div"
+              className={classes.remark}
+            >
+              <Icon>event</Icon> {item.deadline}
+            </Typography>
+          )}
+
           <StorageName
             id={item.storageId}
             className={classes.remark}

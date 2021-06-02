@@ -61,7 +61,7 @@ describe('Sheet', () => {
                 values: [['row', 'id', 'name', 'description', 'printed']],
               },
               {
-                range: 'belongings!A1:G1',
+                range: 'belongings!A1:H1',
                 majorDimension: 'ROWS',
                 values: [
                   [
@@ -72,6 +72,7 @@ describe('Sheet', () => {
                     'quantities',
                     'storageId',
                     'printed',
+                    'deadline',
                   ],
                 ],
               },
@@ -85,7 +86,7 @@ describe('Sheet', () => {
         expect(Sheet.service.spreadsheets.values.batchGet).toHaveBeenCalledWith(
           {
             spreadsheetId,
-            ranges: ['storages!A1:E1', 'belongings!A1:G1'],
+            ranges: ['storages!A1:E1', 'belongings!A1:H1'],
           }
         )
       })
@@ -109,7 +110,7 @@ describe('Sheet', () => {
                 values: [['row', 'id', 'name', 'description', 'printed']],
               },
               {
-                range: 'belongings!A1:G1',
+                range: 'belongings!A1:H1',
                 majorDimension: 'ROWS',
                 values: [
                   [
@@ -120,6 +121,7 @@ describe('Sheet', () => {
                     'quantities',
                     'storageId',
                     'printed',
+                    'deadline',
                   ],
                 ],
               },
@@ -161,7 +163,7 @@ describe('Sheet', () => {
 
         expect(Sheet.update).toHaveBeenCalledWith([
           {
-            range: 'belongings!A1:G1',
+            range: 'belongings!A1:H1',
             values: [
               'row',
               'id',
@@ -170,11 +172,21 @@ describe('Sheet', () => {
               'quantities',
               'storageId',
               'printed',
+              'deadline',
             ],
           },
           {
-            range: 'belongings!A2:G2',
-            values: ['=ROW()', generateduuid, '最初の物品', '', 1, '', false],
+            range: 'belongings!A2:H2',
+            values: [
+              '=ROW()',
+              generateduuid,
+              '最初の物品',
+              '',
+              1,
+              '',
+              false,
+              '',
+            ],
           },
           {
             range: 'storages!A1:E1',
@@ -451,6 +463,7 @@ describe('Sheet', () => {
       storageId: 'storageuuid',
       description: 'belonging description',
       printed: false,
+      deadline: null,
     }
 
     describe('add', () => {
@@ -465,6 +478,7 @@ describe('Sheet', () => {
             description: 'desc 1',
             storageId: 'storage-id',
             printed: false,
+            deadline: '',
           },
           {
             name: 'item 2',
@@ -472,6 +486,7 @@ describe('Sheet', () => {
             description: 'desc 2',
             storageId: '',
             printed: false,
+            deadline: '2021/05/28',
           },
         ]
         const actual = await api.add(newItems)
@@ -485,8 +500,18 @@ describe('Sheet', () => {
             1,
             'storage-id',
             'false',
+            '',
           ],
-          ['=ROW()', generateduuid, 'item 2', 'desc 2', 2, '', 'false'],
+          [
+            '=ROW()',
+            generateduuid,
+            'item 2',
+            'desc 2',
+            2,
+            '',
+            'false',
+            '2021/05/28',
+          ],
         ])
 
         expect(actual[0].id).toEqual(generateduuid)
@@ -502,6 +527,7 @@ describe('Sheet', () => {
           description: 'desc 1',
           storageId: 'storage-id',
           printed: true,
+          deadline: '',
         }
 
         const actual = await api.add([newItem])
@@ -515,6 +541,7 @@ describe('Sheet', () => {
             newItem.quantities,
             newItem.storageId,
             String(newItem.printed),
+            newItem.deadline,
           ],
         ])
       })
@@ -531,6 +558,7 @@ describe('Sheet', () => {
             expected.quantities,
             expected.storageId,
             expected.printed,
+            expected.deadline,
           ],
         ])
         const actual = await api.get('belonginguuid')
@@ -567,23 +595,25 @@ describe('Sheet', () => {
         )
         expect(Sheet.update).toHaveBeenCalledWith([
           {
-            range: 'belongings!C5:G5',
+            range: 'belongings!C5:H5',
             values: [
               b1.name,
               b1.description,
               b1.quantities,
               b1.storageId,
               b1.printed,
+              b1.deadline,
             ],
           },
           {
-            range: 'belongings!C3:G3',
+            range: 'belongings!C3:H3',
             values: [
               b2.name,
               b2.description,
               b2.quantities,
               b2.storageId,
               b2.printed,
+              b2.deadline,
             ],
           },
         ])
@@ -597,13 +627,14 @@ describe('Sheet', () => {
 
         expect(Sheet.update).toHaveBeenCalledWith([
           {
-            range: 'belongings!C3:G3',
+            range: 'belongings!C3:H3',
             values: [
               b2.name,
               b2.description,
               b2.quantities,
               b2.storageId,
               b2.printed,
+              b2.deadline,
             ],
           },
         ])
@@ -630,8 +661,8 @@ describe('Sheet', () => {
         )
         expect(Sheet.update).toHaveBeenCalledWith([
           {
-            range: 'belongings!A4:G4',
-            values: ['', '', '', '', '', '', ''],
+            range: 'belongings!A4:H4',
+            values: ['', '', '', '', '', '', '', ''],
           },
         ])
       })
@@ -660,6 +691,7 @@ describe('Sheet', () => {
             expected.quantities,
             expected.storageId,
             expected.printed,
+            expected.deadline,
           ],
         ])
       })
@@ -710,6 +742,7 @@ describe('Sheet', () => {
             expected.quantities,
             expected.storageId,
             expected.printed,
+            expected.deadline,
           ])
         )
         const actual = await api.search('', 1)
@@ -744,6 +777,7 @@ describe('Sheet', () => {
             expected.quantities,
             expected.storageId,
             expected.printed,
+            expected.deadline,
           ],
         ])
       })

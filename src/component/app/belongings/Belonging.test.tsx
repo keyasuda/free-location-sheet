@@ -135,6 +135,7 @@ describe('Belonging', () => {
           ...mockItem,
           name: mockItem.name + 'addedname',
           description: mockItem.description + 'addeddescription',
+          deadline: '',
         },
       ])
     })
@@ -241,6 +242,7 @@ describe('Belonging', () => {
           storageId: null,
           quantities: 1,
           printed: true, // unknown code has scanned - the code is already on somewhere
+          deadline: '',
         },
       ])
     })
