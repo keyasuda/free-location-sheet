@@ -21,16 +21,14 @@ const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const EditDialog = (props) => {
   const {
+    classes,
+    open,
     itemId,
     item,
-    open,
     newItem,
-    history,
-    classes,
+    onSubmit,
+    onCancel,
     handleClose,
-    add,
-    update,
-    fileId,
   } = props
 
   const nameRef = useRef()
@@ -114,63 +112,32 @@ const EditDialog = (props) => {
         </DialogContent>
 
         <DialogActions className={classes.actions}>
+          <IconButton onClick={onCancel} aria-label="cancel">
+            <Icon>close</Icon>
+          </IconButton>
+
           {newItem && (
-            <>
-              <IconButton
-                onClick={() => history.push(`/app/${fileId}`)}
-                aria-label="cancel"
-              >
-                <Icon>close</Icon>
-              </IconButton>
-
-              <IconButton aria-label="autofill-button" onClick={autofill}>
-                <Icon>auto_fix_normal</Icon>
-              </IconButton>
-
-              <IconButton
-                onClick={() => {
-                  add({
-                    ...item,
-                    name: nameRef.current.value,
-                    description: descriptionRef.current.value,
-                    quantities: Number(quantitiesRef.current.value),
-                    printed: printed,
-                  })
-                  handleClose()
-                }}
-                color="primary"
-                aria-label="add"
-                autoFocus
-              >
-                <Icon>done</Icon>
-              </IconButton>
-            </>
+            <IconButton aria-label="autofill-button" onClick={autofill}>
+              <Icon>auto_fix_normal</Icon>
+            </IconButton>
           )}
 
-          {!newItem && (
-            <>
-              <IconButton onClick={handleClose}>
-                <Icon>close</Icon>
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  update({
-                    ...item,
-                    name: nameRef.current.value,
-                    description: descriptionRef.current.value,
-                    quantities: Number(quantitiesRef.current.value),
-                    printed: printed,
-                  })
-                  handleClose()
-                }}
-                color="primary"
-                aria-label="update"
-                autoFocus
-              >
-                <Icon>done</Icon>
-              </IconButton>
-            </>
-          )}
+          <IconButton
+            onClick={() => {
+              onSubmit({
+                name: nameRef.current.value,
+                description: descriptionRef.current.value,
+                quantities: quantitiesRef.current.value,
+                printed: printed,
+              })
+              handleClose()
+            }}
+            color="primary"
+            aria-label="done"
+            autoFocus
+          >
+            <Icon>done</Icon>
+          </IconButton>
         </DialogActions>
       </Dialog>
 
