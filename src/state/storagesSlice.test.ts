@@ -338,7 +338,7 @@ describe('async thunks', () => {
         items: [b1, b3],
         nextPage: false,
       }
-      action = thunk(args, 0)
+      action = thunk({ keyword: args, page: 0 })
       Sheet.storages.search = jest.fn()
       Sheet.storages.search.mockResolvedValue(result)
     })
@@ -346,7 +346,10 @@ describe('async thunks', () => {
     it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.storages.search).toHaveBeenCalledWith(args, 0)
+      expect(Sheet.storages.search).toHaveBeenCalledWith({
+        keyword: args,
+        page: 0,
+      })
       expect(subject.payload).toEqual(result)
     })
   })
@@ -365,10 +368,10 @@ describe('async thunks', () => {
     it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.storages.search).toHaveBeenCalledWith(
-        args.keyword,
-        args.page
-      )
+      expect(Sheet.storages.search).toHaveBeenCalledWith({
+        keyword: args.keyword,
+        page: args.page,
+      })
       expect(subject.payload).toEqual(result)
     })
   })

@@ -42,7 +42,7 @@ const Storages = (props) => {
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
-    dispatch(storagesAsyncThunk.search(keyword || ''))
+    dispatch(storagesAsyncThunk.search({ keyword: keyword || '' }))
   }, [])
 
   const getNextPage = () => {

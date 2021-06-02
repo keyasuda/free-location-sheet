@@ -1,6 +1,11 @@
 import { makeStyles } from '@material-ui/core/styles'
 
 const makeListStyles = makeStyles({
+  header: {
+    display: 'flex',
+    justifyContent: 'center',
+    margin: '16px',
+  },
   link: {
     cursor: 'pointer',
     display: 'block',

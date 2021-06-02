@@ -363,7 +363,7 @@ describe('Sheet', () => {
 
       describe('with single word', () => {
         it('should find storages by both name and description', async () => {
-          const actual = await api.search('storage', 0)
+          const actual = await api.search({ keyword: 'storage', page: 0 })
 
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * where ((C contains "storage")) or ((D contains "storage")) order by A desc limit 51 offset 0',
@@ -375,7 +375,7 @@ describe('Sheet', () => {
 
       describe('with two words', () => {
         it('should find storages by both name and description', async () => {
-          const actual = await api.search('storage name', 0)
+          const actual = await api.search({ keyword: 'storage name', page: 0 })
 
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * where ((C contains "storage") and (C contains "name")) or ((D contains "storage") and (D contains "name")) order by A desc limit 51 offset 0',
@@ -387,7 +387,7 @@ describe('Sheet', () => {
 
       describe('without keywords', () => {
         it('should return everything', async () => {
-          const actual = await api.search('', 0)
+          const actual = await api.search({ keyword: '', page: 0 })
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * order by A desc limit 51 offset 0',
             'storages'
@@ -406,7 +406,7 @@ describe('Sheet', () => {
               expected.printed,
             ])
           )
-          const actual = await api.search('', 1)
+          const actual = await api.search({ keyword: '', page: 1 })
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * order by A desc limit 51 offset 50',
             'storages'
@@ -419,7 +419,7 @@ describe('Sheet', () => {
 
       describe('non ascii word', () => {
         it('should be in raw', async () => {
-          const actual = await api.search('猫ベッド', 0)
+          const actual = await api.search({ keyword: '猫ベッド', page: 0 })
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド")) order by A desc limit 51 offset 0',
             'storages'
@@ -698,7 +698,7 @@ describe('Sheet', () => {
 
       describe('with single word', () => {
         it('should find belongings by both name and description', async () => {
-          const actual = await api.search('belonging', 0)
+          const actual = await api.search({ keyword: 'belonging', page: 0 })
 
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * where ((C contains "belonging")) or ((D contains "belonging")) order by A desc limit 51 offset 0',
@@ -710,7 +710,10 @@ describe('Sheet', () => {
 
       describe('with two words', () => {
         it('should find belongings by both name and description', async () => {
-          const actual = await api.search('belonging name', 0)
+          const actual = await api.search({
+            keyword: 'belonging name',
+            page: 0,
+          })
 
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * where ((C contains "belonging") and (C contains "name")) or ((D contains "belonging") and (D contains "name")) order by A desc limit 51 offset 0',
@@ -722,7 +725,7 @@ describe('Sheet', () => {
 
       describe('without keywords', () => {
         it('should return everything', async () => {
-          const actual = await api.search('', 0)
+          const actual = await api.search({ keyword: '', page: 0 })
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * order by A desc limit 51 offset 0',
             'belongings'
@@ -745,7 +748,7 @@ describe('Sheet', () => {
             expected.deadline,
           ])
         )
-        const actual = await api.search('', 1)
+        const actual = await api.search({ keyword: '', page: 1 })
         expect(Sheet.query).toHaveBeenCalledWith(
           'select * order by A desc limit 51 offset 50',
           'belongings'
@@ -757,9 +760,37 @@ describe('Sheet', () => {
 
       describe('non ascii word', () => {
         it('should be in raw', async () => {
-          const actual = await api.search('猫ベッド', 0)
+          const actual = await api.search({ keyword: '猫ベッド', page: 0 })
           expect(Sheet.query).toHaveBeenCalledWith(
             'select * where ((C contains "猫ベッド")) or ((D contains "猫ベッド")) order by A desc limit 51 offset 0',
+            'belongings'
+          )
+        })
+      })
+
+      describe('search by deadline', () => {
+        it('should return everything with deadlines', async () => {
+          const actual = await api.search({
+            keyword: '',
+            page: 0,
+            deadline: true,
+          })
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where (H is not null) order by H limit 51 offset 0',
+            'belongings'
+          )
+          expect(actual.nextPage).toBe(false)
+          expect(actual.page).toBe(0)
+        })
+
+        it('should find items have deadlines and keyword, order desc', async () => {
+          const actual = await api.search({
+            keyword: '猫ベッド',
+            page: 0,
+            deadline: true,
+          })
+          expect(Sheet.query).toHaveBeenCalledWith(
+            'select * where (((C contains "猫ベッド")) or ((D contains "猫ベッド"))) and (H is not null) order by H limit 51 offset 0',
             'belongings'
           )
         })

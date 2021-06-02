@@ -262,7 +262,9 @@ export const Sheet = {
       }
     },
 
-    search: async (keyword: string, page: number) => {
+    search: async (params) => {
+      const { keyword, page } = params
+
       let words
       try {
         words = split(keyword)
@@ -390,7 +392,9 @@ export const Sheet = {
       }
     },
 
-    search: async (keyword: string, page: number) => {
+    search: async (params) => {
+      const { keyword, page, deadline } = params
+
       let words
       try {
         words = split(keyword)
@@ -398,18 +402,31 @@ export const Sheet = {
         words = [keyword]
       }
 
-      let q
-      if (keyword.length == 0) {
-        q = 'select *'
-      } else {
+      let q, o
+      if (words.length > 0) {
         q =
-          'select * where (' +
+          '(' +
           words.map((w) => `(C contains "${w}")`).join(' and ') +
           ') or (' +
           words.map((w) => `(D contains "${w}")`).join(' and ') +
           ')'
       }
-      q = `${q} order by A desc limit 51 offset ${50 * page}`
+      o = 'order by A desc'
+
+      if (deadline) {
+        if (q) {
+          q = `(${q}) and (H is not null)`
+        } else {
+          q = '(H is not null)'
+        }
+        o = 'order by H'
+      }
+
+      if (q) {
+        q = `select * where ${q} ${o} limit 51 offset ${50 * page}`
+      } else {
+        q = `select * ${o} limit 51 offset ${50 * page}`
+      }
 
       const results = await Sheet.query(q, 'belongings')
       let items = results.map((r) => Sheet.belongings.queryResultToBelonging(r))

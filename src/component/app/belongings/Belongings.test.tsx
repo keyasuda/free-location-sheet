@@ -16,12 +16,15 @@ import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 
-const setMockState = (keyword, belongings) => {
+const setMockState = (params) => {
+  const { keyword, belongings, deadline } = params
+
   const mockState = {
     router: {
       location: {
         query: {
           keyword: keyword,
+          deadline: deadline,
         },
         pathname: '/app/file-id/belongings',
       },
@@ -36,6 +39,8 @@ const setMockState = (keyword, belongings) => {
     .spyOn(ReactRedux, 'useSelector')
     .mockImplementation((selector) => selector(mockState))
 }
+
+const pushSpy = jest.spyOn(history, 'push')
 
 const mockItem = {
   klass: 'belonging',
@@ -74,7 +79,7 @@ describe('Belongings', () => {
   describe('data to show', () => {
     describe('without keywords', () => {
       beforeEach(() => {
-        setMockState('', [])
+        setMockState({ keyword: '', belongings: [], deadline: null })
         renderIt()
       })
 
@@ -83,18 +88,56 @@ describe('Belongings', () => {
       })
 
       it('dispatch search action without keywords', async () => {
-        expect(searchThunk).toHaveBeenCalledWith('')
+        expect(searchThunk).toHaveBeenCalledWith({
+          keyword: '',
+          page: 0,
+          deadline: null,
+        })
       })
     })
 
     describe('with keywords', () => {
       beforeEach(() => {
-        setMockState('searchword', [])
+        setMockState({ keyword: 'searchword', belongings: [], deadline: null })
         renderIt()
       })
 
       it('dispatch search action with keywords', async () => {
-        expect(searchThunk).toHaveBeenCalledWith('searchword')
+        expect(searchThunk).toHaveBeenCalledWith({
+          keyword: 'searchword',
+          page: 0,
+          deadline: null,
+        })
+      })
+    })
+
+    describe('search by deadline', () => {
+      describe('with keyword', () => {
+        it('should dispatch search action with keywords and deadline=true', () => {
+          setMockState({
+            keyword: 'searchword',
+            belongings: [],
+            deadline: true,
+          })
+          renderIt()
+          expect(searchThunk).toHaveBeenCalledWith({
+            keyword: 'searchword',
+            page: 0,
+            deadline: true,
+          })
+        })
+      })
+
+      describe('without keywords', () => {
+        it('should dispatch search action with keywords and deadline=true', () => {
+          setMockState({ keyword: '', belongings: [], deadline: true })
+          renderIt()
+          expect(searchThunk).toHaveBeenCalledWith({
+            keyword: '',
+            page: 0,
+            deadline: true,
+          })
+        })
       })
     })
   })
@@ -106,7 +149,7 @@ describe('Belongings', () => {
         { ...mockItem, id: uuidv4(), name: 'itemname2' },
       ]
       beforeEach(() => {
-        setMockState('', items)
+        setMockState({ keyword: '', belongings: items })
         renderIt()
       })
 
@@ -117,7 +160,10 @@ describe('Belongings', () => {
 
     describe('item without name', () => {
       beforeEach(() => {
-        setMockState('', [{ ...mockItem, id: uuidv4() }])
+        setMockState({
+          keyword: '',
+          belongings: [{ ...mockItem, id: uuidv4() }],
+        })
         renderIt()
       })
 
@@ -128,23 +174,20 @@ describe('Belongings', () => {
   })
 
   describe('buttons', () => {
-    const item = {
-      klass: 'belonging',
-      name: '',
-      description: '',
-      storageId: null,
-      quantities: 1,
-      printed: false,
-    }
-
-    let addThunk
-    beforeEach(() => {
-      addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
-      renderIt()
-    })
-
     describe('bulk add button', () => {
+      const item = {
+        klass: 'belonging',
+        name: '',
+        description: '',
+        storageId: null,
+        quantities: 1,
+        printed: false,
+      }
+
+      let addThunk
       beforeEach(() => {
+        addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
+        renderIt()
         const fab = screen.getByLabelText('add')
         userEvent.click(fab)
       })
@@ -169,6 +212,72 @@ describe('Belongings', () => {
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('filter button', () => {
+      describe('without keywords', () => {
+        it('should apply deadline filter', () => {
+          setMockState({
+            keyword: '',
+            belongings: [],
+          })
+          renderIt()
+
+          const chip = screen.getByLabelText('search-by-deadline')
+          userEvent.click(chip)
+
+          expect(pushSpy).toHaveBeenCalledWith(
+            '/app/file-id/belongings?deadline=true'
+          )
+        })
+
+        it('should clear filter when its already applied', () => {
+          setMockState({
+            keyword: '',
+            deadline: true,
+            belongings: [],
+          })
+          renderIt()
+
+          const chip = screen.getByLabelText('search-by-deadline')
+          userEvent.click(chip)
+
+          expect(pushSpy).toHaveBeenCalledWith('/app/file-id/belongings')
+        })
+      })
+
+      describe('with keywords', () => {
+        it('should apply deadline filter', () => {
+          setMockState({
+            keyword: 'word',
+            belongings: [],
+          })
+          renderIt()
+
+          const chip = screen.getByLabelText('search-by-deadline')
+          userEvent.click(chip)
+
+          expect(pushSpy).toHaveBeenCalledWith(
+            '/app/file-id/belongings?keyword=word&deadline=true'
+          )
+        })
+
+        it('should clear filter when its already applied', () => {
+          setMockState({
+            keyword: 'word',
+            deadline: true,
+            belongings: [],
+          })
+          renderIt()
+
+          const chip = screen.getByLabelText('search-by-deadline')
+          userEvent.click(chip)
+
+          expect(pushSpy).toHaveBeenCalledWith(
+            '/app/file-id/belongings?keyword=word'
+          )
+        })
       })
     })
   })

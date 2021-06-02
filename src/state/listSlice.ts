@@ -21,15 +21,16 @@ export const listSliceAndThunks = (params) => {
   // search existing items
   const search = createAsyncThunk(
     `${baseName}/search`,
-    async (keyword: string, _thunkApi) => {
-      return await api.search(keyword, 0)
+    async (params, _thunkApi) => {
+      const { keyword, deadline } = params
+      return await api.search({ keyword, page: 0, deadline })
     }
   )
   const searchNext = createAsyncThunk(
     `${baseName}/searchNext`,
     async (params, thunkApi) => {
-      const { keyword, page } = params
-      return await api.search(keyword, page)
+      const { keyword, page, deadline } = params
+      return await api.search({ keyword, page, deadline })
     }
   )
 

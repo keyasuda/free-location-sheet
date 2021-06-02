@@ -375,7 +375,7 @@ describe('async thunks', () => {
         items: [b1, b3],
         nextPage: false,
       }
-      action = thunk(args)
+      action = thunk({ keyword: args })
       Sheet.belongings.search = jest.fn()
       Sheet.belongings.search.mockResolvedValue(result)
     })
@@ -383,7 +383,10 @@ describe('async thunks', () => {
     it('calls Sheet.belongings.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.search).toHaveBeenCalledWith(args, 0)
+      expect(Sheet.belongings.search).toHaveBeenCalledWith({
+        keyword: args,
+        page: 0,
+      })
       expect(subject.payload).toEqual(result)
     })
   })
@@ -402,10 +405,10 @@ describe('async thunks', () => {
     it('calls Sheet.belongings.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.belongings.search).toHaveBeenCalledWith(
-        args.keyword,
-        args.page
-      )
+      expect(Sheet.belongings.search).toHaveBeenCalledWith({
+        keyword: args.keyword,
+        page: args.page,
+      })
       expect(subject.payload).toEqual(result)
     })
   })
