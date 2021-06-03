@@ -345,6 +345,56 @@ describe('Belonging', () => {
 
         await waitFor(() => screen.getByText('自動入力できませんでした'))
       })
+
+      it('should call OpenBD for ISBN', async () => {
+        jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
+          fileId: 'file-id',
+          itemId: '9783161484100',
+        })
+
+        const autofillSource = [
+          {
+            onix: {
+              DescriptiveDetail: {
+                TitleDetail: {
+                  TitleElement: {
+                    TitleText: {
+                      content: 'book title',
+                    },
+                  },
+                },
+                Contributor: [
+                  {
+                    PersonName: {
+                      content: 'book author',
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ]
+
+        fetchMock.get('https://api.openbd.jp/v1/get?isbn=9783161484100', {
+          status: 200,
+          body: JSON.stringify(autofillSource),
+        })
+
+        setMockState(null)
+        renderIt()
+        const button = screen.getByLabelText('autofill-button')
+
+        userEvent.click(button)
+
+        const nameField = screen.getByLabelText('name').querySelector('input')
+        const descriptionField = screen
+          .getByLabelText('description')
+          .querySelector('input')
+
+        await waitFor(() =>
+          expect(nameField.value).toEqual('book title book author')
+        )
+      })
     })
   })
 })
