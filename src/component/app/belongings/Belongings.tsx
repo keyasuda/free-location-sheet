@@ -15,6 +15,7 @@ import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import Fab from '@material-ui/core/Fab'
 import Button from '@material-ui/core/Button'
+import Chip from '@material-ui/core/Chip'
 import _ from 'lodash'
 
 import { authorizedClient, authorizedSheet } from '../../authentication'
@@ -44,6 +45,7 @@ const Belongings = (props) => {
   const nextPage = useSelector((s) => s.belongings.nextPage)
   const page = useSelector((s) => s.belongings.page)
   const currentPath = useSelector((s) => s.router.location.pathname)
+  const deadline = useSelector((s) => s.router.location.query.deadline)
   const bulkAmountRef = useRef()
   const history = useHistory()
   const keyword = useSearchword()
@@ -51,8 +53,14 @@ const Belongings = (props) => {
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
-    dispatch(belongingsAsyncThunk.search(keyword || ''))
-  }, [keyword])
+    dispatch(
+      belongingsAsyncThunk.search({
+        keyword: keyword || '',
+        page: 0,
+        deadline: deadline,
+      })
+    )
+  }, [keyword, deadline])
 
   const getNextPage = () => {
     dispatch(
@@ -80,13 +88,40 @@ const Belongings = (props) => {
     setDialogOpen(false)
   }
 
+  const onDeadlineChipClick = () => {
+    const params = []
+    if (keyword) {
+      params.push(`keyword=${keyword}`)
+    }
+    if (!deadline) {
+      params.push('deadline=true')
+    }
+    const q = params.length > 0 ? `?${params.join('&')}` : ''
+    history.push(`${currentPath}${q}`)
+  }
+
   return (
     <>
       <Helmet>
         <title>物品一覧 - 持ち物管理表</title>
       </Helmet>
       <AppBar />
-      <Loader loading={pending} updating={updating}>
+      <Loader
+        loading={pending}
+        updating={updating}
+        header={
+          <div className={classes.header}>
+            <Chip
+              icon={<Icon>event</Icon>}
+              aria-label="search-by-deadline"
+              label="期限があるもの"
+              clickable
+              color={deadline ? 'primary' : 'default'}
+              onClick={onDeadlineChipClick}
+            />
+          </div>
+        }
+      >
         <List component="nav">
           {(list || []).map((b) => (
             <ListItem
@@ -94,7 +129,10 @@ const Belongings = (props) => {
               button
               onClick={() => history.push(`${currentPath}/${b.id}`)}
             >
-              <ListItemText primary={b.name || '(名称未設定)'} />
+              <ListItemText
+                primary={b.name || '(名称未設定)'}
+                secondary={b.deadline}
+              />
             </ListItem>
           ))}
         </List>

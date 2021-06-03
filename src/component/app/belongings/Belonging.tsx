@@ -104,6 +104,27 @@ const Belonging = (props) => {
     setAlertOpen(false)
   }
 
+  const onEditFormSubmit = (values) => {
+    const payload = {
+      ...item,
+      name: values.name,
+      description: values.description,
+      quantities: Number(values.quantities),
+      printed: values.printed,
+      deadline: values.deadline,
+    }
+    if (notFound) {
+      add(payload)
+    } else {
+      update(payload)
+    }
+  }
+
+  const onEditFormCancel = () => {
+    if (notFound) history.push(`/app/${fileId}`)
+    setDialogOpen(false)
+  }
+
   return (
     <>
       <AppBar />
@@ -120,16 +141,14 @@ const Belonging = (props) => {
         />
 
         <EditDialog
+          classes={classes}
+          open={dialogOpen || notFound}
           itemId={itemId}
           item={item}
-          classes={classes}
-          fileId={fileId}
-          history={history}
-          add={add}
-          update={update}
-          open={dialogOpen || notFound}
-          handleClose={() => setDialogOpen(false)}
           newItem={notFound}
+          onSubmit={onEditFormSubmit}
+          onCancel={onEditFormCancel}
+          handleClose={() => setDialogOpen(false)}
         />
 
         <RemoveDialog

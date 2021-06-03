@@ -21,6 +21,8 @@ import AppBar from '../AppBar'
 
 import { autoFillEndpoint } from '../../../settings'
 
+Sheet.init = jest.fn()
+
 const setMockState = (belonging) => {
   const mockState = {
     belongings: {
@@ -127,7 +129,7 @@ describe('Belonging', () => {
         .querySelector('input')
       userEvent.type(descriptionField, 'addeddescription')
 
-      const updateButton = screen.getByLabelText('update')
+      const updateButton = screen.getByLabelText('done')
       userEvent.click(updateButton)
 
       expect(updateThunk).toHaveBeenCalledWith([
@@ -135,6 +137,7 @@ describe('Belonging', () => {
           ...mockItem,
           name: mockItem.name + 'addedname',
           description: mockItem.description + 'addeddescription',
+          deadline: '',
         },
       ])
     })
@@ -223,11 +226,11 @@ describe('Belonging', () => {
 
     it('should show a register dialog', () => {
       screen.getByText('物品の追加')
-      screen.getByLabelText('add')
+      screen.getByLabelText('done')
     })
 
     it('should add the item as a new belonging', () => {
-      const button = screen.getByLabelText('add')
+      const button = screen.getByLabelText('done')
       const addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
       const getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
       userEvent.click(button)
@@ -241,6 +244,7 @@ describe('Belonging', () => {
           storageId: null,
           quantities: 1,
           printed: true, // unknown code has scanned - the code is already on somewhere
+          deadline: '',
         },
       ])
     })

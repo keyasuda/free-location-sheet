@@ -13,24 +13,37 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import Snackbar from '@material-ui/core/Snackbar'
 import MuiAlert from '@material-ui/lab/Alert'
+import DateFnsUtils from '@date-io/date-fns'
+import format from 'date-fns/format'
+import jaLocale from 'date-fns/locale/ja'
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers'
 import { useForm, Controller } from 'react-hook-form'
+import { makeStyles } from '@material-ui/core/styles'
 
 import { autoFillEndpoint } from '../../../settings'
+
+export class JaDateFnsUtils extends DateFnsUtils {
+  getCalendarHeaderText(date: Date) {
+    return format(date, 'yyyy MMM', { locale: this.locale })
+  }
+
+  getDatePickerHeaderText(date: Date) {
+    return format(date, 'MMMd日', { locale: this.locale })
+  }
+}
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const EditDialog = (props) => {
   const {
+    classes,
+    open,
     itemId,
     item,
-    open,
     newItem,
-    history,
-    classes,
+    onSubmit,
+    onCancel,
     handleClose,
-    add,
-    update,
-    fileId,
   } = props
 
   const nameRef = useRef()
@@ -41,6 +54,13 @@ const EditDialog = (props) => {
 
   const [printed, setPrinted] = useState(item.printed)
   const [alert, setAlert] = useState(false)
+  const [deadline, setDeadline] = useState(item.deadline ? item.deadline : null)
+
+  const clearButtonClass = makeStyles({
+    clear: {
+      margin: '20px 0 0 0',
+    },
+  })()
 
   const autofill = async () => {
     const ret = await fetch(autoFillEndpoint + itemId)
@@ -52,6 +72,19 @@ const EditDialog = (props) => {
     } else {
       setAlert(true)
     }
+  }
+
+  const submit = () => {
+    const deadlineStr = deadline ? format(deadline, 'yyyy/MM/dd') : ''
+
+    onSubmit({
+      name: nameRef.current.value,
+      description: descriptionRef.current.value,
+      quantities: quantitiesRef.current.value,
+      printed: printed,
+      deadline: deadlineStr,
+    })
+    handleClose()
   }
 
   return (
@@ -91,12 +124,37 @@ const EditDialog = (props) => {
                 />
               )}
             />
+
             <TextField
               label="数量"
               aria-label="quantities"
               inputRef={quantitiesRef}
               defaultValue={1}
             />
+
+            <div>
+              <MuiPickersUtilsProvider utils={JaDateFnsUtils} locale={jaLocale}>
+                <DatePicker
+                  margin="normal"
+                  aria-label="deadline"
+                  label="期限"
+                  okLabel="確定"
+                  cancelLabel="キャンセル"
+                  format="yyyy/MM/dd"
+                  value={deadline}
+                  onChange={setDeadline}
+                />
+              </MuiPickersUtilsProvider>
+              {deadline && (
+                <IconButton
+                  onClick={() => setDeadline(null)}
+                  className={clearButtonClass.clear}
+                >
+                  <Icon>clear</Icon>
+                </IconButton>
+              )}
+            </div>
+
             <FormGroup row>
               <FormControlLabel
                 control={
@@ -114,63 +172,24 @@ const EditDialog = (props) => {
         </DialogContent>
 
         <DialogActions className={classes.actions}>
+          <IconButton onClick={onCancel} aria-label="cancel">
+            <Icon>close</Icon>
+          </IconButton>
+
           {newItem && (
-            <>
-              <IconButton
-                onClick={() => history.push(`/app/${fileId}`)}
-                aria-label="cancel"
-              >
-                <Icon>close</Icon>
-              </IconButton>
-
-              <IconButton aria-label="autofill-button" onClick={autofill}>
-                <Icon>auto_fix_normal</Icon>
-              </IconButton>
-
-              <IconButton
-                onClick={() => {
-                  add({
-                    ...item,
-                    name: nameRef.current.value,
-                    description: descriptionRef.current.value,
-                    quantities: Number(quantitiesRef.current.value),
-                    printed: printed,
-                  })
-                  handleClose()
-                }}
-                color="primary"
-                aria-label="add"
-                autoFocus
-              >
-                <Icon>done</Icon>
-              </IconButton>
-            </>
+            <IconButton aria-label="autofill-button" onClick={autofill}>
+              <Icon>auto_fix_normal</Icon>
+            </IconButton>
           )}
 
-          {!newItem && (
-            <>
-              <IconButton onClick={handleClose}>
-                <Icon>close</Icon>
-              </IconButton>
-              <IconButton
-                onClick={() => {
-                  update({
-                    ...item,
-                    name: nameRef.current.value,
-                    description: descriptionRef.current.value,
-                    quantities: Number(quantitiesRef.current.value),
-                    printed: printed,
-                  })
-                  handleClose()
-                }}
-                color="primary"
-                aria-label="update"
-                autoFocus
-              >
-                <Icon>done</Icon>
-              </IconButton>
-            </>
-          )}
+          <IconButton
+            onClick={submit}
+            color="primary"
+            aria-label="done"
+            autoFocus
+          >
+            <Icon>done</Icon>
+          </IconButton>
         </DialogActions>
       </Dialog>
 
