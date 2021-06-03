@@ -10,6 +10,8 @@ import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
 import Icon from '@material-ui/core/Icon'
 import Typography from '@material-ui/core/Typography'
+import Interweave from 'interweave'
+import { UrlMatcher } from 'interweave-autolink'
 
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 
@@ -56,7 +58,10 @@ const Card = (props) => {
         <CardHeader avatar={<Icon>inventory</Icon>} title={item.name} />
         <CardContent>
           <Typography variant="body1" color="textPrimary" component="p">
-            {item.description}
+            <Interweave
+              content={item.description}
+              matchers={[new UrlMatcher('url')]}
+            />
           </Typography>
         </CardContent>
 

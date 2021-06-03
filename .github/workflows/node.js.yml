@@ -28,4 +28,5 @@ jobs:
           npm install -g npm
           npm install
           mv src/credentials.js.blank src/credentials.js
+          mv src/settings.js.blank src/settings.js
           npm run test

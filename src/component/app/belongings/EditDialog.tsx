@@ -11,9 +11,17 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
+import { useForm, Controller } from 'react-hook-form'
+
+import { autoFillEndpoint } from '../../../settings'
+
+const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const EditDialog = (props) => {
   const {
+    itemId,
     item,
     open,
     newItem,
@@ -24,109 +32,158 @@ const EditDialog = (props) => {
     update,
     fileId,
   } = props
+
   const nameRef = useRef()
   const descriptionRef = useRef()
   const quantitiesRef = useRef()
+
+  const { control, setValue } = useForm()
+
   const [printed, setPrinted] = useState(item.printed)
+  const [alert, setAlert] = useState(false)
+
+  const autofill = async () => {
+    const ret = await fetch(autoFillEndpoint + itemId)
+
+    if (ret.ok) {
+      const src = await ret.json()
+      setValue('name', src.name)
+      setValue('description', src.url)
+    } else {
+      setAlert(true)
+    }
+  }
 
   return (
-    <Dialog open={open} onClose={handleClose} disableBackdropClick>
-      <DialogTitle>
-        {newItem && <>物品の追加</>}
-        {!newItem && <>物品の編集</>}
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText component="div">
-          <TextField
-            aria-label="name"
-            label="名称"
-            inputRef={nameRef}
-            defaultValue={item.name}
-            className={classes.input}
-          />
-          <TextField
-            aria-label="description"
-            label="説明"
-            inputRef={descriptionRef}
-            defaultValue={item.description}
-            className={classes.input}
-          />
-          <TextField
-            label="数量"
-            aria-label="quantities"
-            inputRef={quantitiesRef}
-            defaultValue={1}
-          />
-          <FormGroup row>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={printed}
-                  onChange={(e) => setPrinted(e.target.checked)}
-                  name="printed"
-                  color="primary"
+    <>
+      <Dialog open={open} onClose={handleClose} disableBackdropClick>
+        <DialogTitle>
+          {newItem && <>物品の追加</>}
+          {!newItem && <>物品の編集</>}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText component="div">
+            <Controller
+              name="name"
+              control={control}
+              defaultValue={item.name}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  aria-label="name"
+                  label="名称"
+                  inputRef={nameRef}
+                  className={classes.input}
                 />
-              }
-              label="印刷済み"
+              )}
             />
-          </FormGroup>
-        </DialogContentText>
-      </DialogContent>
+            <Controller
+              name="description"
+              control={control}
+              defaultValue={item.description}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  aria-label="description"
+                  label="説明"
+                  inputRef={descriptionRef}
+                  className={classes.input}
+                />
+              )}
+            />
+            <TextField
+              label="数量"
+              aria-label="quantities"
+              inputRef={quantitiesRef}
+              defaultValue={1}
+            />
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={printed}
+                    onChange={(e) => setPrinted(e.target.checked)}
+                    name="printed"
+                    color="primary"
+                  />
+                }
+                label="印刷済み"
+              />
+            </FormGroup>
+          </DialogContentText>
+        </DialogContent>
 
-      <DialogActions className={classes.actions}>
-        {newItem && (
-          <>
-            <IconButton
-              onClick={() => history.push(`/app/${fileId}`)}
-              aria-label="cancel"
-            >
-              <Icon>close</Icon>
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                add({
-                  ...item,
-                  name: nameRef.current.value,
-                  description: descriptionRef.current.value,
-                  quantities: Number(quantitiesRef.current.value),
-                  printed: printed,
-                })
-                handleClose()
-              }}
-              color="primary"
-              aria-label="add"
-              autoFocus
-            >
-              <Icon>done</Icon>
-            </IconButton>
-          </>
-        )}
-        {!newItem && (
-          <>
-            <IconButton onClick={handleClose}>
-              <Icon>close</Icon>
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                update({
-                  ...item,
-                  name: nameRef.current.value,
-                  description: descriptionRef.current.value,
-                  quantities: Number(quantitiesRef.current.value),
-                  printed: printed,
-                })
-                handleClose()
-              }}
-              color="primary"
-              aria-label="update"
-              autoFocus
-            >
-              <Icon>done</Icon>
-            </IconButton>
-          </>
-        )}
-      </DialogActions>
-    </Dialog>
+        <DialogActions className={classes.actions}>
+          {newItem && (
+            <>
+              <IconButton
+                onClick={() => history.push(`/app/${fileId}`)}
+                aria-label="cancel"
+              >
+                <Icon>close</Icon>
+              </IconButton>
+
+              <IconButton aria-label="autofill-button" onClick={autofill}>
+                <Icon>auto_fix_normal</Icon>
+              </IconButton>
+
+              <IconButton
+                onClick={() => {
+                  add({
+                    ...item,
+                    name: nameRef.current.value,
+                    description: descriptionRef.current.value,
+                    quantities: Number(quantitiesRef.current.value),
+                    printed: printed,
+                  })
+                  handleClose()
+                }}
+                color="primary"
+                aria-label="add"
+                autoFocus
+              >
+                <Icon>done</Icon>
+              </IconButton>
+            </>
+          )}
+
+          {!newItem && (
+            <>
+              <IconButton onClick={handleClose}>
+                <Icon>close</Icon>
+              </IconButton>
+              <IconButton
+                onClick={() => {
+                  update({
+                    ...item,
+                    name: nameRef.current.value,
+                    description: descriptionRef.current.value,
+                    quantities: Number(quantitiesRef.current.value),
+                    printed: printed,
+                  })
+                  handleClose()
+                }}
+                color="primary"
+                aria-label="update"
+                autoFocus
+              >
+                <Icon>done</Icon>
+              </IconButton>
+            </>
+          )}
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={alert}
+        autoHideDuration={6000}
+        onClose={() => {
+          setAlert(false)
+        }}
+      >
+        <Alert severity="info">自動入力できませんでした</Alert>
+      </Snackbar>
+    </>
   )
 }
 export default EditDialog

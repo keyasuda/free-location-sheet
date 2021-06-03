@@ -2,6 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
+const fetchMock = require('fetch-mock-jest')
 
 import { MemoryRouter } from 'react-router-dom'
 import ReactRouter from 'react-router'
@@ -17,6 +18,8 @@ import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import CodeReader from '../CodeReader'
 import AppBar from '../AppBar'
+
+import { autoFillEndpoint } from '../../../settings'
 
 const setMockState = (belonging) => {
   const mockState = {
@@ -266,6 +269,78 @@ describe('Belonging', () => {
 
       expect(removeThunk).toHaveBeenCalledWith(mockItem)
       expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+    })
+  })
+
+  describe('autofill button', () => {
+    it('shouldnt appear for existing item', () => {
+      setMockState(mockItem)
+      renderIt()
+      const button = screen.queryByLabelText('autofill-button')
+      expect(button).toEqual(null)
+    })
+
+    it('should appear for new item', () => {
+      setMockState(null)
+      renderIt()
+      screen.getByLabelText('autofill-button')
+    })
+
+    describe('clicks', () => {
+      afterEach(() => fetchMock.restore())
+
+      it('should call backend and fill when something has returned', async () => {
+        jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
+          fileId: 'file-id',
+          itemId: 'itemid-toautofill',
+        })
+
+        const autofillSource = {
+          name: 'autofill item name',
+          url: 'autofill item url',
+        }
+
+        fetchMock.get(autoFillEndpoint + 'itemid-toautofill', {
+          status: 200,
+          body: JSON.stringify(autofillSource),
+        })
+
+        setMockState(null)
+        renderIt()
+        const button = screen.getByLabelText('autofill-button')
+
+        userEvent.click(button)
+
+        const nameField = screen.getByLabelText('name').querySelector('input')
+        const descriptionField = screen
+          .getByLabelText('description')
+          .querySelector('input')
+
+        await waitFor(() =>
+          expect(nameField.value).toEqual(autofillSource.name)
+        )
+        expect(descriptionField.value).toEqual(autofillSource.url)
+      })
+
+      it('should show notice when therere no autofill values', async () => {
+        jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
+          fileId: 'file-id',
+          itemId: 'itemid-cannotautofill',
+        })
+
+        fetchMock.get(autoFillEndpoint + 'itemid-cannotautofill', {
+          status: 404,
+          body: 'not found',
+        })
+
+        setMockState(null)
+        renderIt()
+        const button = screen.getByLabelText('autofill-button')
+
+        userEvent.click(button)
+
+        await waitFor(() => screen.getByText('自動入力できませんでした'))
+      })
     })
   })
 })

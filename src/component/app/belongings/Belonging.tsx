@@ -23,6 +23,7 @@ const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
+
   const pending = useSelector((s) => s.belongings.pending)
   const updating = useSelector((s) => s.belongings.updating)
   const { item, notFound } = useSelector((s) => {
@@ -44,7 +45,9 @@ const Belonging = (props) => {
       }
     }
   })
+
   const history = useHistory()
+
   const [alertOpen, setAlertOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
@@ -115,7 +118,9 @@ const Belonging = (props) => {
           update={update}
           removeButtonClick={() => setRemoveDialogOpen(true)}
         />
+
         <EditDialog
+          itemId={itemId}
           item={item}
           classes={classes}
           fileId={fileId}
@@ -126,6 +131,7 @@ const Belonging = (props) => {
           handleClose={() => setDialogOpen(false)}
           newItem={notFound}
         />
+
         <RemoveDialog
           handleClose={() => setRemoveDialogOpen(false)}
           remove={() => remove(item)}
