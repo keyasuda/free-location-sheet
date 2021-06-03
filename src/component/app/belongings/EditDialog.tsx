@@ -22,6 +22,8 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import { autoFillEndpoint } from '../../../settings'
 
+const OpenBD = 'https://api.openbd.jp/v1/get?isbn='
+
 export class JaDateFnsUtils extends DateFnsUtils {
   getCalendarHeaderText(date: Date) {
     return format(date, 'yyyy MMM', { locale: this.locale })
@@ -63,14 +65,30 @@ const EditDialog = (props) => {
   })()
 
   const autofill = async () => {
-    const ret = await fetch(autoFillEndpoint + itemId)
+    if (itemId.match(/97[89][0-9]{10}/)) {
+      const ret = await fetch(OpenBD + itemId)
 
-    if (ret.ok) {
-      const src = await ret.json()
-      setValue('name', src.name)
-      setValue('description', src.url)
+      if (ret.ok) {
+        const src = await ret.json()
+        const title =
+          src[0].onix.DescriptiveDetail.TitleDetail.TitleElement.TitleText
+            .content
+        const author =
+          src[0].onix.DescriptiveDetail.Contributor[0].PersonName.content
+        setValue('name', title + ' ' + author)
+      } else {
+        setAlert(true)
+      }
     } else {
-      setAlert(true)
+      const ret = await fetch(autoFillEndpoint + itemId)
+
+      if (ret.ok) {
+        const src = await ret.json()
+        setValue('name', src.name)
+        setValue('description', src.url)
+      } else {
+        setAlert(true)
+      }
     }
   }
 
