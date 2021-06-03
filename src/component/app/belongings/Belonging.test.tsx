@@ -21,6 +21,8 @@ import AppBar from '../AppBar'
 
 import { autoFillEndpoint } from '../../../settings'
 
+Sheet.init = jest.fn()
+
 const setMockState = (belonging) => {
   const mockState = {
     belongings: {

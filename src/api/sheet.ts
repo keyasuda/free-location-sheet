@@ -37,29 +37,25 @@ export const Sheet = {
 
     // format
     await Sheet.format()
+    await Sheet.setInitialItems()
 
     return id
   },
 
-  init: (documentId: string, auth, sheetsService) => {
+  init: async (documentId: string, auth, sheetsService) => {
     Sheet.documentId = documentId
     Sheet.auth = auth
     Sheet.service = sheetsService
 
-    // check sheets
-    // create sheet(s)
-    // put header
+    if (documentId) await Sheet.format()
   },
 
-  validate: async () => {
-    // check sheets
+  missingSheets: async () => {
     const currentSheets = await Sheet.sheets()
-    const missing = _.difference(['belongings', 'storages'], currentSheets)
-    if (missing.length > 0) {
-      return false
-    }
+    return _.difference(['belongings', 'storages'], currentSheets)
+  },
 
-    // check headers
+  missingHeaders: async () => {
     const range = {
       storages: 'storages!A1:E1',
       belongings: 'belongings!A1:H1',
@@ -68,43 +64,58 @@ export const Sheet = {
       spreadsheetId: Sheet.documentId,
       ranges: [range.storages, range.belongings],
     })
+
+    const storageRange = ret.result.valueRanges.find(
+      (v) => v.range == range.storages
+    )
+    const belongingRange = ret.result.valueRanges.find(
+      (v) => v.range == range.belongings
+    )
+
     const actual = {
-      storages: ret.data.valueRanges.find((v) => v.range == range.storages)
-        .values[0],
-      belongings: ret.data.valueRanges.find((v) => v.range == range.belongings)
-        .values[0],
-    }
-    if (_.difference(actual.storages, header.storages).length > 0) {
-      return false
-    }
-    if (_.difference(actual.belongings, header.belongings).length > 0) {
-      return false
+      storages: storageRange.values ? storageRange.values[0] : [],
+      belongings: belongingRange.values ? belongingRange.values[0] : [],
     }
 
-    return true
+    return {
+      belongings: _.difference(header.belongings, actual.belongings),
+      storages: _.difference(header.storages, actual.storages),
+    }
   },
 
   format: async () => {
     // add required sheets
-    const currentSheets = await Sheet.sheets()
-    const missing = _.difference(['belongings', 'storages'], currentSheets)
+    const missing = await Sheet.missingSheets()
     for (let n of missing) {
       await Sheet.createSheet(n)
     }
 
-    // add required headers
-    await Sheet.update([
-      {
+    // check headers
+    const missingHeaders = await Sheet.missingHeaders()
+    const req = []
+    if (missingHeaders.belongings.length > 0) {
+      req.push({
         range: 'belongings!A1:H1',
         values: header.belongings,
-      },
+      })
+    }
+    if (missingHeaders.storages.length > 0) {
+      req.push({
+        range: 'storages!A1:E1',
+        values: header.storages,
+      })
+    }
+
+    if (req.length > 0) {
+      await Sheet.update(req)
+    }
+  },
+
+  setInitialItems: async () => {
+    await Sheet.update([
       {
         range: 'belongings!A2:H2',
         values: ['=ROW()', uuidv4(), '最初の物品', '', 1, '', false, ''],
-      },
-      {
-        range: 'storages!A1:E1',
-        values: header.storages,
       },
       {
         range: 'storages!A2:E2',

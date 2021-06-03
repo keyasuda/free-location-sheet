@@ -16,6 +16,8 @@ import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 
+Sheet.init = jest.fn()
+
 const setMockState = (params) => {
   const { keyword, belongings, deadline } = params
 

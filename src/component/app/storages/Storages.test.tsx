@@ -15,6 +15,8 @@ import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 
+Sheet.init = jest.fn()
+
 describe('Storages', () => {
   beforeEach(() => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })

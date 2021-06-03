@@ -49,11 +49,103 @@ describe('Sheet', () => {
       })
     })
 
-    describe('validate', () => {
-      it('should return true when its valid', async () => {
-        Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
+    describe('validators', () => {
+      describe('missingSheets', () => {
+        it('should return empty when required sheets are there', async () => {
+          Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
+          const actual = await Sheet.missingSheets()
+          expect(actual).toEqual([])
+        })
+
+        it('should return missing sheet name', async () => {
+          Sheet.sheets.mockResolvedValue(['storages'])
+          const actual = await Sheet.missingSheets()
+          expect(actual).toEqual(['belongings'])
+        })
+
+        it('should ignore unknown sheets', async () => {
+          Sheet.sheets.mockResolvedValue(['belongings', 'storages', 'hoge'])
+          const actual = await Sheet.missingSheets()
+          expect(actual).toEqual([])
+        })
+      })
+
+      describe('missingHeaders', () => {
+        it('should return blank when header is valid', async () => {
+          Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
+            result: {
+              valueRanges: [
+                {
+                  range: 'storages!A1:E1',
+                  majorDimension: 'ROWS',
+                  values: [['row', 'id', 'name', 'description', 'printed']],
+                },
+                {
+                  range: 'belongings!A1:H1',
+                  majorDimension: 'ROWS',
+                  values: [
+                    [
+                      'row',
+                      'id',
+                      'name',
+                      'description',
+                      'quantities',
+                      'storageId',
+                      'printed',
+                      'deadline',
+                    ],
+                  ],
+                },
+              ],
+            },
+          })
+
+          const actual = await Sheet.missingHeaders()
+          expect(actual).toEqual({ belongings: [], storages: [] })
+        })
+
+        it('should return missing headers', async () => {
+          Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
+            result: {
+              valueRanges: [
+                {
+                  range: 'storages!A1:E1',
+                  majorDimension: 'ROWS',
+                  values: [['row', 'id', 'name', '', 'printed']],
+                },
+                {
+                  range: 'belongings!A1:H1',
+                  majorDimension: 'ROWS',
+                  values: [
+                    [
+                      'row',
+                      'id',
+                      'name',
+                      'description',
+                      'quantities',
+                      'storageId',
+                      'printed',
+                    ],
+                  ],
+                },
+              ],
+            },
+          })
+
+          const actual = await Sheet.missingHeaders()
+          expect(actual).toEqual({
+            belongings: ['deadline'],
+            storages: ['description'],
+          })
+        })
+      })
+    })
+
+    describe('format', () => {
+      it('should add two sheets, belongings and storages', async () => {
+        Sheet.sheets.mockResolvedValue([])
         Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
-          data: {
+          result: {
             valueRanges: [
               {
                 range: 'storages!A1:E1',
@@ -79,30 +171,17 @@ describe('Sheet', () => {
             ],
           },
         })
+        await Sheet.format()
 
-        const actual = await Sheet.validate()
-
-        expect(actual).toBe(true)
-        expect(Sheet.service.spreadsheets.values.batchGet).toHaveBeenCalledWith(
-          {
-            spreadsheetId,
-            ranges: ['storages!A1:E1', 'belongings!A1:H1'],
-          }
-        )
+        expect(Sheet.sheets).toHaveBeenCalled()
+        expect(Sheet.createSheet).toHaveBeenCalledWith('belongings')
+        expect(Sheet.createSheet).toHaveBeenCalledWith('storages')
       })
 
-      it('should return false when therere missed sheets', async () => {
+      it('should add missed sheet', async () => {
         Sheet.sheets.mockResolvedValue(['belongings'])
-
-        const actual = await Sheet.validate()
-
-        expect(actual).toBe(false)
-      })
-
-      it('should return false when any headers are missing', async () => {
-        Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
         Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
-          data: {
+          result: {
             valueRanges: [
               {
                 range: 'storages!A1:E1',
@@ -114,10 +193,10 @@ describe('Sheet', () => {
                 majorDimension: 'ROWS',
                 values: [
                   [
-                    'ROW', // wrong case
-                    'ID', // wrong case
+                    'row',
+                    'id',
                     'name',
-                    '', // description is missing
+                    'description',
                     'quantities',
                     'storageId',
                     'printed',
@@ -128,25 +207,6 @@ describe('Sheet', () => {
             ],
           },
         })
-
-        const actual = await Sheet.validate()
-
-        expect(actual).toBe(false)
-      })
-    })
-
-    describe('format', () => {
-      it('should add two sheets, belongings and storages', async () => {
-        Sheet.sheets.mockResolvedValue([])
-        await Sheet.format()
-
-        expect(Sheet.sheets).toHaveBeenCalled()
-        expect(Sheet.createSheet).toHaveBeenCalledWith('belongings')
-        expect(Sheet.createSheet).toHaveBeenCalledWith('storages')
-      })
-
-      it('should add missed sheet', async () => {
-        Sheet.sheets.mockResolvedValue(['belongings'])
         await Sheet.format()
 
         expect(Sheet.sheets).toHaveBeenCalled()
@@ -154,11 +214,35 @@ describe('Sheet', () => {
         expect(Sheet.createSheet).toHaveBeenCalledWith('storages')
       })
 
-      it('should (over)write headers to sheets', async () => {
-        const generateduuid = 'generateduuid'
-        jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
-
+      it('should overwrite headers if missing', async () => {
         Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
+        Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
+          result: {
+            valueRanges: [
+              {
+                range: 'storages!A1:E1',
+                majorDimension: 'ROWS',
+                values: [['row', 'id', 'name', '', 'printed']],
+              },
+              {
+                range: 'belongings!A1:H1',
+                majorDimension: 'ROWS',
+                values: [
+                  [
+                    'row',
+                    'id',
+                    'name',
+                    'description',
+                    'quantities',
+                    'storageId',
+                    'printed',
+                  ],
+                ],
+              },
+            ],
+          },
+        })
+
         await Sheet.format()
 
         expect(Sheet.update).toHaveBeenCalledWith([
@@ -176,6 +260,70 @@ describe('Sheet', () => {
             ],
           },
           {
+            range: 'storages!A1:E1',
+            values: ['row', 'id', 'name', 'description', 'printed'],
+          },
+        ])
+      })
+
+      it('should overwrite only missing header', async () => {
+        Sheet.sheets.mockResolvedValue(['belongings', 'storages'])
+        Sheet.service.spreadsheets.values.batchGet.mockResolvedValue({
+          result: {
+            valueRanges: [
+              {
+                range: 'storages!A1:E1',
+                majorDimension: 'ROWS',
+                values: [['row', 'id', 'name', 'description', 'printed']],
+              },
+              {
+                range: 'belongings!A1:H1',
+                majorDimension: 'ROWS',
+                values: [
+                  [
+                    'row',
+                    'id',
+                    'name',
+                    'description',
+                    'quantities',
+                    'storageId',
+                    'printed',
+                  ],
+                ],
+              },
+            ],
+          },
+        })
+
+        await Sheet.format()
+
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
+            range: 'belongings!A1:H1',
+            values: [
+              'row',
+              'id',
+              'name',
+              'description',
+              'quantities',
+              'storageId',
+              'printed',
+              'deadline',
+            ],
+          },
+        ])
+      })
+    })
+
+    describe('setInitialItems', () => {
+      it('should append initial items', async () => {
+        const generateduuid = 'generateduuid'
+        jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
+
+        await Sheet.setInitialItems()
+
+        expect(Sheet.update).toHaveBeenCalledWith([
+          {
             range: 'belongings!A2:H2',
             values: [
               '=ROW()',
@@ -187,10 +335,6 @@ describe('Sheet', () => {
               false,
               '',
             ],
-          },
-          {
-            range: 'storages!A1:E1',
-            values: ['row', 'id', 'name', 'description', 'printed'],
           },
           {
             range: 'storages!A2:E2',
