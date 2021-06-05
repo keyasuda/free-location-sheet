@@ -296,7 +296,7 @@ describe('Belonging', () => {
       it('should call backend and fill when something has returned', async () => {
         jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
           fileId: 'file-id',
-          itemId: 'itemid-toautofill',
+          itemId: 'barcode1145141841842',
         })
 
         const autofillSource = {
@@ -304,7 +304,7 @@ describe('Belonging', () => {
           url: 'autofill item url',
         }
 
-        fetchMock.get(autoFillEndpoint + 'itemid-toautofill', {
+        fetchMock.get(autoFillEndpoint + '1145141841842', {
           status: 200,
           body: JSON.stringify(autofillSource),
         })
@@ -329,10 +329,10 @@ describe('Belonging', () => {
       it('should show notice when therere no autofill values', async () => {
         jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
           fileId: 'file-id',
-          itemId: 'itemid-cannotautofill',
+          itemId: 'barcode1145141841842',
         })
 
-        fetchMock.get(autoFillEndpoint + 'itemid-cannotautofill', {
+        fetchMock.get(autoFillEndpoint + '1145141841842', {
           status: 404,
           body: 'not found',
         })
@@ -349,7 +349,7 @@ describe('Belonging', () => {
       it('should call OpenBD for ISBN', async () => {
         jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
           fileId: 'file-id',
-          itemId: '9783161484100',
+          itemId: 'barcode9783161484100',
         })
 
         const autofillSource = [
