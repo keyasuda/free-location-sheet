@@ -21,15 +21,16 @@ export const listSliceAndThunks = (params) => {
   // search existing items
   const search = createAsyncThunk(
     `${baseName}/search`,
-    async (keyword: string, _thunkApi) => {
-      return await api.search(keyword, 0)
+    async (params, _thunkApi) => {
+      const { keyword, deadline } = params
+      return await api.search({ keyword, page: 0, deadline })
     }
   )
   const searchNext = createAsyncThunk(
     `${baseName}/searchNext`,
     async (params, thunkApi) => {
-      const { keyword, page } = params
-      return await api.search(keyword, page)
+      const { keyword, page, deadline } = params
+      return await api.search({ keyword, page, deadline })
     }
   )
 
@@ -53,7 +54,8 @@ export const listSliceAndThunks = (params) => {
   const remove = createAsyncThunk(
     `${baseName}/remove`,
     async (item, _thunkApi) => {
-      return await api.update(item)
+      await api.delete(item.id)
+      return item
     }
   )
 
@@ -65,19 +67,29 @@ export const listSliceAndThunks = (params) => {
   const fix = (state, _) => {
     state.pending = false
   }
+  const startUpdating = (state, _) => {
+    state.updating = true
+  }
+  const endUpdating = (state, _) => {
+    state.updating = false
+  }
 
   const slice = createSlice({
     name: baseName,
     initialState,
     extraReducers: (builder) => {
-      ;[add, get, search, findByPrinted, update, remove].forEach((t) => {
+      ;[get, search, findByPrinted].forEach((t) => {
         builder.addCase(t.pending, pend)
         builder.addCase(t.rejected, fix)
+      })
+      ;[add, update, remove, searchNext].forEach((t) => {
+        builder.addCase(t.pending, startUpdating)
+        builder.addCase(t.rejected, endUpdating)
       })
 
       builder.addCase(add.fulfilled, (state, action) => {
         state.list = [...action.payload, ...state.list]
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase(get.fulfilled, (state, action) => {
@@ -103,7 +115,7 @@ export const listSliceAndThunks = (params) => {
         state.list = [...state.list, ...payload.items]
         state.page = payload.page
         state.nextPage = payload.nextPage
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase(findByPrinted.fulfilled, (state, action) => {
@@ -121,13 +133,13 @@ export const listSliceAndThunks = (params) => {
           }
         })
 
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase(remove.fulfilled, (state, action) => {
         const payload = action.payload
         state.list = state.list.filter((e) => e.id != payload.id)
-        state.pending = false
+        state.updating = false
       })
 
       builder.addCase('@@router/LOCATION_CHANGE', (state, action) => {

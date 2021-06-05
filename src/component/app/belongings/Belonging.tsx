@@ -16,13 +16,16 @@ import CodeReader from '../CodeReader'
 import AppBar from '../AppBar'
 import Card from './Card'
 import EditDialog from './EditDialog'
+import RemoveDialog from './RemoveDialog'
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
+
   const pending = useSelector((s) => s.belongings.pending)
+  const updating = useSelector((s) => s.belongings.updating)
   const { item, notFound } = useSelector((s) => {
     const inState = s.belongings.list.find((i) => i && i.id == itemId)
     if (inState) {
@@ -42,9 +45,12 @@ const Belonging = (props) => {
       }
     }
   })
+
   const history = useHistory()
+
   const [alertOpen, setAlertOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
   const [openScanner, setOpenScanner] = useState(false)
 
   const classes = makeCardStyles()
@@ -60,6 +66,11 @@ const Belonging = (props) => {
 
   const update = (item) => {
     dispatch(belongingsAsyncThunk.update([item]))
+  }
+
+  const remove = (item) => {
+    dispatch(belongingsAsyncThunk.remove(item))
+    history.push(`/app/${fileId}/belongings`)
   }
 
   const setStorageId = (id) => {
@@ -93,11 +104,32 @@ const Belonging = (props) => {
     setAlertOpen(false)
   }
 
+  const onEditFormSubmit = (values) => {
+    const payload = {
+      ...item,
+      name: values.name,
+      description: values.description,
+      quantities: Number(values.quantities),
+      printed: values.printed,
+      deadline: values.deadline,
+    }
+    if (notFound) {
+      add(payload)
+    } else {
+      update(payload)
+    }
+  }
+
+  const onEditFormCancel = () => {
+    if (notFound) history.push(`/app/${fileId}`)
+    setDialogOpen(false)
+  }
+
   return (
     <>
       <AppBar />
 
-      <Loader loading={pending}>
+      <Loader loading={pending} updating={updating}>
         <Card
           item={item}
           fileId={fileId}
@@ -105,17 +137,24 @@ const Belonging = (props) => {
           scan={() => setOpenScanner(true)}
           edit={() => setDialogOpen(true)}
           update={update}
+          removeButtonClick={() => setRemoveDialogOpen(true)}
         />
+
         <EditDialog
-          item={item}
           classes={classes}
-          fileId={fileId}
-          history={history}
-          add={add}
-          update={update}
           open={dialogOpen || notFound}
-          handleClose={() => setDialogOpen(false)}
+          itemId={itemId}
+          item={item}
           newItem={notFound}
+          onSubmit={onEditFormSubmit}
+          onCancel={onEditFormCancel}
+          handleClose={() => setDialogOpen(false)}
+        />
+
+        <RemoveDialog
+          handleClose={() => setRemoveDialogOpen(false)}
+          remove={() => remove(item)}
+          open={removeDialogOpen}
         />
         {openScanner && (
           <CodeReader

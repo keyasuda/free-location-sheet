@@ -16,6 +16,7 @@ const Storage = (props) => {
   const { fileId, itemId } = useParams()
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.storages.pending)
+  const updating = useSelector((s) => s.storages.updating)
   const item = useSelector((s) => s.storages.list[0])
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -29,7 +30,7 @@ const Storage = (props) => {
   return (
     <>
       <AppBar />
-      <Loader loading={pending}>
+      <Loader loading={pending} updating={updating}>
         {item && (
           <>
             <Card

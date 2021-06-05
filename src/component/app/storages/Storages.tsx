@@ -30,6 +30,7 @@ const Storages = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.storages.pending)
+  const updating = useSelector((s) => s.storages.updating)
   const list = useSelector((s) => s.storages.list)
   const nextPage = useSelector((s) => s.storages.nextPage)
   const page = useSelector((s) => s.storages.page)
@@ -41,7 +42,7 @@ const Storages = (props) => {
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
-    dispatch(storagesAsyncThunk.search(keyword || ''))
+    dispatch(storagesAsyncThunk.search({ keyword: keyword || '' }))
   }, [])
 
   const getNextPage = () => {
@@ -76,14 +77,15 @@ const Storages = (props) => {
         <title>保管場所一覧 - 持ち物管理表</title>
       </Helmet>
       <AppBar />
-      <Loader loading={pending}>
+      <Loader loading={pending} updating={updating}>
         <List component="nav">
           {(list || []).map((b) => (
-            <ListItem key={b.id} button>
-              <ListItemText
-                primary={b.name || '(名称未設定)'}
-                onClick={() => history.push(`${currentPath}/${b.id}`)}
-              />
+            <ListItem
+              key={b.id}
+              button
+              onClick={() => history.push(`${currentPath}/${b.id}`)}
+            >
+              <ListItemText primary={b.name || '(名称未設定)'} />
             </ListItem>
           ))}
         </List>

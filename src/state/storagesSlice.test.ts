@@ -31,6 +31,7 @@ describe('storages slice', () => {
     expect(reducer(undefined, {})).toEqual({
       list: [],
       pending: false,
+      updating: false,
       page: 0,
       nextPage: false,
     })
@@ -81,7 +82,9 @@ describe('storages slice', () => {
     describe('pending', () => {
       it('shouldnt set state pending=true', () => {
         const action = thunk.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(false)
+        const actual = reducer({ pending: false, updating: false }, action)
+        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(true)
       })
     })
 
@@ -93,12 +96,19 @@ describe('storages slice', () => {
           page: 1,
         })
         const actual = reducer(
-          { list: [b2], pending: false, nextPage: true, page: 0 },
+          {
+            list: [b2],
+            pending: false,
+            updating: true,
+            nextPage: true,
+            page: 0,
+          },
           action
         )
 
         expect(actual.list).toEqual([b2, b1])
         expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
   })
@@ -137,24 +147,24 @@ describe('storages slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = add.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        expect(reducer({ updating: false }, action).updating).toBe(true)
       })
     })
 
     describe('fulfilled', () => {
       it('should append the payload in front of the list', () => {
         const action = add.fulfilled([b2])
-        const actual = reducer({ list: [b1], pending: true }, action)
+        const actual = reducer({ list: [b1], updating: true }, action)
 
         expect(actual.list).toEqual([b2, b1])
-        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
 
     describe('rejected', () => {
       it('should set state pending=false', () => {
         const action = add.rejected()
-        expect(reducer({ pending: true }, action).pending).toBe(false)
+        expect(reducer({ updating: true }, action).updating).toBe(false)
       })
     })
   })
@@ -199,7 +209,7 @@ describe('storages slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = update.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        expect(reducer({ updating: false }, action).updating).toBe(true)
       })
     })
 
@@ -210,10 +220,10 @@ describe('storages slice', () => {
           name: 'new name',
         }
         const action = update.fulfilled([newStorages])
-        const actual = reducer({ list: [b1], pending: true }, action)
+        const actual = reducer({ list: [b1], updating: true }, action)
 
         expect(actual.list[0].name).toEqual('new name')
-        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
 
       it('shouldnt update list item if it doesnt exist', () => {
@@ -222,18 +232,18 @@ describe('storages slice', () => {
           name: 'new name',
         }
         const action = update.fulfilled([newStorages])
-        const actual = reducer({ list: [b1], pending: true }, action)
+        const actual = reducer({ list: [b1], updating: true }, action)
 
         expect(actual.list).toEqual([b1])
         expect(actual.list[0].name).not.toEqual('new name')
-        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
 
     describe('rejected', () => {
       it('should set state pending=false', () => {
         const action = update.rejected()
-        expect(reducer({ pending: true }, action).pending).toBe(false)
+        expect(reducer({ updating: true }, action).updating).toBe(false)
       })
     })
   })
@@ -244,24 +254,24 @@ describe('storages slice', () => {
     describe('pending', () => {
       it('should set state pending=true', () => {
         const action = thunk.pending()
-        expect(reducer({ pending: false }, action).pending).toBe(true)
+        expect(reducer({ updating: false }, action).updating).toBe(true)
       })
     })
 
     describe('fulfilled', () => {
       it('should remove the payload from the list', () => {
         const action = thunk.fulfilled(b1)
-        const actual = reducer({ list: [b1, b2], pending: true }, action)
+        const actual = reducer({ list: [b1, b2], updating: true }, action)
 
         expect(actual.list).toEqual([b2])
-        expect(actual.pending).toBe(false)
+        expect(actual.updating).toBe(false)
       })
     })
 
     describe('rejected', () => {
       it('should set state pending=false', () => {
         const action = thunk.rejected()
-        expect(reducer({ pending: true }, action).pending).toBe(false)
+        expect(reducer({ updating: true }, action).updating).toBe(false)
       })
     })
   })
@@ -328,7 +338,7 @@ describe('async thunks', () => {
         items: [b1, b3],
         nextPage: false,
       }
-      action = thunk(args, 0)
+      action = thunk({ keyword: args, page: 0 })
       Sheet.storages.search = jest.fn()
       Sheet.storages.search.mockResolvedValue(result)
     })
@@ -336,7 +346,10 @@ describe('async thunks', () => {
     it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.storages.search).toHaveBeenCalledWith(args, 0)
+      expect(Sheet.storages.search).toHaveBeenCalledWith({
+        keyword: args,
+        page: 0,
+      })
       expect(subject.payload).toEqual(result)
     })
   })
@@ -355,10 +368,10 @@ describe('async thunks', () => {
     it('calls Sheet.storages.search', async () => {
       subject = await action(jest.fn(), jest.fn(), undefined)
 
-      expect(Sheet.storages.search).toHaveBeenCalledWith(
-        args.keyword,
-        args.page
-      )
+      expect(Sheet.storages.search).toHaveBeenCalledWith({
+        keyword: args.keyword,
+        page: args.page,
+      })
       expect(subject.payload).toEqual(result)
     })
   })

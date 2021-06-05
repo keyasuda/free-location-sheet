@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { split } from 'shellwords'
 import { Belonging } from '../state/types'
 import _ from 'lodash'
+import format from 'date-fns/format'
 
 const header = {
   storages: ['row', 'id', 'name', 'description', 'printed'],
@@ -13,6 +14,7 @@ const header = {
     'quantities',
     'storageId',
     'printed',
+    'deadline',
   ],
 }
 
@@ -35,74 +37,85 @@ export const Sheet = {
 
     // format
     await Sheet.format()
+    await Sheet.setInitialItems()
 
     return id
   },
 
-  init: (documentId: string, auth, sheetsService) => {
+  init: async (documentId: string, auth, sheetsService) => {
     Sheet.documentId = documentId
     Sheet.auth = auth
     Sheet.service = sheetsService
 
-    // check sheets
-    // create sheet(s)
-    // put header
+    if (documentId) await Sheet.format()
   },
 
-  validate: async () => {
-    // check sheets
+  missingSheets: async () => {
     const currentSheets = await Sheet.sheets()
-    const missing = _.difference(['belongings', 'storages'], currentSheets)
-    if (missing.length > 0) {
-      return false
-    }
+    return _.difference(['belongings', 'storages'], currentSheets)
+  },
 
-    // check headers
+  missingHeaders: async () => {
     const range = {
       storages: 'storages!A1:E1',
-      belongings: 'belongings!A1:G1',
+      belongings: 'belongings!A1:H1',
     }
     const ret = await Sheet.service.spreadsheets.values.batchGet({
       spreadsheetId: Sheet.documentId,
       ranges: [range.storages, range.belongings],
     })
+
+    const storageRange = ret.result.valueRanges.find(
+      (v) => v.range == range.storages
+    )
+    const belongingRange = ret.result.valueRanges.find(
+      (v) => v.range == range.belongings
+    )
+
     const actual = {
-      storages: ret.data.valueRanges.find((v) => v.range == range.storages)
-        .values[0],
-      belongings: ret.data.valueRanges.find((v) => v.range == range.belongings)
-        .values[0],
-    }
-    if (_.difference(actual.storages, header.storages).length > 0) {
-      return false
-    }
-    if (_.difference(actual.belongings, header.belongings).length > 0) {
-      return false
+      storages: storageRange.values ? storageRange.values[0] : [],
+      belongings: belongingRange.values ? belongingRange.values[0] : [],
     }
 
-    return true
+    return {
+      belongings: _.difference(header.belongings, actual.belongings),
+      storages: _.difference(header.storages, actual.storages),
+    }
   },
 
   format: async () => {
     // add required sheets
-    const currentSheets = await Sheet.sheets()
-    const missing = _.difference(['belongings', 'storages'], currentSheets)
+    const missing = await Sheet.missingSheets()
     for (let n of missing) {
       await Sheet.createSheet(n)
     }
 
-    // add required headers
-    await Sheet.update([
-      {
-        range: 'belongings!A1:G1',
+    // check headers
+    const missingHeaders = await Sheet.missingHeaders()
+    const req = []
+    if (missingHeaders.belongings.length > 0) {
+      req.push({
+        range: 'belongings!A1:H1',
         values: header.belongings,
-      },
-      {
-        range: 'belongings!A2:G2',
-        values: ['=ROW()', uuidv4(), '最初の物品', '', 1, '', false],
-      },
-      {
+      })
+    }
+    if (missingHeaders.storages.length > 0) {
+      req.push({
         range: 'storages!A1:E1',
         values: header.storages,
+      })
+    }
+
+    if (req.length > 0) {
+      await Sheet.update(req)
+    }
+  },
+
+  setInitialItems: async () => {
+    await Sheet.update([
+      {
+        range: 'belongings!A2:H2',
+        values: ['=ROW()', uuidv4(), '最初の物品', '', 1, '', false, ''],
       },
       {
         range: 'storages!A2:E2',
@@ -155,7 +168,6 @@ export const Sheet = {
     const match = text.match(
       /google\.visualization\.Query\.setResponse\((.+)\)/
     )
-    console.log(match[1])
 
     // ret will in [[row1 col1, row1 col2...], [row2 col1, row2 col2...]]
     return JSON.parse(match[1]).table.rows.map((e) =>
@@ -255,11 +267,15 @@ export const Sheet = {
       )[0][0]
 
       if (row != undefined) {
-        await Sheet.update(`storages!A${row}:E${row}`, [['', '', '', '', '']])
+        await Sheet.update([
+          { range: `storages!A${row}:E${row}`, values: ['', '', '', '', ''] },
+        ])
       }
     },
 
-    search: async (keyword: string, page: number) => {
+    search: async (params) => {
+      const { keyword, page } = params
+
       let words
       try {
         words = split(keyword)
@@ -310,6 +326,7 @@ export const Sheet = {
       quantities: r[4],
       storageId: r[5],
       printed: r[6],
+      deadline: r[7] ? format(eval('new ' + r[7]), 'yyyy/MM/dd') : null,
     }),
 
     add: async (newItems: Belonging[]) => {
@@ -322,6 +339,7 @@ export const Sheet = {
         i.quantities,
         i.storageId,
         String(i.printed),
+        i.deadline,
       ])
       await Sheet.add('belongings!A:A', payload)
 
@@ -349,13 +367,14 @@ export const Sheet = {
           const row = rows.find((r) => r[1] == u.id)
           if (row != undefined) {
             return {
-              range: `belongings!C${row[0]}:G${row[0]}`,
+              range: `belongings!C${row[0]}:H${row[0]}`,
               values: [
                 u.name,
                 u.description,
                 u.quantities,
                 u.storageId,
                 u.printed,
+                u.deadline,
               ],
             }
           }
@@ -375,13 +394,18 @@ export const Sheet = {
       )[0][0]
 
       if (row != undefined) {
-        await Sheet.update(`belongings!A${row}:G${row}`, [
-          ['', '', '', '', '', '', ''],
+        await Sheet.update([
+          {
+            range: `belongings!A${row}:H${row}`,
+            values: ['', '', '', '', '', '', '', ''],
+          },
         ])
       }
     },
 
-    search: async (keyword: string, page: number) => {
+    search: async (params) => {
+      const { keyword, page, deadline } = params
+
       let words
       try {
         words = split(keyword)
@@ -389,18 +413,31 @@ export const Sheet = {
         words = [keyword]
       }
 
-      let q
-      if (keyword.length == 0) {
-        q = 'select *'
-      } else {
+      let q, o
+      if (words.length > 0) {
         q =
-          'select * where (' +
+          '(' +
           words.map((w) => `(C contains "${w}")`).join(' and ') +
           ') or (' +
           words.map((w) => `(D contains "${w}")`).join(' and ') +
           ')'
       }
-      q = `${q} order by A desc limit 51 offset ${50 * page}`
+      o = 'order by A desc'
+
+      if (deadline) {
+        if (q) {
+          q = `(${q}) and (H is not null)`
+        } else {
+          q = '(H is not null)'
+        }
+        o = 'order by H'
+      }
+
+      if (q) {
+        q = `select * where ${q} ${o} limit 51 offset ${50 * page}`
+      } else {
+        q = `select * ${o} limit 51 offset ${50 * page}`
+      }
 
       const results = await Sheet.query(q, 'belongings')
       let items = results.map((r) => Sheet.belongings.queryResultToBelonging(r))

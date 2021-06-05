@@ -11,122 +11,216 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import FormGroup from '@material-ui/core/FormGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
+import Snackbar from '@material-ui/core/Snackbar'
+import MuiAlert from '@material-ui/lab/Alert'
+import DateFnsUtils from '@date-io/date-fns'
+import format from 'date-fns/format'
+import jaLocale from 'date-fns/locale/ja'
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers'
+import { useForm, Controller } from 'react-hook-form'
+import { makeStyles } from '@material-ui/core/styles'
+
+import { autoFillEndpoint } from '../../../settings'
+
+const OpenBD = 'https://api.openbd.jp/v1/get?isbn='
+
+export class JaDateFnsUtils extends DateFnsUtils {
+  getCalendarHeaderText(date: Date) {
+    return format(date, 'yyyy MMM', { locale: this.locale })
+  }
+
+  getDatePickerHeaderText(date: Date) {
+    return format(date, 'MMMd日', { locale: this.locale })
+  }
+}
+
+const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
 const EditDialog = (props) => {
   const {
-    item,
-    open,
-    newItem,
-    history,
     classes,
+    open,
+    itemId,
+    item,
+    newItem,
+    onSubmit,
+    onCancel,
     handleClose,
-    add,
-    update,
-    fileId,
   } = props
+
   const nameRef = useRef()
   const descriptionRef = useRef()
   const quantitiesRef = useRef()
+
+  const { control, setValue } = useForm()
+
   const [printed, setPrinted] = useState(item.printed)
+  const [alert, setAlert] = useState(false)
+  const [deadline, setDeadline] = useState(item.deadline ? item.deadline : null)
+
+  const clearButtonClass = makeStyles({
+    clear: {
+      margin: '20px 0 0 0',
+    },
+  })()
+
+  const autofill = async () => {
+    if (itemId.match(/97[89][0-9]{10}/)) {
+      const ret = await fetch(OpenBD + itemId)
+
+      if (ret.ok) {
+        const src = await ret.json()
+        const title =
+          src[0].onix.DescriptiveDetail.TitleDetail.TitleElement.TitleText
+            .content
+        const author =
+          src[0].onix.DescriptiveDetail.Contributor[0].PersonName.content
+        setValue('name', title + ' ' + author)
+      } else {
+        setAlert(true)
+      }
+    } else {
+      const ret = await fetch(autoFillEndpoint + itemId)
+
+      if (ret.ok) {
+        const src = await ret.json()
+        setValue('name', src.name)
+        setValue('description', src.url)
+      } else {
+        setAlert(true)
+      }
+    }
+  }
+
+  const submit = () => {
+    const deadlineStr = deadline ? format(deadline, 'yyyy/MM/dd') : ''
+
+    onSubmit({
+      name: nameRef.current.value,
+      description: descriptionRef.current.value,
+      quantities: quantitiesRef.current.value,
+      printed: printed,
+      deadline: deadlineStr,
+    })
+    handleClose()
+  }
 
   return (
-    <Dialog open={open} onClose={handleClose} disableBackdropClick>
-      <DialogTitle>
-        {newItem && <>物品の追加</>}
-        {!newItem && <>物品の編集</>}
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText component="div">
-          <TextField
-            aria-label="name"
-            label="名称"
-            inputRef={nameRef}
-            defaultValue={item.name}
-            className={classes.input}
-          />
-          <TextField
-            aria-label="description"
-            label="説明"
-            inputRef={descriptionRef}
-            defaultValue={item.description}
-            className={classes.input}
-          />
-          <TextField
-            label="数量"
-            aria-label="quantities"
-            inputRef={quantitiesRef}
-            defaultValue={1}
-          />
-          <FormGroup row>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={printed}
-                  onChange={(e) => setPrinted(e.target.checked)}
-                  name="printed"
-                  color="primary"
+    <>
+      <Dialog open={open} onClose={handleClose} disableBackdropClick>
+        <DialogTitle>
+          {newItem && <>物品の追加</>}
+          {!newItem && <>物品の編集</>}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText component="div">
+            <Controller
+              name="name"
+              control={control}
+              defaultValue={item.name}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  aria-label="name"
+                  label="名称"
+                  inputRef={nameRef}
+                  className={classes.input}
                 />
-              }
-              label="印刷済み"
+              )}
             />
-          </FormGroup>
-        </DialogContentText>
-      </DialogContent>
+            <Controller
+              name="description"
+              control={control}
+              defaultValue={item.description}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  aria-label="description"
+                  label="説明"
+                  inputRef={descriptionRef}
+                  className={classes.input}
+                />
+              )}
+            />
 
-      <DialogActions className={classes.actions}>
-        {newItem && (
-          <>
-            <IconButton
-              onClick={() => history.push(`/app/${fileId}`)}
-              aria-label="cancel"
-            >
-              <Icon>close</Icon>
+            <TextField
+              label="数量"
+              aria-label="quantities"
+              inputRef={quantitiesRef}
+              defaultValue={1}
+            />
+
+            <div>
+              <MuiPickersUtilsProvider utils={JaDateFnsUtils} locale={jaLocale}>
+                <DatePicker
+                  margin="normal"
+                  aria-label="deadline"
+                  label="期限"
+                  okLabel="確定"
+                  cancelLabel="キャンセル"
+                  format="yyyy/MM/dd"
+                  value={deadline}
+                  onChange={setDeadline}
+                />
+              </MuiPickersUtilsProvider>
+              {deadline && (
+                <IconButton
+                  onClick={() => setDeadline(null)}
+                  className={clearButtonClass.clear}
+                >
+                  <Icon>clear</Icon>
+                </IconButton>
+              )}
+            </div>
+
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={printed}
+                    onChange={(e) => setPrinted(e.target.checked)}
+                    name="printed"
+                    color="primary"
+                  />
+                }
+                label="印刷済み"
+              />
+            </FormGroup>
+          </DialogContentText>
+        </DialogContent>
+
+        <DialogActions className={classes.actions}>
+          <IconButton onClick={onCancel} aria-label="cancel">
+            <Icon>close</Icon>
+          </IconButton>
+
+          {newItem && (
+            <IconButton aria-label="autofill-button" onClick={autofill}>
+              <Icon>auto_fix_normal</Icon>
             </IconButton>
-            <IconButton
-              onClick={() => {
-                add({
-                  ...item,
-                  name: nameRef.current.value,
-                  description: descriptionRef.current.value,
-                  quantities: Number(quantitiesRef.current.value),
-                  printed: printed,
-                })
-                handleClose()
-              }}
-              color="primary"
-              aria-label="add"
-              autoFocus
-            >
-              <Icon>done</Icon>
-            </IconButton>
-          </>
-        )}
-        {!newItem && (
-          <>
-            <IconButton onClick={handleClose}>
-              <Icon>close</Icon>
-            </IconButton>
-            <IconButton
-              onClick={() => {
-                update({
-                  ...item,
-                  name: nameRef.current.value,
-                  description: descriptionRef.current.value,
-                  quantities: Number(quantitiesRef.current.value),
-                  printed: printed,
-                })
-                handleClose()
-              }}
-              color="primary"
-              aria-label="update"
-              autoFocus
-            >
-              <Icon>done</Icon>
-            </IconButton>
-          </>
-        )}
-      </DialogActions>
-    </Dialog>
+          )}
+
+          <IconButton
+            onClick={submit}
+            color="primary"
+            aria-label="done"
+            autoFocus
+          >
+            <Icon>done</Icon>
+          </IconButton>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={alert}
+        autoHideDuration={6000}
+        onClose={() => {
+          setAlert(false)
+        }}
+      >
+        <Alert severity="info">自動入力できませんでした</Alert>
+      </Snackbar>
+    </>
   )
 }
 export default EditDialog

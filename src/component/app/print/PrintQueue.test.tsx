@@ -8,12 +8,15 @@ import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 
+import { Sheet } from '../../../api/sheet'
 import PrintQueue from './PrintQueue'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import { store, history } from '../../../state/store'
 import * as auth from '../../authentication'
 import AppBar from '../AppBar'
+
+Sheet.init = jest.fn()
 
 const setMockState = (belongings, storages) => {
   const mockState = {

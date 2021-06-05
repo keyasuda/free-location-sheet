@@ -10,6 +10,8 @@ import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
 import Icon from '@material-ui/core/Icon'
 import Typography from '@material-ui/core/Typography'
+import Interweave from 'interweave'
+import { UrlMatcher } from 'interweave-autolink'
 
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 
@@ -45,7 +47,7 @@ const StorageName = (props) => {
 }
 
 const Card = (props) => {
-  const { item, classes, scan, edit, update, fileId } = props
+  const { item, classes, scan, edit, update, removeButtonClick, fileId } = props
 
   return (
     <>
@@ -56,7 +58,10 @@ const Card = (props) => {
         <CardHeader avatar={<Icon>inventory</Icon>} title={item.name} />
         <CardContent>
           <Typography variant="body1" color="textPrimary" component="p">
-            {item.description}
+            <Interweave
+              content={item.description}
+              matchers={[new UrlMatcher('url')]}
+            />
           </Typography>
         </CardContent>
 
@@ -70,6 +75,17 @@ const Card = (props) => {
             <Icon>layers</Icon> {item.quantities}
           </Typography>
 
+          {item.deadline && (
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              component="div"
+              className={classes.remark}
+            >
+              <Icon>event</Icon> {item.deadline}
+            </Typography>
+          )}
+
           <StorageName
             id={item.storageId}
             className={classes.remark}
@@ -78,6 +94,9 @@ const Card = (props) => {
         </CardContent>
 
         <CardActions className={classes.actions}>
+          <IconButton aria-label="remove" onClick={removeButtonClick}>
+            <Icon>delete</Icon>
+          </IconButton>
           <IconButton
             aria-label="increment"
             onClick={() => update({ ...item, quantities: item.quantities + 1 })}

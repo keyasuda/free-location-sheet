@@ -4,6 +4,7 @@ export type WarehouseItem = {
   name: string
   description: string
   printed: boolean
+  deadline: string
 }
 
 export type Storage = WarehouseItem & {}
