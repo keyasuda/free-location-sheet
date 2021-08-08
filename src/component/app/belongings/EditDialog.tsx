@@ -149,7 +149,7 @@ const EditDialog = (props) => {
               label="数量"
               aria-label="quantities"
               inputRef={quantitiesRef}
-              defaultValue={1}
+              defaultValue={item.quantities}
             />
 
             <div>
