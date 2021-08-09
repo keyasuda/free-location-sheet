@@ -6,11 +6,18 @@ const makeListStyles = makeStyles({
     justifyContent: 'center',
     margin: '16px',
   },
+  linkContainer: {
+    width: '100%',
+  },
   link: {
+    color: 'black',
     cursor: 'pointer',
     display: 'block',
-    margin: '1em',
     textDecoration: 'none',
+  },
+  deadline: {
+    color: 'gray',
+    fontSize: '80%',
   },
   paginator: {
     display: 'flex',
