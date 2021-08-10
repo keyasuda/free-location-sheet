@@ -22,6 +22,7 @@ const AppBar = (props) => {
       return ''
     }
   })
+  const keywordRef = useRef()
 
   const basePath = `/app/${fileId}`
 
@@ -57,11 +58,19 @@ const AppBar = (props) => {
       transition: theme.transitions.create('width'),
       width: '100%',
     },
+    clearSearchButton: {
+      color: 'white',
+      width: '32px',
+      height: '32px',
+      marginRight: '10px',
+    },
   }))()
 
   const search = (w) => {
     if (w && w.length > 0) {
       history.push(`${basePath}/belongings?keyword=${encodeURIComponent(w)}`)
+    } else {
+      history.push(`${basePath}/belongings`)
     }
   }
 
@@ -115,7 +124,21 @@ const AppBar = (props) => {
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
-              inputProps={{ 'aria-label': 'search-word' }}
+              endAdornment={
+                keyword.length > 0 && (
+                  <IconButton
+                    className={classes.clearSearchButton}
+                    onClick={() => {
+                      keywordRef.current.value = ''
+                      search('')
+                    }}
+                    aria-label="clear search word"
+                  >
+                    <Icon>backspace</Icon>
+                  </IconButton>
+                )
+              }
+              inputProps={{ 'aria-label': 'search-word', ref: keywordRef }}
               onKeyDown={(e) => {
                 if (e.keyCode == 13) {
                   search(e.target.value)

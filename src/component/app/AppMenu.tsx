@@ -75,6 +75,17 @@ const AppMenu = (props) => {
         <Button
           className={classes.menuItem}
           variant="outlined"
+          onClick={() =>
+            window.open(`https://docs.google.com/spreadsheets/d/${fileId}/edit`)
+          }
+        >
+          <Icon>border_all</Icon>
+          スプレッドシートを開く
+        </Button>
+
+        <Button
+          className={classes.menuItem}
+          variant="outlined"
           onClick={() => {
             signOut()
             location.href = '/'

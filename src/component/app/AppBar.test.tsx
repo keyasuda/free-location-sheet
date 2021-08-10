@@ -51,7 +51,6 @@ const renderIt = (query) => {
 describe('AppBar', () => {
   beforeEach(() => {
     jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
-    renderIt({})
   })
 
   beforeAll(() => {
@@ -66,6 +65,7 @@ describe('AppBar', () => {
     let push
     beforeEach(() => {
       push = jest.spyOn(history, 'push')
+      renderIt({})
     })
 
     it('will be navigated to belongings with keywords when the search button has clicked', async () => {
@@ -79,12 +79,30 @@ describe('AppBar', () => {
       )
     })
 
-    it('wont navigate to belongings when the keyword is blank', async () => {
+    it('will navigate to belongings without keywords when the keyword is blank', async () => {
       const textField = screen.getByLabelText('search-word')
       fireEvent.change(textField, { target: { value: '' } })
       await userEvent.type(textField, '{enter}')
 
-      expect(push).not.toHaveBeenCalled()
+      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+    })
+  })
+
+  describe('search box', () => {
+    let push
+    beforeEach(() => {
+      push = jest.spyOn(history, 'push')
+      renderIt({ keyword: 'searchword' })
+    })
+
+    it('should have clear button with any searchwords', () => {
+      screen.getByLabelText('clear search word')
+    })
+
+    it('should clean searchword', () => {
+      const btn = screen.getByLabelText('clear search word')
+      userEvent.click(btn)
+      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
     })
   })
 
@@ -95,6 +113,7 @@ describe('AppBar', () => {
     })
 
     beforeEach(() => {
+      renderIt({})
       const button = screen.getByLabelText('scan')
       userEvent.click(button)
     })

@@ -65,8 +65,10 @@ const EditDialog = (props) => {
   })()
 
   const autofill = async () => {
-    if (itemId.match(/97[89][0-9]{10}/)) {
-      const ret = await fetch(OpenBD + itemId)
+    const ean = itemId.replace('barcode', '')
+
+    if (ean.match(/97[89][0-9]{10}/)) {
+      const ret = await fetch(OpenBD + ean)
 
       if (ret.ok) {
         const src = await ret.json()
@@ -80,7 +82,7 @@ const EditDialog = (props) => {
         setAlert(true)
       }
     } else {
-      const ret = await fetch(autoFillEndpoint + itemId)
+      const ret = await fetch(autoFillEndpoint + ean)
 
       if (ret.ok) {
         const src = await ret.json()
@@ -147,7 +149,7 @@ const EditDialog = (props) => {
               label="数量"
               aria-label="quantities"
               inputRef={quantitiesRef}
-              defaultValue={1}
+              defaultValue={item.quantities}
             />
 
             <div>

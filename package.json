@@ -28,6 +28,7 @@
     "interweave": "^12.7.2",
     "interweave-autolink": "^4.4.2",
     "lodash": "^4.17.21",
+    "loose-envify": "^1.4.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
