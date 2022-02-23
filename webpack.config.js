@@ -27,10 +27,11 @@ module.exports = {
   },
   devServer: {
     host: '0.0.0.0',
-    disableHostCheck: true,
+    allowedHosts: 'all',
     historyApiFallback: {
       rewrites: [{ from: /^\/*/, to: '/app.html' }],
     },
     https: true,
+    static: './build',
   },
 }
