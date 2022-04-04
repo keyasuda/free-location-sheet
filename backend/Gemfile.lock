@@ -1,14 +1,14 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    cloud_events (0.4.0)
-    functions_framework (0.9.0)
-      cloud_events (~> 0.1)
-      puma (~> 4.3)
+    cloud_events (0.7.0)
+    functions_framework (0.11.0)
+      cloud_events (>= 0.5.1, < 2.a)
+      puma (>= 4.3.0, < 6.a)
       rack (~> 2.1)
     json (2.5.1)
     nio4r (2.5.8)
-    puma (4.3.11)
+    puma (5.6.4)
       nio4r (~> 2.0)
     rack (2.2.3)
     rakuten_web_service (1.13.0)
@@ -18,8 +18,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  functions_framework (~> 0.7)
+  functions_framework (~> 0.9, >= 0.9.0)
   rakuten_web_service
 
 BUNDLED WITH
-   2.2.23
+   2.1.4
