@@ -51,7 +51,7 @@
     "googleapis": "^70.0.0",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^26.6.3",
-    "prettier": "2.2.1",
+    "prettier": "2.6.2",
     "webpack": "^5.15.0",
     "webpack-cli": "^4.7.0",
     "webpack-dev-server": "^4.7.4"
