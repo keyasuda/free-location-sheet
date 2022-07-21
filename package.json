@@ -23,7 +23,7 @@
     "@material-ui/lab": "*",
     "@material-ui/pickers": "^3.3.10",
     "@zxing/library": "^0.19.1",
-    "@reduxjs/toolkit": "^1.8.2",
+    "@reduxjs/toolkit": "^1.8.3",
     "connected-react-router": "^6.9.2",
     "interweave": "^12.9.0",
     "interweave-autolink": "^4.4.3",
