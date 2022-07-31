@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Button from '@material-ui/core/Button'
 
-import { initAuth, signIn } from './authentication'
+import { initAuth, signIn, isSignedIn } from './authentication'
 import btnImg from './btn_google_signin_light_normal_web.png'
 import btnImg2x from './btn_google_signin_light_normal_web@2x.png'
 
@@ -11,15 +11,15 @@ const SignInButton = (props) => {
   const [loaded, setLoaded] = useState(false)
   let [signedIn, setSignedIn] = useState(false)
 
-  useEffect(() => {
-    initAuth((s) => {
-      setLoaded(true)
-      setSignedIn(s)
-    })
+  useEffect(async () => {
+    setSignedIn(await initAuth())
+    setLoaded(true)
   }, [])
 
   const onClick = async () => {
     await signIn()
+    setSignedIn(isSignedIn())
+
     if (afterSignedIn) {
       afterSignedIn()
     }
