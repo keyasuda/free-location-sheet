@@ -11,6 +11,7 @@ import Storages from './app/storages/Storages'
 import Storage from './app/storages/Storage'
 import PrintQueue from './app/print/PrintQueue'
 import AppBar from './app/AppBar'
+import SignInButton from './SignInButton'
 import { initAuth, isSignedIn } from './authentication'
 
 const App: React.FC = () => {
@@ -24,7 +25,7 @@ const App: React.FC = () => {
   }, [])
 
   return (
-    loaded && (
+    <SignInButton>
       <Provider store={store}>
         <ConnectedRouter history={history}>
           <Switch>
@@ -40,7 +41,7 @@ const App: React.FC = () => {
           </Switch>
         </ConnectedRouter>
       </Provider>
-    )
+    </SignInButton>
   )
 }
 
