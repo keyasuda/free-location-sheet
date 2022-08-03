@@ -14,6 +14,8 @@ const SignInButton = (props) => {
   useEffect(async () => {
     setSignedIn(await initAuth())
     setLoaded(true)
+
+    window.addEventListener('focus', () => setSignedIn(isSignedIn()), false)
   }, [])
 
   const onClick = async () => {
@@ -28,13 +30,15 @@ const SignInButton = (props) => {
   return (
     <div>
       {loaded && !signedIn && (
-        <Button onClick={onClick}>
-          <img
-            alt="Sign in with Google"
-            src={btnImg}
-            srcSet={btnImg + ' 1x, ' + btnImg2x + ' 2x'}
-          />
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button onClick={onClick}>
+            <img
+              alt="Sign in with Google"
+              src={btnImg}
+              srcSet={btnImg + ' 1x, ' + btnImg2x + ' 2x'}
+            />
+          </Button>
+        </div>
       )}
 
       {signedIn && children}

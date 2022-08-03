@@ -10,7 +10,7 @@ Cookies.set('G_AUTH2_MIGRATION', 'enforced')
 
 const getSession = () => JSON.parse(Cookies.get(COOKIE_NAME) || '{}')
 
-export const isSignedIn = () => gapi.client.getToken() !== null
+export const isSignedIn = () => getSession()['token'] != null
 
 export const initAuth = async () => {
   const session = getSession()
