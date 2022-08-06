@@ -11,11 +11,9 @@ import SheetList from './component/SheetList'
 
 const IndexApp: React.FC = () => {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <SignInButton>
-        <SheetList gapi={gapi} />
-      </SignInButton>
-    </div>
+    <SignInButton>
+      <SheetList gapi={gapi} />
+    </SignInButton>
   )
 }
 

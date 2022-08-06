@@ -28,8 +28,7 @@ const SheetList = (props) => {
 
     const list = (
       await gapi.client.drive.files.list({
-        q:
-          "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
+        q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
         fields: 'files(id, name)',
         orderBy: 'modifiedTime desc',
       })
@@ -42,16 +41,18 @@ const SheetList = (props) => {
   return (
     <Loader loading={loading}>
       {sheetList && (
-        <List component="nav">
-          {sheetList.map((s) => (
-            <ListItem key={s.id} button>
-              <ListItemText
-                primary={s.name}
-                onClick={() => (location.href = `/app/${s.id}/`)}
-              />
-            </ListItem>
-          ))}
-        </List>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <List component="nav">
+            {sheetList.map((s) => (
+              <ListItem key={s.id} button>
+                <ListItemText
+                  primary={s.name}
+                  onClick={() => (location.href = `/app/${s.id}/`)}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </div>
       )}
 
       <div style={{ display: 'flex', justifyContent: 'center' }}>
