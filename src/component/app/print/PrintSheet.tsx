@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useRef, memo } from 'react'
 import { BrowserQRCodeSvgWriter } from '@zxing/library'
 import { makeStyles } from '@material-ui/styles'
 import Icon from '@material-ui/core/Icon'
@@ -59,27 +59,27 @@ const ItemElement = (props) => {
   )
 }
 
-const PrintSheet = (props, ref) => {
+const ItemMemo = memo(ItemElement)
+
+const PrintSheet = (props) => {
   const { items } = props
-  const classes = makeStyles({
-    container: {
-      alignContent: 'flex-start',
-      display: 'flex',
-      flexWrap: 'wrap',
-      height: '100vh', // 297mm(A4)
-      listStyleType: 'none',
-      margin: 0,
-      padding: 0,
-      pageBreakAfter: 'always',
-      width: '70.7vh', // 210mm(A4)
-    },
-  })()
+  const styles = {
+    alignContent: 'flex-start',
+    display: 'flex',
+    flexWrap: 'wrap',
+    height: '100vh',
+    listStyleType: 'none',
+    margin: 0,
+    padding: 0,
+    pageBreakAfter: 'always',
+    width: '70.7vh', // 210mm(A4)
+  }
 
   return (
-    <ul className={classes.container}>
+    <ul style={styles}>
       {items.map((item) => (
         <li key={item.id}>
-          <ItemElement item={item} />
+          <ItemMemo item={item} />
         </li>
       ))}
     </ul>
