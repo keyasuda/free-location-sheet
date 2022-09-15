@@ -1,2 +1,0 @@
-export const autoFillEndpoint =
-  process.env.NODE_ENV == 'development' ? 'dev endpoint' : 'prod endpoint'

@@ -4,7 +4,15 @@
 
 [![Node.js CI](https://github.com/keyasuda/free-location-sheet/actions/workflows/node.js.yml/badge.svg)](https://github.com/keyasuda/free-location-sheet/actions/workflows/node.js.yml)
 
-## Installation
+## Setup
+
+Run following ruby script to write settings.
+
+```
+API_KEY=<Google API key> CLIENT_ID=<Google API client ID> AUTO_FILL_ENDPOINT=<auto complete backend endpoint> ruby settings_writer.rb
+```
+
+## Deployment
 
 For Firebase hosting use the following command:
 
