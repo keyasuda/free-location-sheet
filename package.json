@@ -10,8 +10,10 @@
     "api-test:watch": "npm run api-test -- --watch",
     "start": "cp *.html build/ && webpack serve",
     "build": "webpack",
-    "build-prod": "cp *.html build && cp *.png build && webpack --mode=production",
-    "deploy": "npm run test && npm run build-prod && firebase deploy"
+    "copy-statics": "mkdir -p build && cp *.html build && cp *.png build",
+    "build:staging": "npm run copy-statics && webpack --mode=production",
+    "build:production": "npm run copy-statics && webpack --mode=production",
+    "deploy": "npm run test && npm run build:production && firebase deploy"
   },
   "keywords": [],
   "author": "Kenichiro Yasuda",
