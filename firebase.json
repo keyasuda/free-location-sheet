@@ -1,14 +1,28 @@
 {
-  "hosting": {
-    "public": "build",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/app.html"
-      }
-    ]
-  },
+  "hosting": [
+    {
+      "site": "free-location-sheet-staging-fd228",
+      "public": "build",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/app.html"
+        }
+      ]
+    },
+    {
+      "site": "quickstart-1614336716847",
+      "public": "build",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/app.html"
+        }
+      ]
+    }
+  ],
   "emulators": {
     "hosting": {
       "port": 5000

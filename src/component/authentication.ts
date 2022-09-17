@@ -1,6 +1,6 @@
 const { gapi, google } = window
 
-import { apiKey, clientId } from '../credentials'
+import { apiKey, clientId } from '../settings'
 
 import authorizedResource from '../api/authorizedResource'
 import Cookies from 'js-cookie'

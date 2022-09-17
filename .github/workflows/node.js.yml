@@ -20,13 +20,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Setup Ruby, JRuby and TruffleRuby
+        uses: ruby/setup-ruby@v1.117.0
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
       - run: |
+          ruby settings_writer.rb
           npm install -g npm
           npm install
-          mv src/credentials.js.blank src/credentials.js
-          mv src/settings.js.blank src/settings.js
           npm run test
