@@ -16,6 +16,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Create GitHub deployment
+        uses: chrnorm/deployment-action@v2.0.4
+        id: deployment
+        with:
+          token: '${{ secrets.GITHUB_TOKEN }}'
+          environment-url: https://free-location-sheet-staging-fd228.web.app/
+          environment: staging
+
       - name: Setup Ruby, JRuby and TruffleRuby
         uses: ruby/setup-ruby@v1.117.0
       - name: Use Node.js 16.x
@@ -36,3 +45,13 @@ jobs:
           channelId: live
           target: free-location-sheet-staging-fd228
           projectId: quickstart-1614336716847
+
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@v2.0.0
+        with:
+          token: '${{ secrets.GITHUB_TOKEN }}'
+          environment-url: https://free-location-sheet-staging-fd228.web.app/
+          environment: staging
+          state: 'success'
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
