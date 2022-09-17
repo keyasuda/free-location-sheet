@@ -35,4 +35,5 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_QUICKSTART_1614336716847 }}'
           channelId: live
+          target: quickstart-1614336716847
           projectId: quickstart-1614336716847
