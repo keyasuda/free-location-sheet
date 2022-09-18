@@ -6,6 +6,8 @@ import btnImg from './btn_google_signin_light_normal_web.png'
 import btnImg2x from './btn_google_signin_light_normal_web@2x.png'
 
 const SignInButton = (props) => {
+  const { styles } = props
+
   const { afterSignedIn, children } = props
 
   const [loaded, setLoaded] = useState(false)
@@ -30,7 +32,15 @@ const SignInButton = (props) => {
   return (
     <div>
       {loaded && !signedIn && (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            ...styles,
+            ...{
+              display: 'flex',
+              justifyContent: 'center',
+            },
+          }}
+        >
           <Button onClick={onClick}>
             <img
               alt="Sign in with Google"

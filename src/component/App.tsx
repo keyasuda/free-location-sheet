@@ -25,7 +25,7 @@ const App: React.FC = () => {
   }, [])
 
   return (
-    <SignInButton>
+    <SignInButton styles={{ marginTop: 'calc(50vh - 29px)' }}>
       <Provider store={store}>
         <ConnectedRouter history={history}>
           <Switch>
