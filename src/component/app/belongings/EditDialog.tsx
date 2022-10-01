@@ -15,6 +15,7 @@ import Snackbar from '@material-ui/core/Snackbar'
 import MuiAlert from '@material-ui/lab/Alert'
 import DateFnsUtils from '@date-io/date-fns'
 import format from 'date-fns/format'
+import parse from 'date-fns/parse'
 import jaLocale from 'date-fns/locale/ja'
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers'
 import { useForm, Controller } from 'react-hook-form'
@@ -95,7 +96,9 @@ const EditDialog = (props) => {
   }
 
   const submit = () => {
-    const deadlineStr = deadline ? format(deadline, 'yyyy/MM/dd') : ''
+    const deadlineStr = deadline
+      ? format(parse(deadline, 'yyyy/MM/dd', new Date()), 'yyyy/MM/dd')
+      : ''
 
     onSubmit({
       name: nameRef.current.value,
