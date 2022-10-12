@@ -96,9 +96,15 @@ const EditDialog = (props) => {
   }
 
   const submit = () => {
-    const deadlineStr = deadline
-      ? format(parse(deadline, 'yyyy/MM/dd', new Date()), 'yyyy/MM/dd')
-      : ''
+    let deadlineStr = ''
+    if (typeof deadline == 'object') {
+      deadlineStr = deadline ? format(deadline, 'yyyy/MM/dd') : ''
+    } else {
+      deadlineStr = format(
+        parse(deadline, 'yyyy/MM/dd', new Date()),
+        'yyyy/MM/dd'
+      )
+    }
 
     onSubmit({
       name: nameRef.current.value,
