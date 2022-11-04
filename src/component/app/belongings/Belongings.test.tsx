@@ -4,30 +4,28 @@ import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
-import { MemoryRouter } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
 
 import Belongings from './Belongings'
 import * as auth from '../../authentication'
 import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
-
 Sheet.init = jest.fn()
 
 const setMockState = (params) => {
   const { keyword, belongings, deadline } = params
+  const search = new URLSearchParams()
+  if (keyword) search.append('keyword', keyword)
+  if (deadline) search.append('deadline', deadline)
 
   const mockState = {
     router: {
       location: {
-        query: {
-          keyword: keyword,
-          deadline: deadline,
-        },
+        search: search.toString(),
         pathname: '/app/file-id/belongings',
       },
     },
@@ -71,9 +69,9 @@ describe('Belongings', () => {
   const renderIt = () => {
     render(
       <Provider store={store}>
-        <ConnectedRouter history={history}>
+        <Router history={history}>
           <Belongings />
-        </ConnectedRouter>
+        </Router>
       </Provider>
     )
   }

@@ -15,7 +15,8 @@ const AppBar = (props) => {
   const history = useHistory()
   const [openScanner, setOpenScanner] = useState(false)
   const keyword = useSelector((s) => {
-    const k = s.router.location.query.keyword
+    const query = new URLSearchParams(s.router.location.search)
+    const k = query.get('keyword')
     if (k) {
       return decodeURIComponent(k)
     } else {

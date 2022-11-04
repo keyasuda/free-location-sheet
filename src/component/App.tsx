@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
-import { Route, Switch } from 'react-router-dom'
+import { Router, Route, Switch } from 'react-router-dom'
 
 import { store, history } from '../state/store'
 import AppMenu from './app/AppMenu'
@@ -27,7 +26,7 @@ const App: React.FC = () => {
   return (
     <SignInButton styles={{ marginTop: 'calc(50vh - 29px)' }}>
       <Provider store={store}>
-        <ConnectedRouter history={history}>
+        <Router history={history}>
           <Switch>
             <Route path="/app/:fileId/print" component={PrintQueue} />
             <Route path="/app/:fileId/storages/:itemId" component={Storage} />
@@ -39,7 +38,7 @@ const App: React.FC = () => {
             <Route path="/app/:fileId/belongings" component={Belongings} />
             <Route path="/app/:fileId" component={AppMenu} />
           </Switch>
-        </ConnectedRouter>
+        </Router>
       </Provider>
     </SignInButton>
   )

@@ -45,7 +45,13 @@ const Belongings = (props) => {
   const nextPage = useSelector((s) => s.belongings.nextPage)
   const page = useSelector((s) => s.belongings.page)
   const currentPath = useSelector((s) => s.router.location.pathname)
-  const deadline = useSelector((s) => s.router.location.query.deadline)
+  const deadline = useSelector((s) => {
+    const query = new URLSearchParams(s.router.location.search)
+    if (query.get('deadline') == 'true') {
+      return true
+    }
+    return null
+  })
   const bulkAmountRef = useRef()
   const history = useHistory()
   const keyword = useSearchword()

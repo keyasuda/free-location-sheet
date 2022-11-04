@@ -1,21 +1,24 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit'
-import { connectRouter, routerMiddleware } from 'connected-react-router'
+import {
+  combineReducers,
+  configureStore,
+  getDefaultMiddleware,
+} from '@reduxjs/toolkit'
+import { createReduxHistoryContext } from 'redux-first-history'
 import { createBrowserHistory } from 'history'
 
 import { belongingsSlice } from './belongingsSlice'
 import { storagesSlice } from './storagesSlice'
 
-export const history = createBrowserHistory()
-
-const reducer = combineReducers({
-  router: connectRouter(history),
-  belongings: belongingsSlice.reducer,
-  storages: storagesSlice.reducer,
-})
+const { createReduxHistory, routerMiddleware, routerReducer } =
+  createReduxHistoryContext({ history: createBrowserHistory() })
 
 export const store = configureStore({
-  reducer,
-  middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware().concat(routerMiddleware(history))
-  },
+  reducer: combineReducers({
+    router: routerReducer,
+    belongings: belongingsSlice.reducer,
+    storages: storagesSlice.reducer,
+  }),
+  middleware: [...getDefaultMiddleware(), routerMiddleware],
 })
+
+export const history = createReduxHistory(store)

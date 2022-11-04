@@ -2,11 +2,10 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { MemoryRouter } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
 
 import { Sheet } from '../../../api/sheet'
 import PrintQueue from './PrintQueue'
@@ -58,9 +57,9 @@ const renderIt = (belongings, storages) => {
 
   render(
     <Provider store={store}>
-      <ConnectedRouter history={history}>
+      <Router history={history}>
         <PrintQueue />
-      </ConnectedRouter>
+      </Router>
     </Provider>
   )
 }
