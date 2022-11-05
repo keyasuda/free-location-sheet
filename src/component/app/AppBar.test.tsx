@@ -3,11 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 
-import { MemoryRouter } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
 
 import { store, history } from '../../state/store'
 import AppBar from './AppBar'
@@ -27,12 +26,12 @@ jest.mock('./CodeReader', () => ({
   default: jest.fn(),
 }))
 
-const renderIt = (query) => {
+const renderIt = (search) => {
   jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) =>
     selector({
       router: {
         location: {
-          query,
+          search,
           pathname: '/app/file-id/',
         },
       },
@@ -41,9 +40,9 @@ const renderIt = (query) => {
 
   render(
     <Provider store={store}>
-      <ConnectedRouter history={history}>
+      <Router history={history}>
         <AppBar />
-      </ConnectedRouter>
+      </Router>
     </Provider>
   )
 }
@@ -65,7 +64,7 @@ describe('AppBar', () => {
     let push
     beforeEach(() => {
       push = jest.spyOn(history, 'push')
-      renderIt({})
+      renderIt('')
     })
 
     it('will be navigated to belongings with keywords when the search button has clicked', async () => {
@@ -92,7 +91,7 @@ describe('AppBar', () => {
     let push
     beforeEach(() => {
       push = jest.spyOn(history, 'push')
-      renderIt({ keyword: 'searchword' })
+      renderIt('keyword=searchword')
     })
 
     it('should have clear button with any searchwords', () => {
@@ -113,7 +112,7 @@ describe('AppBar', () => {
     })
 
     beforeEach(() => {
-      renderIt({})
+      renderIt('')
       const button = screen.getByLabelText('scan')
       userEvent.click(button)
     })

@@ -4,11 +4,10 @@ import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 const fetchMock = require('fetch-mock-jest')
 
-import { MemoryRouter } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
 
 import Belonging from './Belonging'
 import * as auth from '../../authentication'
@@ -56,9 +55,9 @@ const mockItem = {
 const renderIt = () => {
   render(
     <Provider store={store}>
-      <ConnectedRouter history={history}>
+      <Router history={history}>
         <Belonging />
-      </ConnectedRouter>
+      </Router>
     </Provider>
   )
 }

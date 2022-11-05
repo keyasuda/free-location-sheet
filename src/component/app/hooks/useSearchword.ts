@@ -2,7 +2,8 @@ import { useSelector } from 'react-redux'
 
 const useSearchword = () => {
   return useSelector((s) => {
-    const k = s.router.location.query.keyword
+    const query = new URLSearchParams(s.router.location.search)
+    const k = query.get('keyword')
     if (k) {
       return decodeURIComponent(k)
     } else {

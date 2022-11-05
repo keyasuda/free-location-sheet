@@ -4,10 +4,9 @@ import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
-import { MemoryRouter } from 'react-router-dom'
+import { Router } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
-import { ConnectedRouter } from 'connected-react-router'
 
 import Storages from './Storages'
 import * as auth from '../../authentication'
@@ -32,9 +31,9 @@ describe('Storages', () => {
   const renderIt = () => {
     render(
       <Provider store={store}>
-        <ConnectedRouter history={history}>
+        <Router history={history}>
           <Storages />
-        </ConnectedRouter>
+        </Router>
       </Provider>
     )
   }
