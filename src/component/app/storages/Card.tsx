@@ -1,12 +1,12 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import IconButton from '@material-ui/core/IconButton'
-import { default as MuiCard } from '@material-ui/core/Card'
-import CardHeader from '@material-ui/core/CardHeader'
-import CardContent from '@material-ui/core/CardContent'
-import CardActions from '@material-ui/core/CardActions'
-import Icon from '@material-ui/core/Icon'
-import Typography from '@material-ui/core/Typography'
+import IconButton from '@mui/material/IconButton'
+import { default as MuiCard } from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+import Icon from '@mui/material/Icon'
+import Typography from '@mui/material/Typography'
 
 const Card = (props) => {
   const { item, classes, edit } = props

@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { makeStyles } from '@material-ui/core/styles'
-import Snackbar from '@material-ui/core/Snackbar'
-import MuiAlert from '@material-ui/lab/Alert'
+import { makeStyles } from '@mui/styles'
+import Snackbar from '@mui/material/Snackbar'
+import MuiAlert from '@mui/material/Alert'
 
 import { authorizedClient, authorizedSheet } from '../../authentication'
 import { Sheet } from '../../../api/sheet'
@@ -18,7 +18,11 @@ import Card from './Card'
 import EditDialog from './EditDialog'
 import RemoveDialog from './RemoveDialog'
 
-const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
+const Alert = (props) => (
+  <div>
+    <MuiAlert elevation={6} variant="filled" {...props} />
+  </div>
+)
 
 const Belonging = (props) => {
   const { fileId, itemId } = useParams()

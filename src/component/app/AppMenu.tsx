@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, useHistory, Link } from 'react-router-dom'
-import Button from '@material-ui/core/Button'
-import { makeStyles } from '@material-ui/core/styles'
-import Icon from '@material-ui/core/Icon'
+import Button from '@mui/material/Button'
+import { makeStyles } from '@mui/styles'
+import Icon from '@mui/material/Icon'
 
 import AppBar from './AppBar'
 import CodeReader from './CodeReader'

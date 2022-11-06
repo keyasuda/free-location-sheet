@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { fade, makeStyles } from '@material-ui/core/styles'
-import { default as MUIAppBar } from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import InputBase from '@material-ui/core/InputBase'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
+import { makeStyles } from '@mui/styles'
+import { default as MUIAppBar } from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import InputBase from '@mui/material/InputBase'
+import Icon from '@mui/material/Icon'
+import IconButton from '@mui/material/IconButton'
 
 import CodeReader from './CodeReader'
 
@@ -30,17 +30,17 @@ const AppBar = (props) => {
   const classes = makeStyles((theme) => ({
     search: {
       position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      backgroundColor: fade(theme.palette.common.white, 0.15),
+      borderRadius: '4px',
+      backgroundColor: 'rgba(255, 255, 255, 0.15)',
       '&:hover': {
-        backgroundColor: fade(theme.palette.common.white, 0.25),
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
       },
       marginRight: 0,
       marginLeft: 0,
       width: '100%',
     },
     searchIcon: {
-      padding: theme.spacing(0, 2),
+      padding: '0px 16px',
       height: '100%',
       position: 'absolute',
       pointerEvents: 'none',
@@ -53,10 +53,10 @@ const AppBar = (props) => {
       width: '100%',
     },
     inputInput: {
-      padding: theme.spacing(1, 1, 1, 0),
+      padding: '8px 8px 8px 0',
       // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create('width'),
+      paddingLeft: `calc(1em + 32px)`,
+      transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
       width: '100%',
     },
     clearSearchButton: {

@@ -3,13 +3,21 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { Route, Switch } from 'react-router-dom'
-import { ThemeProvider, createTheme } from '@material-ui/core/styles'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 
 import App from './component/App'
 import SignInButton from './component/SignInButton'
 import SheetList from './component/SheetList'
 
-const theme = createTheme()
+const theme = createTheme({
+  components: {
+    MuiTextField: {
+      defaultProps: {
+        variant: 'standard',
+      },
+    },
+  },
+})
 
 const IndexApp: React.FC = () => {
   return (
