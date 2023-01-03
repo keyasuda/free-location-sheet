@@ -14,6 +14,10 @@ jobs:
       AUTO_FILL_ENDPOINT: ${{ secrets.AUTO_FILL_ENDPOINT }}
 
     runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+      pull-requests: write
+      checks: write
 
     steps:
       - uses: actions/checkout@v2

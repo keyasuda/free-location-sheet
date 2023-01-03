@@ -13,6 +13,10 @@ jobs:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
 
     runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+      pull-requests: write
+      checks: write
 
     steps:
       - uses: actions/checkout@v2
