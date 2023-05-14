@@ -52,7 +52,7 @@ jobs:
 
       - name: Update deployment status (success)
         if: success()
-        uses: chrnorm/deployment-status@v2.0.0
+        uses: chrnorm/deployment-status@v2.0.1
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'
           environment-url: https://free-location-sheet-staging-fd228.web.app/
