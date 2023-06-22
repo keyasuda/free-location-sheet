@@ -35,7 +35,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "react-hook-form": "^7.40.0",
+    "react-hook-form": "^7.44.2",
     "react-router-dom": "^5.3.3",
     "react-to-print": "^2.14.12",
     "redux-first-history": "^5.1.1",
@@ -54,9 +54,9 @@
     "fetch-mock-jest": "^1.5.1",
     "googleapis": "^70.0.0",
     "html-webpack-plugin": "^5.5.1",
-    "jest": "^26.6.3",
+    "jest": "^27.0.0",
     "prettier": "2.8.8",
-    "webpack": "^5.83.1",
+    "webpack": "^5.84.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.0"
   }
