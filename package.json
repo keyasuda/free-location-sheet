@@ -43,8 +43,8 @@
     "uuid": "^3.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.8",
-    "@babel/preset-env": "^7.22.7",
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
     "@babel/preset-react": "^7.22.3",
     "@babel/preset-typescript": "^7.22.5",
     "@testing-library/react": "^11.2.6",
