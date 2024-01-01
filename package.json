@@ -25,7 +25,7 @@
     "@material-ui/lab": "*",
     "@material-ui/pickers": "^3.3.10",
     "@reduxjs/toolkit": "^1.9.5",
-    "@types/js-cookie": "^3.0.3",
+    "@types/js-cookie": "^3.0.6",
     "@zxing/library": "^0.20.0",
     "interweave": "^12.9.0",
     "interweave-autolink": "^4.4.3",
