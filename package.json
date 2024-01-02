@@ -24,7 +24,7 @@
     "@material-ui/icons": "^4.11.3",
     "@material-ui/lab": "*",
     "@material-ui/pickers": "^3.3.10",
-    "@reduxjs/toolkit": "^1.9.5",
+    "@reduxjs/toolkit": "^1.9.7",
     "@types/js-cookie": "^3.0.6",
     "@zxing/library": "^0.20.0",
     "interweave": "^12.9.0",
