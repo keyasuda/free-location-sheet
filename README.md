@@ -31,7 +31,7 @@ npm run build-prod
 For Cloud Function use the following command inside backend/:
 
 ```
-gcloud functions deploy ichiba_proxy --project=PROJECT_ID --runtime ruby27 --memory=128MB --trigger-http --allow-unauthenticated --region=asia-northeast1 --set-env-vars RWS_APPLICATION_ID=APPLICATION_ID,ALLOW_ORIGIN=ORIGIN
+gcloud functions deploy ichiba_proxy --project=PROJECT_ID --runtime ruby32 --memory=128MB --trigger-http --allow-unauthenticated --region=asia-northeast1 --set-env-vars RWS_APPLICATION_ID=APPLICATION_ID,ALLOW_ORIGIN=ORIGIN --entry-point=ichiba_proxy
 ```
 
 ## Usage
