@@ -38,6 +38,7 @@
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.53.0",
     "react-router-dom": "^5.3.3",
+    "react-router-dom-v5-compat": "^6.26.2",
     "react-to-print": "^2.15.1",
     "redux-first-history": "^5.2.0",
     "shellwords": "^0.1.1",
