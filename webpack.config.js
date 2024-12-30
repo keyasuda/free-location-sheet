@@ -31,7 +31,7 @@ module.exports = {
     historyApiFallback: {
       rewrites: [{ from: /^\/*/, to: '/app.html' }],
     },
-    https: true,
+    server: 'https',
     static: './build',
   },
 }
