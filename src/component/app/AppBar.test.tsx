@@ -20,6 +20,22 @@ const MockCodeReader = (props) => {
   return <>code reader</>
 }
 
+// navigator.mediaDevicesのモック
+Object.defineProperty(global.navigator, 'mediaDevices', {
+  value: {
+    getUserMedia: jest.fn().mockImplementation(() =>
+      Promise.resolve({
+        getTracks: () => [
+          {
+            stop: () => {},
+          },
+        ],
+      })
+    ),
+  },
+  writable: true,
+})
+
 jest.mock('./CodeReader', () => ({
   __esModule: true,
   namedExport: jest.fn(),
