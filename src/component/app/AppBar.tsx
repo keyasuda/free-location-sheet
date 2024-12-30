@@ -151,7 +151,14 @@ const AppBar = (props) => {
             edge="end"
             color="inherit"
             aria-label="scan"
-            onClick={() => setOpenScanner(true)}
+            onClick={async () => {
+              const stream = await navigator.mediaDevices.getUserMedia({
+                video: true,
+              })
+              stream.getTracks().forEach((track) => track.stop())
+
+              setOpenScanner(true)
+            }}
           >
             <Icon>qr_code_scanner</Icon>
           </IconButton>
