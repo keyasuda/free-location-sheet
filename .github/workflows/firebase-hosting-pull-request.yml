@@ -30,7 +30,7 @@ jobs:
           environment: staging
 
       - name: Setup Ruby, JRuby and TruffleRuby
-        uses: ruby/setup-ruby@v1.148.0
+        uses: ruby/setup-ruby@v1.206.0
       - name: Use Node.js 16.x
         uses: actions/setup-node@v4
         with:
