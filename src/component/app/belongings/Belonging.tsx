@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom-v5-compat'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import Snackbar from '@material-ui/core/Snackbar'
@@ -46,7 +47,7 @@ const Belonging = (props) => {
     }
   })
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [alertOpen, setAlertOpen] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -70,7 +71,7 @@ const Belonging = (props) => {
 
   const remove = (item) => {
     dispatch(belongingsAsyncThunk.remove(item))
-    history.push(`/app/${fileId}/belongings`)
+    navigate(`/app/${fileId}/belongings`)
   }
 
   const setStorageId = (id) => {
@@ -121,7 +122,7 @@ const Belonging = (props) => {
   }
 
   const onEditFormCancel = () => {
-    if (notFound) history.push(`/app/${fileId}`)
+    if (notFound) navigate(`/app/${fileId}`)
     setDialogOpen(false)
   }
 

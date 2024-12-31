@@ -231,7 +231,13 @@ describe('Belongings', () => {
           userEvent.click(chip)
 
           expect(pushSpy).toHaveBeenCalledWith(
-            '/app/file-id/belongings?deadline=true'
+            {
+              hash: '',
+              pathname: '/app/file-id/belongings',
+              search: '?deadline=true',
+            },
+            undefined,
+            {}
           )
         })
 
@@ -246,7 +252,11 @@ describe('Belongings', () => {
           const chip = screen.getByLabelText('search-by-deadline')
           userEvent.click(chip)
 
-          expect(pushSpy).toHaveBeenCalledWith('/app/file-id/belongings')
+          expect(pushSpy).toHaveBeenCalledWith(
+            { hash: '', pathname: '/app/file-id/belongings', search: '' },
+            undefined,
+            {}
+          )
         })
       })
 
@@ -262,7 +272,13 @@ describe('Belongings', () => {
           userEvent.click(chip)
 
           expect(pushSpy).toHaveBeenCalledWith(
-            '/app/file-id/belongings?keyword=word&deadline=true'
+            {
+              hash: '',
+              pathname: '/app/file-id/belongings',
+              search: '?keyword=word&deadline=true',
+            },
+            undefined,
+            {}
           )
         })
 
@@ -278,7 +294,13 @@ describe('Belongings', () => {
           userEvent.click(chip)
 
           expect(pushSpy).toHaveBeenCalledWith(
-            '/app/file-id/belongings?keyword=word'
+            {
+              hash: '',
+              pathname: '/app/file-id/belongings',
+              search: '?keyword=word',
+            },
+            undefined,
+            {}
           )
         })
       })

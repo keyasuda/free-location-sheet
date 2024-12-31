@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom-v5-compat'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from '@material-ui/core/styles'
 import IconButton from '@material-ui/core/IconButton'
@@ -20,7 +20,7 @@ const StorageName = (props) => {
   const item = useSelector((s) => s.storages.list[0])
   const pending = useSelector((s) => s.storages.pending)
   const dispatch = useDispatch()
-  const history = useHistory()
+  const navigate = useNavigate()
   const classes = makeStyles({ link: { cursor: 'pointer' } })()
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const StorageName = (props) => {
           color="textSecondary"
           component="div"
           className={`${className} ${classes.link}`}
-          onClick={() => history.push(`/app/${fileId}/storages/${id}`)}
+          onClick={() => navigate(`/app/${fileId}/storages/${id}`)}
         >
           <Icon>place</Icon> {item.name}
         </Typography>

@@ -4,6 +4,7 @@ import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 
 import { Router } from 'react-router-dom'
+import { CompatRouter } from 'react-router-dom-v5-compat'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -57,7 +58,9 @@ const renderIt = (search) => {
   render(
     <Provider store={store}>
       <Router history={history}>
-        <AppBar />
+        <CompatRouter>
+          <AppBar />
+        </CompatRouter>
       </Router>
     </Provider>
   )
@@ -90,7 +93,13 @@ describe('AppBar', () => {
       await userEvent.type(textField, '{enter}')
 
       expect(push).toHaveBeenCalledWith(
-        '/app/file-id/belongings?keyword=' + encodeURIComponent(keyword)
+        {
+          hash: '',
+          pathname: '/app/file-id/belongings',
+          search: '?keyword=' + encodeURIComponent(keyword),
+        },
+        undefined,
+        {}
       )
     })
 
@@ -99,7 +108,15 @@ describe('AppBar', () => {
       fireEvent.change(textField, { target: { value: '' } })
       await userEvent.type(textField, '{enter}')
 
-      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+      expect(push).toHaveBeenCalledWith(
+        {
+          hash: '',
+          pathname: '/app/file-id/belongings',
+          search: '',
+        },
+        undefined,
+        {}
+      )
     })
   })
 
@@ -117,7 +134,15 @@ describe('AppBar', () => {
     it('should clean searchword', () => {
       const btn = screen.getByLabelText('clear search word')
       userEvent.click(btn)
-      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+      expect(push).toHaveBeenCalledWith(
+        {
+          hash: '',
+          pathname: '/app/file-id/belongings',
+          search: '',
+        },
+        undefined,
+        {}
+      )
     })
   })
 
@@ -144,7 +169,13 @@ describe('AppBar', () => {
           codeReaderOnRead(code)
         })
         expect(history.push).toHaveBeenCalledWith(
-          '/app/file-id/belongings/belonginguuid'
+          {
+            hash: '',
+            pathname: '/app/file-id/belongings/belonginguuid',
+            search: '',
+          },
+          undefined,
+          {}
         )
       })
     })
@@ -161,7 +192,13 @@ describe('AppBar', () => {
           codeReaderOnRead(code)
         })
         expect(history.push).toHaveBeenCalledWith(
-          '/app/file-id/storages/storageuuid'
+          {
+            hash: '',
+            pathname: '/app/file-id/storages/storageuuid',
+            search: '',
+          },
+          undefined,
+          {}
         )
       })
     })
@@ -175,7 +212,13 @@ describe('AppBar', () => {
             codeReaderOnRead(code)
           })
           expect(history.push).toHaveBeenCalledWith(
-            `/app/file-id/belongings/${code}`
+            {
+              hash: '',
+              pathname: `/app/file-id/belongings/${code}`,
+              search: '',
+            },
+            undefined,
+            {}
           )
         })
       })

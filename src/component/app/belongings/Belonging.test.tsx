@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event'
 const fetchMock = require('fetch-mock-jest')
 
 import { Router } from 'react-router-dom'
+import { CompatRouter } from 'react-router-dom-v5-compat'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -56,7 +57,9 @@ const renderIt = () => {
   render(
     <Provider store={store}>
       <Router history={history}>
-        <Belonging />
+        <CompatRouter>
+          <Belonging />
+        </CompatRouter>
       </Router>
     </Provider>
   )
@@ -251,7 +254,11 @@ describe('Belonging', () => {
     it('should navigate to AppMenu when it has cancelled', () => {
       const button = screen.getByLabelText('cancel')
       userEvent.click(button)
-      expect(push).toHaveBeenCalledWith('/app/file-id')
+      expect(push).toHaveBeenCalledWith(
+        { hash: '', pathname: '/app/file-id', search: '' },
+        undefined,
+        {}
+      )
     })
   })
 
@@ -271,7 +278,11 @@ describe('Belonging', () => {
       userEvent.click(okButton)
 
       expect(removeThunk).toHaveBeenCalledWith(mockItem)
-      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+      expect(push).toHaveBeenCalledWith(
+        { hash: '', pathname: '/app/file-id/belongings', search: '' },
+        undefined,
+        {}
+      )
     })
   })
 

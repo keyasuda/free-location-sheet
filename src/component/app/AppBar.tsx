@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom-v5-compat'
 import { useDispatch, useSelector } from 'react-redux'
 import { alpha, makeStyles } from '@material-ui/core/styles'
 import { default as MUIAppBar } from '@material-ui/core/AppBar'
@@ -12,7 +13,8 @@ import CodeReader from './CodeReader'
 
 const AppBar = (props) => {
   const { fileId } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
   const [openScanner, setOpenScanner] = useState(false)
   const keyword = useSelector((s) => {
     const query = new URLSearchParams(s.router.location.search)
@@ -69,9 +71,9 @@ const AppBar = (props) => {
 
   const search = (w) => {
     if (w && w.length > 0) {
-      history.push(`${basePath}/belongings?keyword=${encodeURIComponent(w)}`)
+      navigate(`${basePath}/belongings?keyword=${encodeURIComponent(w)}`)
     } else {
-      history.push(`${basePath}/belongings`)
+      navigate(`${basePath}/belongings`)
     }
   }
 
@@ -96,8 +98,8 @@ const AppBar = (props) => {
       destination = `${basePath}/belongings/${encodeURIComponent(code)}`
     }
 
-    if (history.location.pathname != destination) {
-      history.push(destination)
+    if (location.pathname != destination) {
+      navigate(destination)
     }
     setOpenScanner(false)
   }
@@ -110,7 +112,7 @@ const AppBar = (props) => {
             edge="start"
             color="inherit"
             aria-label="home"
-            onClick={() => history.push(basePath)}
+            onClick={() => navigate(basePath)}
           >
             <Icon>home</Icon>
           </IconButton>
