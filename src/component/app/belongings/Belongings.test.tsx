@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Router } from 'react-router-dom'
+import { CompatRouter, CompatRoute } from 'react-router-dom-v5-compat'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -70,7 +71,9 @@ describe('Belongings', () => {
     render(
       <Provider store={store}>
         <Router history={history}>
-          <Belongings />
+          <CompatRouter>
+            <Belongings />
+          </CompatRouter>
         </Router>
       </Provider>
     )
