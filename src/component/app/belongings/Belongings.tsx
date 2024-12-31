@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom-v5-compat'
 import { Link } from 'react-router-dom-v5-compat'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
@@ -54,7 +55,7 @@ const Belongings = (props) => {
     return null
   })
   const bulkAmountRef = useRef()
-  const history = useHistory()
+  const navigate = useNavigate()
   const keyword = useSearchword()
   const classes = makeListStyles()
 
@@ -104,7 +105,7 @@ const Belongings = (props) => {
       params.push('deadline=true')
     }
     const q = params.length > 0 ? `?${params.join('&')}` : ''
-    history.push(`${currentPath}${q}`)
+    navigate(`${currentPath}${q}`)
   }
 
   return (
