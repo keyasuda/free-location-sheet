@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom-v5-compat'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
@@ -37,7 +37,6 @@ const Storages = (props) => {
   const page = useSelector((s) => s.storages.page)
   const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
-  const history = useHistory()
   const keyword = useSearchword()
   const classes = makeListStyles()
 
