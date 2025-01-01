@@ -1,8 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom-v5-compat'
-import { Link } from 'react-router-dom-v5-compat'
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
 import Icon from '@material-ui/core/Icon'
@@ -39,6 +43,8 @@ const newItem = {
 
 const Belongings = (props) => {
   const { fileId } = useParams()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
   const [dialogOpen, setDialogOpen] = useState(false)
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.belongings.pending)
@@ -47,13 +53,7 @@ const Belongings = (props) => {
   const nextPage = useSelector((s) => s.belongings.nextPage)
   const page = useSelector((s) => s.belongings.page)
   const currentPath = useSelector((s) => s.router.location.pathname)
-  const deadline = useSelector((s) => {
-    const query = new URLSearchParams(s.router.location.search)
-    if (query.get('deadline') == 'true') {
-      return true
-    }
-    return null
-  })
+  const deadline = searchParams.get('deadline') === 'true'
   const bulkAmountRef = useRef()
   const navigate = useNavigate()
   const keyword = useSearchword()
@@ -68,7 +68,7 @@ const Belongings = (props) => {
         deadline: deadline,
       })
     )
-  }, [keyword, deadline])
+  }, [keyword, deadline, location.search])
 
   const getNextPage = () => {
     dispatch(

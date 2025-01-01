@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom-v5-compat'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/core/styles'
 import Icon from '@material-ui/core/Icon'
