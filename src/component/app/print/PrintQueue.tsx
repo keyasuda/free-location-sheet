@@ -108,7 +108,14 @@ const PrintQueue = (props) => {
         <Sheets items={items} ref={sheetRef} />
       </div>
 
-      <Dialog open={dialogOpen} onClose={handleClose} disableBackdropClick>
+      <Dialog
+        open={dialogOpen}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
+            handleClose()
+          }
+        }}
+      >
         <DialogTitle>印刷済みコード</DialogTitle>
         <DialogContent>
           <DialogContentText>
