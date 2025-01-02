@@ -127,15 +127,22 @@ describe('AppBar', () => {
       id: 'belonginguuid',
     })
 
-    beforeEach(() => {
+    beforeEach(async () => {
+      // async を追加
       renderIt('')
       const button = screen.getByLabelText('scan')
-      userEvent.click(button)
+      // クリックイベントを act でラップ
+      await act(async () => {
+        await userEvent.click(button)
+      })
     })
 
     describe('code is of belonging', () => {
-      it('should navigate to belonging page', () => {
-        act(() => codeReaderOnRead(code))
+      it('should navigate to belonging page', async () => {
+        // async を追加
+        await act(async () => {
+          codeReaderOnRead(code)
+        })
         expect(history.push).toHaveBeenCalledWith(
           '/app/file-id/belongings/belonginguuid'
         )
@@ -148,8 +155,11 @@ describe('AppBar', () => {
         id: 'storageuuid',
       })
 
-      it('should navigate to storage page', () => {
-        act(() => codeReaderOnRead(code))
+      it('should navigate to storage page', async () => {
+        // async を追加
+        await act(async () => {
+          codeReaderOnRead(code)
+        })
         expect(history.push).toHaveBeenCalledWith(
           '/app/file-id/storages/storageuuid'
         )
@@ -159,8 +169,11 @@ describe('AppBar', () => {
     describe('code is unknown', () => {
       const codes = ['generalpurposebarcode', '1234567890']
       codes.map((code) => {
-        it('should navigate to belonging page, code as ID', () => {
-          act(() => codeReaderOnRead(code))
+        it('should navigate to belonging page, code as ID', async () => {
+          // async を追加
+          await act(async () => {
+            codeReaderOnRead(code)
+          })
           expect(history.push).toHaveBeenCalledWith(
             `/app/file-id/belongings/${code}`
           )

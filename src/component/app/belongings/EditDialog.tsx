@@ -118,7 +118,14 @@ const EditDialog = (props) => {
 
   return (
     <>
-      <Dialog open={open} onClose={handleClose} disableBackdropClick>
+      <Dialog
+        open={open}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
+            handleClose()
+          }
+        }}
+      >
         <DialogTitle>
           {newItem && <>物品の追加</>}
           {!newItem && <>物品の編集</>}

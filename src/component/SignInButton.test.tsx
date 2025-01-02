@@ -5,6 +5,7 @@ import {
   TestingLibraryElementError,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { act } from '@testing-library/react'
 
 import * as authModule from './authentication'
 import SignInButton from './SignInButton'
@@ -20,12 +21,14 @@ describe('SignInButton', () => {
     signIn.mockResolvedValue()
   })
 
-  const renderIt = () => {
-    render(
-      <SignInButton afterSignedIn={afterSignedIn}>
-        <div>children</div>
-      </SignInButton>
-    )
+  const renderIt = async () => {
+    await act(async () => {
+      render(
+        <SignInButton afterSignedIn={afterSignedIn}>
+          <div>children</div>
+        </SignInButton>
+      )
+    })
   }
 
   describe('signed out', () => {
@@ -41,7 +44,10 @@ describe('SignInButton', () => {
       initAuth.mockImplementationOnce(() => false)
       isSignedIn.mockImplementationOnce(() => true)
       await renderIt()
-      await userEvent.click(screen.getByRole('button'))
+
+      await act(async () => {
+        await userEvent.click(screen.getByRole('button'))
+      })
 
       expect(signIn).toHaveBeenCalled()
     })

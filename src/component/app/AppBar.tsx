@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useHistory, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { fade, makeStyles } from '@material-ui/core/styles'
+import { alpha, makeStyles } from '@material-ui/core/styles'
 import { default as MUIAppBar } from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import InputBase from '@material-ui/core/InputBase'
@@ -31,9 +31,9 @@ const AppBar = (props) => {
     search: {
       position: 'relative',
       borderRadius: theme.shape.borderRadius,
-      backgroundColor: fade(theme.palette.common.white, 0.15),
+      backgroundColor: alpha(theme.palette.common.white, 0.15),
       '&:hover': {
-        backgroundColor: fade(theme.palette.common.white, 0.25),
+        backgroundColor: alpha(theme.palette.common.white, 0.25),
       },
       marginRight: 0,
       marginLeft: 0,
