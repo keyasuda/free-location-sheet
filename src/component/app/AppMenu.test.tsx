@@ -1,81 +1,100 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
-import { CompatRouter } from 'react-router-dom-v5-compat'
-import ReactRouter from 'react-router'
-import * as ReactRedux from 'react-redux'
-import { Provider } from 'react-redux'
-import { createMemoryHistory } from 'history'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import AppMenu from './AppMenu'
-import CodeReader from './CodeReader'
-import * as auth from '../authentication'
+import * as authentication from '../authentication'
 
-let codeReaderOnRead
-const MockCodeReader = (props) => {
-  const { onRead } = props
-  codeReaderOnRead = onRead
-  return <>code reader</>
-}
+// モックの作成
+jest.mock('../authentication', () => ({
+  signOut: jest.fn(),
+}))
 
-jest.mock('./CodeReader', () => ({
-  __esModule: true,
-  namedExport: jest.fn(),
-  default: jest.fn(),
+// window.open のモック
+const mockOpen = jest.fn()
+window.open = mockOpen
+
+// useNavigate のモック
+const mockNavigate = jest.fn()
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
 }))
 
 describe('AppMenu', () => {
-  let history, signOut
+  const fileId = 'test-file-id'
 
+  // テスト前の共通セットアップ
   beforeEach(() => {
-    history = createMemoryHistory({ initialEntries: ['/app/file-id/'] })
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
-    jest.spyOn(ReactRouter, 'useHistory').mockReturnValue(history)
-    signOut = jest.spyOn(auth, 'signOut').mockReturnValue()
-
-    const mockState = {
-      router: {
-        location: {
-          query: {},
-          pathname: '/app/file-id/',
-        },
-      },
-    }
-
-    const mockStore = {
-      getState: () => mockState,
-      subscribe: jest.fn(),
-      dispatch: jest.fn(),
-    }
-
-    jest
-      .spyOn(ReactRedux, 'useSelector')
-      .mockImplementation((selector) => selector(mockState))
-
     render(
-      <Provider store={mockStore}>
-        <MemoryRouter initialEntries={['/app/file-id/']} initialIndex={0}>
-          <CompatRouter>
-            <AppMenu />
-          </CompatRouter>
-        </MemoryRouter>
-      </Provider>
+      <MemoryRouter initialEntries={[`/app/${fileId}`]}>
+        <Routes>
+          <Route path="/app/:fileId" element={<AppMenu />} />
+        </Routes>
+      </MemoryRouter>
     )
   })
 
-  beforeAll(() => {
-    CodeReader.mockImplementation(MockCodeReader)
-  })
-
+  // テスト後のクリーンアップ
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('navigation', () => {
-    it('should be a menu to let user sign out', () => {
-      const button = screen.getByText('ログアウト')
-      userEvent.click(button)
-      expect(signOut).toHaveBeenCalled()
-    })
+  it('renders all menu items', () => {
+    expect(screen.getByText('物品一覧')).toBeInTheDocument()
+    expect(screen.getByText('保管場所一覧')).toBeInTheDocument()
+    expect(screen.getByText('コード印刷')).toBeInTheDocument()
+    expect(screen.getByText('スプレッドシート変更')).toBeInTheDocument()
+    expect(screen.getByText('スプレッドシートを開く')).toBeInTheDocument()
+    expect(screen.getByText('ログアウト')).toBeInTheDocument()
+  })
+
+  it('navigates to belongings page when clicking 物品一覧', () => {
+    fireEvent.click(screen.getByText('物品一覧'))
+    expect(mockNavigate).toHaveBeenCalledWith(`/app/${fileId}/belongings`)
+  })
+
+  it('navigates to storages page when clicking 保管場所一覧', () => {
+    fireEvent.click(screen.getByText('保管場所一覧'))
+    expect(mockNavigate).toHaveBeenCalledWith(`/app/${fileId}/storages`)
+  })
+
+  it('navigates to print page when clicking コード印刷', () => {
+    fireEvent.click(screen.getByText('コード印刷'))
+    expect(mockNavigate).toHaveBeenCalledWith(`/app/${fileId}/print`)
+  })
+
+  it('opens spreadsheet in new window when clicking スプレッドシートを開く', () => {
+    fireEvent.click(screen.getByText('スプレッドシートを開く'))
+    expect(mockOpen).toHaveBeenCalledWith(
+      `https://docs.google.com/spreadsheets/d/${fileId}/edit`
+    )
+  })
+
+  it('signs out and redirects when clicking ログアウト', () => {
+    // locationのモックを作成
+    const originalLocation = window.location
+    delete window.location
+    window.location = { href: '' } as Location
+
+    fireEvent.click(screen.getByText('ログアウト'))
+
+    expect(authentication.signOut).toHaveBeenCalled()
+    expect(window.location.href).toBe('/')
+
+    // locationのモックを元に戻す
+    window.location = originalLocation
+  })
+
+  it('redirects to root when clicking スプレッドシート変更', () => {
+    // locationのモックを作成
+    const originalLocation = window.location
+    delete window.location
+    window.location = { href: '' } as Location
+
+    fireEvent.click(screen.getByText('スプレッドシート変更'))
+    expect(window.location.href).toBe('/')
+
+    // locationのモックを元に戻す
+    window.location = originalLocation
   })
 })
