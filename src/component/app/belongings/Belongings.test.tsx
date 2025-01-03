@@ -5,6 +5,7 @@ import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
 import { Router } from 'react-router-dom'
+import { CompatRouter, CompatRoute } from 'react-router-dom-v5-compat'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -70,7 +71,9 @@ describe('Belongings', () => {
     render(
       <Provider store={store}>
         <Router history={history}>
-          <Belongings />
+          <CompatRouter>
+            <Belongings />
+          </CompatRouter>
         </Router>
       </Provider>
     )
@@ -228,7 +231,13 @@ describe('Belongings', () => {
           userEvent.click(chip)
 
           expect(pushSpy).toHaveBeenCalledWith(
-            '/app/file-id/belongings?deadline=true'
+            {
+              hash: '',
+              pathname: '/app/file-id/belongings',
+              search: '?deadline=true',
+            },
+            undefined,
+            {}
           )
         })
 
@@ -243,7 +252,11 @@ describe('Belongings', () => {
           const chip = screen.getByLabelText('search-by-deadline')
           userEvent.click(chip)
 
-          expect(pushSpy).toHaveBeenCalledWith('/app/file-id/belongings')
+          expect(pushSpy).toHaveBeenCalledWith(
+            { hash: '', pathname: '/app/file-id/belongings', search: '' },
+            undefined,
+            {}
+          )
         })
       })
 
@@ -259,7 +272,13 @@ describe('Belongings', () => {
           userEvent.click(chip)
 
           expect(pushSpy).toHaveBeenCalledWith(
-            '/app/file-id/belongings?keyword=word&deadline=true'
+            {
+              hash: '',
+              pathname: '/app/file-id/belongings',
+              search: '?keyword=word&deadline=true',
+            },
+            undefined,
+            {}
           )
         })
 
@@ -275,7 +294,13 @@ describe('Belongings', () => {
           userEvent.click(chip)
 
           expect(pushSpy).toHaveBeenCalledWith(
-            '/app/file-id/belongings?keyword=word'
+            {
+              hash: '',
+              pathname: '/app/file-id/belongings',
+              search: '?keyword=word',
+            },
+            undefined,
+            {}
           )
         })
       })
