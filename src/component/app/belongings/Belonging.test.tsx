@@ -4,8 +4,7 @@ import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 const fetchMock = require('fetch-mock-jest')
 
-import { Router } from 'react-router-dom'
-import { CompatRouter } from 'react-router-dom-v5-compat'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -53,14 +52,14 @@ const mockItem = {
   printed: false,
 }
 
-const renderIt = () => {
+const renderIt = (itemId) => {
   render(
     <Provider store={store}>
-      <Router history={history}>
-        <CompatRouter>
-          <Belonging />
-        </CompatRouter>
-      </Router>
+      <MemoryRouter initialEntries={[`/file-id/${itemId}`]} history={history}>
+        <Routes>
+          <Route path="/:fileId/:itemId" element={<Belonging />} />
+        </Routes>
+      </MemoryRouter>
     </Provider>
   )
 }
@@ -85,6 +84,12 @@ jest.mock('../AppBar', () => ({
   default: jest.fn(),
 }))
 
+const mockUseNavigate = jest.fn()
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockUseNavigate,
+}))
+
 describe('Belonging', () => {
   let getThunk
 
@@ -96,10 +101,6 @@ describe('Belonging', () => {
   beforeEach(() => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
-      fileId: 'file-id',
-      itemId: mockItem.id,
-    })
     getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
     setMockState(mockItem)
   })
@@ -110,7 +111,7 @@ describe('Belonging', () => {
 
   describe('initialize', () => {
     it('should get belonging by provided ID', () => {
-      renderIt()
+      renderIt(mockItem.id)
       expect(getThunk).toHaveBeenCalledWith(mockItem.id)
     })
   })
@@ -118,7 +119,7 @@ describe('Belonging', () => {
   describe('update operation', () => {
     it('should update with the dialog', async () => {
       const updateThunk = jest.spyOn(belongingsAsyncThunk, 'update')
-      renderIt()
+      renderIt(mockItem.id)
       const editButton = screen.getByLabelText('edit')
       userEvent.click(editButton)
       await waitFor(() => screen.findByText('物品の編集'))
@@ -152,7 +153,7 @@ describe('Belonging', () => {
 
     it('should get the storage', () => {
       const thunk = jest.spyOn(storagesAsyncThunk, 'get')
-      renderIt()
+      renderIt(mockItem.id)
       expect(thunk).toHaveBeenCalledWith('storageid')
     })
   })
@@ -164,7 +165,7 @@ describe('Belonging', () => {
 
     it('should get the storage', () => {
       const thunk = jest.spyOn(storagesAsyncThunk, 'get')
-      renderIt()
+      renderIt(mockItem.id)
       expect(thunk).not.toHaveBeenCalled()
     })
   })
@@ -179,7 +180,7 @@ describe('Belonging', () => {
     beforeEach(async () => {
       thunk = jest.spyOn(belongingsAsyncThunk, 'update')
       setMockState(mockItem)
-      renderIt()
+      renderIt(mockItem.id)
       const scanButton = screen.getByLabelText('set storage')
       userEvent.click(scanButton)
     })
@@ -215,15 +216,9 @@ describe('Belonging', () => {
   })
 
   describe('unknown ID', () => {
-    let push
     beforeEach(() => {
-      jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
-        fileId: 'file-id',
-        itemId: 'itemid',
-      })
-      push = jest.spyOn(history, 'push')
       setMockState(null, true)
-      renderIt()
+      renderIt('itemid')
     })
 
     it('should show a register dialog', () => {
@@ -254,20 +249,16 @@ describe('Belonging', () => {
     it('should navigate to AppMenu when it has cancelled', () => {
       const button = screen.getByLabelText('cancel')
       userEvent.click(button)
-      expect(push).toHaveBeenCalledWith(
-        { hash: '', pathname: '/app/file-id', search: '' },
-        undefined,
-        {}
-      )
+
+      expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id')
     })
   })
 
   describe('remove button', () => {
     it('should remove item and redirect to belongings', async () => {
       const removeThunk = jest.spyOn(belongingsAsyncThunk, 'remove')
-      const push = jest.spyOn(history, 'push')
 
-      renderIt()
+      renderIt(mockItem.id)
 
       const removeButton = screen.getByLabelText('remove')
       userEvent.click(removeButton)
@@ -278,25 +269,21 @@ describe('Belonging', () => {
       userEvent.click(okButton)
 
       expect(removeThunk).toHaveBeenCalledWith(mockItem)
-      expect(push).toHaveBeenCalledWith(
-        { hash: '', pathname: '/app/file-id/belongings', search: '' },
-        undefined,
-        {}
-      )
+      expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id/belongings')
     })
   })
 
   describe('autofill button', () => {
     it('shouldnt appear for existing item', () => {
       setMockState(mockItem)
-      renderIt()
+      renderIt(mockItem.id)
       const button = screen.queryByLabelText('autofill-button')
       expect(button).toEqual(null)
     })
 
     it('should appear for new item', () => {
       setMockState(null)
-      renderIt()
+      renderIt('new-item')
       screen.getByLabelText('autofill-button')
     })
 
@@ -304,11 +291,6 @@ describe('Belonging', () => {
       afterEach(() => fetchMock.restore())
 
       it('should call backend and fill when something has returned', async () => {
-        jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
-          fileId: 'file-id',
-          itemId: 'barcode1145141841842',
-        })
-
         const autofillSource = {
           name: 'autofill item name',
           url: 'autofill item url',
@@ -320,7 +302,7 @@ describe('Belonging', () => {
         })
 
         setMockState(null)
-        renderIt()
+        renderIt('barcode1145141841842')
         const button = screen.getByLabelText('autofill-button')
 
         userEvent.click(button)
@@ -337,18 +319,13 @@ describe('Belonging', () => {
       })
 
       it('should show notice when therere no autofill values', async () => {
-        jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
-          fileId: 'file-id',
-          itemId: 'barcode1145141841842',
-        })
-
         fetchMock.get(autoFillEndpoint + '1145141841842', {
           status: 404,
           body: 'not found',
         })
 
         setMockState(null)
-        renderIt()
+        renderIt('barcode1145141841842')
         const button = screen.getByLabelText('autofill-button')
 
         userEvent.click(button)
@@ -357,11 +334,6 @@ describe('Belonging', () => {
       })
 
       it('should call OpenBD for ISBN', async () => {
-        jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
-          fileId: 'file-id',
-          itemId: 'barcode9783161484100',
-        })
-
         const autofillSource = [
           {
             onix: {
@@ -391,7 +363,7 @@ describe('Belonging', () => {
         })
 
         setMockState(null)
-        renderIt()
+        renderIt('barcode9783161484100')
         const button = screen.getByLabelText('autofill-button')
 
         userEvent.click(button)
