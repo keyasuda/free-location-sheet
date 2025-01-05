@@ -4,8 +4,7 @@ import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Router } from 'react-router-dom'
-import { CompatRouter, CompatRoute } from 'react-router-dom-v5-compat'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -41,8 +40,6 @@ const setMockState = (params) => {
     .mockImplementation((selector) => selector(mockState))
 }
 
-const pushSpy = jest.spyOn(history, 'push')
-
 const mockItem = {
   klass: 'belonging',
   name: '',
@@ -52,10 +49,15 @@ const mockItem = {
   printed: false,
 }
 
+const mockUseNavigate = jest.fn()
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockUseNavigate,
+}))
+
 describe('Belongings', () => {
   let sheetInit, searchThunk
   beforeEach(() => {
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
     sheetInit = jest.spyOn(Sheet, 'init').mockReturnValue('hogehoge')
     jest.spyOn(Sheet.belongings, 'search').mockResolvedValue([])
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
@@ -67,14 +69,14 @@ describe('Belongings', () => {
     jest.clearAllMocks()
   })
 
-  const renderIt = () => {
+  const renderIt = (initialPath = '/app/file-id/belongings') => {
     render(
       <Provider store={store}>
-        <Router history={history}>
-          <CompatRouter>
-            <Belongings />
-          </CompatRouter>
-        </Router>
+        <MemoryRouter initialEntries={[initialPath]}>
+          <Routes>
+            <Route path="/app/:fileId/belongings" element={<Belongings />} />
+          </Routes>
+        </MemoryRouter>
       </Provider>
     )
   }
@@ -94,7 +96,7 @@ describe('Belongings', () => {
         expect(searchThunk).toHaveBeenCalledWith({
           keyword: '',
           page: 0,
-          deadline: null,
+          deadline: false,
         })
       })
     })
@@ -102,14 +104,14 @@ describe('Belongings', () => {
     describe('with keywords', () => {
       beforeEach(() => {
         setMockState({ keyword: 'searchword', belongings: [], deadline: null })
-        renderIt()
+        renderIt('/app/file-id/belongings?keyword=searchword')
       })
 
       it('dispatch search action with keywords', async () => {
         expect(searchThunk).toHaveBeenCalledWith({
           keyword: 'searchword',
           page: 0,
-          deadline: null,
+          deadline: false,
         })
       })
     })
@@ -122,7 +124,7 @@ describe('Belongings', () => {
             belongings: [],
             deadline: true,
           })
-          renderIt()
+          renderIt('/app/file-id/belongings?keyword=searchword&deadline=true')
           expect(searchThunk).toHaveBeenCalledWith({
             keyword: 'searchword',
             page: 0,
@@ -134,7 +136,7 @@ describe('Belongings', () => {
       describe('without keywords', () => {
         it('should dispatch search action with keywords and deadline=true', () => {
           setMockState({ keyword: '', belongings: [], deadline: true })
-          renderIt()
+          renderIt('/app/file-id/belongings?deadline=true')
           expect(searchThunk).toHaveBeenCalledWith({
             keyword: '',
             page: 0,
@@ -230,14 +232,8 @@ describe('Belongings', () => {
           const chip = screen.getByLabelText('search-by-deadline')
           userEvent.click(chip)
 
-          expect(pushSpy).toHaveBeenCalledWith(
-            {
-              hash: '',
-              pathname: '/app/file-id/belongings',
-              search: '?deadline=true',
-            },
-            undefined,
-            {}
+          expect(mockUseNavigate).toHaveBeenCalledWith(
+            '/app/file-id/belongings?deadline=true'
           )
         })
 
@@ -247,15 +243,13 @@ describe('Belongings', () => {
             deadline: true,
             belongings: [],
           })
-          renderIt()
+          renderIt('/app/file-id/belongings?deadline=true')
 
           const chip = screen.getByLabelText('search-by-deadline')
           userEvent.click(chip)
 
-          expect(pushSpy).toHaveBeenCalledWith(
-            { hash: '', pathname: '/app/file-id/belongings', search: '' },
-            undefined,
-            {}
+          expect(mockUseNavigate).toHaveBeenCalledWith(
+            '/app/file-id/belongings'
           )
         })
       })
@@ -266,19 +260,13 @@ describe('Belongings', () => {
             keyword: 'word',
             belongings: [],
           })
-          renderIt()
+          renderIt('/app/file-id/belongings?keyword=word')
 
           const chip = screen.getByLabelText('search-by-deadline')
           userEvent.click(chip)
 
-          expect(pushSpy).toHaveBeenCalledWith(
-            {
-              hash: '',
-              pathname: '/app/file-id/belongings',
-              search: '?keyword=word&deadline=true',
-            },
-            undefined,
-            {}
+          expect(mockUseNavigate).toHaveBeenCalledWith(
+            '/app/file-id/belongings?keyword=word&deadline=true'
           )
         })
 
@@ -288,19 +276,13 @@ describe('Belongings', () => {
             deadline: true,
             belongings: [],
           })
-          renderIt()
+          renderIt('/app/file-id/belongings?keyword=word&deadline=true')
 
           const chip = screen.getByLabelText('search-by-deadline')
           userEvent.click(chip)
 
-          expect(pushSpy).toHaveBeenCalledWith(
-            {
-              hash: '',
-              pathname: '/app/file-id/belongings',
-              search: '?keyword=word',
-            },
-            undefined,
-            {}
+          expect(mockUseNavigate).toHaveBeenCalledWith(
+            '/app/file-id/belongings?keyword=word'
           )
         })
       })
