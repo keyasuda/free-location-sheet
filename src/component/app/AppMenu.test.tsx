@@ -1,8 +1,7 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
-import { CompatRouter } from 'react-router-dom-v5-compat'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import * as ReactRedux from 'react-redux'
 import { Provider } from 'react-redux'
@@ -29,8 +28,6 @@ describe('AppMenu', () => {
 
   beforeEach(() => {
     history = createMemoryHistory({ initialEntries: ['/app/file-id/'] })
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
-    jest.spyOn(ReactRouter, 'useHistory').mockReturnValue(history)
     signOut = jest.spyOn(auth, 'signOut').mockReturnValue()
 
     const mockState = {
@@ -54,10 +51,10 @@ describe('AppMenu', () => {
 
     render(
       <Provider store={mockStore}>
-        <MemoryRouter initialEntries={['/app/file-id/']} initialIndex={0}>
-          <CompatRouter>
-            <AppMenu />
-          </CompatRouter>
+        <MemoryRouter initialEntries={['/app/file-id']} initialIndex={0}>
+          <Routes>
+            <Route path="/app/:fileId" element={<AppMenu />} />
+          </Routes>
         </MemoryRouter>
       </Provider>
     )
