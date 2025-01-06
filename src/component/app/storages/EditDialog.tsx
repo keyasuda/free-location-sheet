@@ -20,7 +20,7 @@ const EditDialog = (props) => {
 
   return (
     <Dialog
-      open={dialogOpen}
+      open={open}
       onClose={(event, reason) => {
         if (reason !== 'backdropClick') {
           handleClose()
