@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { Router } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -52,14 +52,20 @@ const mockStorage = {
   printed: false,
 }
 
-const renderIt = (belongings, storages) => {
+const renderIt = (
+  belongings,
+  storages,
+  initialPath = '/app/file-id/itemid'
+) => {
   setMockState(belongings, storages)
 
   render(
     <Provider store={store}>
-      <Router history={history}>
-        <PrintQueue />
-      </Router>
+      <MemoryRouter initialEntries={[initialPath]} history={history}>
+        <Routes>
+          <Route path="/app/:fileId/:itemId" element={<PrintQueue />} />
+        </Routes>
+      </MemoryRouter>
     </Provider>
   )
 }
@@ -80,10 +86,6 @@ describe('PrintQueue', () => {
   beforeEach(() => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({
-      fileId: 'file-id',
-      itemId: 'itemid',
-    })
     bFindByPrinted = jest.spyOn(belongingsAsyncThunk, 'findByPrinted')
     sFindByPrinted = jest.spyOn(storagesAsyncThunk, 'findByPrinted')
   })
