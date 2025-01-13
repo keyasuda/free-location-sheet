@@ -52,7 +52,6 @@ const Belongings = (props) => {
   const list = useSelector((s) => s.belongings.list)
   const nextPage = useSelector((s) => s.belongings.nextPage)
   const page = useSelector((s) => s.belongings.page)
-  const currentPath = useSelector((s) => s.router.location.pathname)
   const deadline = searchParams.get('deadline') === 'true'
   const bulkAmountRef = useRef()
   const navigate = useNavigate()
@@ -105,7 +104,7 @@ const Belongings = (props) => {
       params.push('deadline=true')
     }
     const q = params.length > 0 ? `?${params.join('&')}` : ''
-    navigate(`${currentPath}${q}`)
+    navigate(`${location.pathname}${q}`)
   }
 
   return (

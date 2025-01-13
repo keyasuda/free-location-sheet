@@ -34,7 +34,6 @@ const Storages = (props) => {
   const list = useSelector((s) => s.storages.list)
   const nextPage = useSelector((s) => s.storages.nextPage)
   const page = useSelector((s) => s.storages.page)
-  const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
   const keyword = useSearchword()
   const classes = makeListStyles()
