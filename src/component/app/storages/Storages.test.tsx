@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
-import { Router } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 
@@ -18,7 +18,6 @@ Sheet.init = jest.fn()
 
 describe('Storages', () => {
   beforeEach(() => {
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
     jest.spyOn(Sheet.storages, 'search').mockResolvedValue([])
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
@@ -28,12 +27,14 @@ describe('Storages', () => {
     jest.clearAllMocks()
   })
 
-  const renderIt = () => {
+  const renderIt = (initialPath = '/app/file-id/storages') => {
     render(
       <Provider store={store}>
-        <Router history={history}>
-          <Storages />
-        </Router>
+        <MemoryRouter initialEntries={[initialPath]}>
+          <Routes>
+            <Route path="/app/:fileId/storages" element={<Storages />} />
+          </Routes>
+        </MemoryRouter>
       </Provider>
     )
   }
