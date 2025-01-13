@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import Button from '@material-ui/core/Button'
 import { makeStyles } from '@material-ui/core/styles'
 import Icon from '@material-ui/core/Icon'
@@ -11,7 +11,7 @@ import { signOut } from '../authentication'
 
 const AppMenu = (props) => {
   const { fileId } = useParams()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const basePath = `/app/${fileId}`
   const classes = makeStyles({
@@ -39,7 +39,7 @@ const AppMenu = (props) => {
         <Button
           className={classes.menuItem}
           variant="outlined"
-          onClick={() => history.push(`${basePath}/belongings`)}
+          onClick={() => navigate(`${basePath}/belongings`)}
         >
           <Icon>inventory</Icon>
           物品一覧
@@ -48,7 +48,7 @@ const AppMenu = (props) => {
         <Button
           className={classes.menuItem}
           variant="outlined"
-          onClick={() => history.push(`${basePath}/storages`)}
+          onClick={() => navigate(`${basePath}/storages`)}
         >
           <Icon>place</Icon>
           保管場所一覧
@@ -57,7 +57,7 @@ const AppMenu = (props) => {
         <Button
           className={classes.menuItem}
           variant="outlined"
-          onClick={() => history.push(`${basePath}/print`)}
+          onClick={() => navigate(`${basePath}/print`)}
         >
           <Icon>print</Icon>
           コード印刷

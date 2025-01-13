@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
 import IconButton from '@material-ui/core/IconButton'
@@ -34,9 +34,7 @@ const Storages = (props) => {
   const list = useSelector((s) => s.storages.list)
   const nextPage = useSelector((s) => s.storages.nextPage)
   const page = useSelector((s) => s.storages.page)
-  const currentPath = useSelector((s) => s.router.location.pathname)
   const bulkAmountRef = useRef()
-  const history = useHistory()
   const keyword = useSearchword()
   const classes = makeListStyles()
 
@@ -82,7 +80,7 @@ const Storages = (props) => {
           {(list || []).map((b) => (
             <ListItem key={b.id}>
               <div className={classes.linkContainer}>
-                <Link to={`${currentPath}/${b.id}`} className={classes.link}>
+                <Link to={b.id} className={classes.link}>
                   {b.name || '(名称未設定)'}
                 </Link>
               </div>

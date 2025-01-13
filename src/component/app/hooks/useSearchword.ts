@@ -1,14 +1,8 @@
-import { useSelector } from 'react-redux'
+import { useSearchParams } from 'react-router-dom'
 
 const useSearchword = () => {
-  return useSelector((s) => {
-    const query = new URLSearchParams(s.router.location.search)
-    const k = query.get('keyword')
-    if (k) {
-      return decodeURIComponent(k)
-    } else {
-      return ''
-    }
-  })
+  const [searchParams] = useSearchParams()
+  return searchParams.get('keyword') || ''
 }
+
 export default useSearchword

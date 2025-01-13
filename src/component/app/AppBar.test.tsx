@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { act } from '@testing-library/react-hooks'
 import userEvent from '@testing-library/user-event'
 
-import { Router } from 'react-router-dom'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
@@ -54,20 +54,29 @@ const renderIt = (search) => {
     })
   )
 
+  let path = '/file-id'
+  if (search.length > 0) {
+    path = `${path}?${search}`
+  }
+
   render(
     <Provider store={store}>
-      <Router history={history}>
-        <AppBar />
-      </Router>
+      <MemoryRouter initialEntries={[path]} history={history}>
+        <Routes>
+          <Route path="/:fileId" element={<AppBar />} />
+        </Routes>
+      </MemoryRouter>
     </Provider>
   )
 }
 
-describe('AppBar', () => {
-  beforeEach(() => {
-    jest.spyOn(ReactRouter, 'useParams').mockReturnValue({ fileId: 'file-id' })
-  })
+const mockUseNavigate = jest.fn()
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockUseNavigate,
+}))
 
+describe('AppBar', () => {
   beforeAll(() => {
     CodeReader.mockImplementation(MockCodeReader)
   })
@@ -89,7 +98,7 @@ describe('AppBar', () => {
       fireEvent.change(textField, { target: { value: keyword } })
       await userEvent.type(textField, '{enter}')
 
-      expect(push).toHaveBeenCalledWith(
+      expect(mockUseNavigate).toHaveBeenCalledWith(
         '/app/file-id/belongings?keyword=' + encodeURIComponent(keyword)
       )
     })
@@ -99,14 +108,13 @@ describe('AppBar', () => {
       fireEvent.change(textField, { target: { value: '' } })
       await userEvent.type(textField, '{enter}')
 
-      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+      expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id/belongings')
     })
   })
 
   describe('search box', () => {
     let push
     beforeEach(() => {
-      push = jest.spyOn(history, 'push')
       renderIt('keyword=searchword')
     })
 
@@ -117,7 +125,7 @@ describe('AppBar', () => {
     it('should clean searchword', () => {
       const btn = screen.getByLabelText('clear search word')
       userEvent.click(btn)
-      expect(push).toHaveBeenCalledWith('/app/file-id/belongings')
+      expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id/belongings')
     })
   })
 
@@ -143,7 +151,7 @@ describe('AppBar', () => {
         await act(async () => {
           codeReaderOnRead(code)
         })
-        expect(history.push).toHaveBeenCalledWith(
+        expect(mockUseNavigate).toHaveBeenCalledWith(
           '/app/file-id/belongings/belonginguuid'
         )
       })
@@ -160,7 +168,7 @@ describe('AppBar', () => {
         await act(async () => {
           codeReaderOnRead(code)
         })
-        expect(history.push).toHaveBeenCalledWith(
+        expect(mockUseNavigate).toHaveBeenCalledWith(
           '/app/file-id/storages/storageuuid'
         )
       })
@@ -174,7 +182,7 @@ describe('AppBar', () => {
           await act(async () => {
             codeReaderOnRead(code)
           })
-          expect(history.push).toHaveBeenCalledWith(
+          expect(mockUseNavigate).toHaveBeenCalledWith(
             `/app/file-id/belongings/${code}`
           )
         })

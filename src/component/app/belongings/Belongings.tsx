@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import {
+  useParams,
+  useNavigate,
+  Link,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@material-ui/core/TextField'
 import Icon from '@material-ui/core/Icon'
@@ -37,6 +43,8 @@ const newItem = {
 
 const Belongings = (props) => {
   const { fileId } = useParams()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
   const [dialogOpen, setDialogOpen] = useState(false)
   const dispatch = useDispatch()
   const pending = useSelector((s) => s.belongings.pending)
@@ -44,16 +52,9 @@ const Belongings = (props) => {
   const list = useSelector((s) => s.belongings.list)
   const nextPage = useSelector((s) => s.belongings.nextPage)
   const page = useSelector((s) => s.belongings.page)
-  const currentPath = useSelector((s) => s.router.location.pathname)
-  const deadline = useSelector((s) => {
-    const query = new URLSearchParams(s.router.location.search)
-    if (query.get('deadline') == 'true') {
-      return true
-    }
-    return null
-  })
+  const deadline = searchParams.get('deadline') === 'true'
   const bulkAmountRef = useRef()
-  const history = useHistory()
+  const navigate = useNavigate()
   const keyword = useSearchword()
   const classes = makeListStyles()
 
@@ -66,7 +67,7 @@ const Belongings = (props) => {
         deadline: deadline,
       })
     )
-  }, [keyword, deadline])
+  }, [keyword, deadline, location.search])
 
   const getNextPage = () => {
     dispatch(
@@ -103,7 +104,7 @@ const Belongings = (props) => {
       params.push('deadline=true')
     }
     const q = params.length > 0 ? `?${params.join('&')}` : ''
-    history.push(`${currentPath}${q}`)
+    navigate(`${location.pathname}${q}`)
   }
 
   return (
@@ -132,7 +133,7 @@ const Belongings = (props) => {
           {(list || []).map((b) => (
             <ListItem key={b.id}>
               <div className={classes.linkContainer}>
-                <Link to={`${currentPath}/${b.id}`} className={classes.link}>
+                <Link to={b.id} className={classes.link}>
                   {b.name || '(名称未設定)'}
                 </Link>
                 {b.deadline && (
