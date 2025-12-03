@@ -7,4 +7,7 @@ module.exports = {
     '\\.(css|scss)$': '<rootDir>/__mocks__/styleMock.js',
   },
   testEnvironment: 'jsdom',
+  transformIgnorePatterns: [
+    '/node_modules/(?!(google-auth-library|googleapis|googleapis-common|uuid|gaxios|gcp-metadata|google-gax|proto3-json-serializer|duplexify|google-p12-pem|jws|ms|arrify|retry-request|extend|is-stream|node-fetch|whatwg-url|url-template|google-p12-pem|p-limit|p-queue|abort-controller|stream-events|teeny-request|@babel/runtime|@google-cloud/promisify|@google-cloud/projectify|@google-cloud/resolve-extensions)/)'
+  ]
 }

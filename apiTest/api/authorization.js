@@ -1,6 +1,7 @@
 const fs = require('fs')
 const readline = require('readline')
 const { google } = require('googleapis')
+const { OAuth2Client } = require('google-auth-library')
 
 const SCOPES = [
   'https://www.googleapis.com/auth/spreadsheets',
@@ -10,7 +11,7 @@ const TOKEN_PATH = 'token.json'
 
 const authorize = (credentials) => {
   const { client_secret, client_id, redirect_uris } = credentials.installed
-  const oAuth2Client = new google.auth.OAuth2(
+  const oAuth2Client = new OAuth2Client(
     client_id,
     client_secret,
     redirect_uris[0]

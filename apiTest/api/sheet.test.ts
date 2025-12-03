@@ -5,14 +5,14 @@ other tests using mocks are at src/api/sheet.test.ts
 const fs = require('fs')
 const readline = require('readline')
 const { google } = require('googleapis')
-
-import { Sheet } from '../../src/api/sheet'
+const { OAuth2Client } = require('google-auth-library')
+const { Sheet } = require('../../src/api/sheet')
 
 const documentId = '1Dj0TubC0yY_nD80PUAIYezJQOW6XI2WJePcJaXMoViU'
 const secret = fs.readFileSync('apiTest/api/secret.json')
 const { client_secret, client_id, redirect_uris } = JSON.parse(secret).installed
 const token = fs.readFileSync('apiTest/api/token.json')
-const oAuth2Client = new google.auth.OAuth2(
+const oAuth2Client = new OAuth2Client(
   client_id,
   client_secret,
   redirect_uris[0]

@@ -18,6 +18,9 @@
   "keywords": [],
   "author": "Kenichiro Yasuda",
   "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
     "@material-ui/core": "^4.12.4",
