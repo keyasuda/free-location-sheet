@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
+import { HistoryRouter as Router } from 'redux-first-history/rr6'
 
 import { store, history } from '../state/store'
 import AppMenu from './app/AppMenu'
@@ -17,10 +18,12 @@ const App: React.FC = () => {
   const [loaded, setLoaded] = useState(false)
   const [signedIn, setSignedIn] = useState(false)
 
-  useEffect(async () => {
-    await initAuth()
-    setSignedIn(isSignedIn())
-    setLoaded(true)
+  useEffect(() => {
+    ;(async () => {
+      await initAuth()
+      setSignedIn(isSignedIn())
+      setLoaded(true)
+    })()
   }, [])
 
   return (

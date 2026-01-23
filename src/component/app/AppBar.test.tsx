@@ -1,6 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { act } from '@testing-library/react-hooks'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
@@ -86,8 +85,9 @@ describe('AppBar', () => {
   })
 
   describe('keyword search', () => {
-    let push
+    let push, user
     beforeEach(() => {
+      user = userEvent.setup()
       push = jest.spyOn(history, 'push')
       renderIt('')
     })
@@ -95,8 +95,8 @@ describe('AppBar', () => {
     it('will be navigated to belongings with keywords when the search button has clicked', async () => {
       const keyword = '検索語'
       const textField = screen.getByLabelText('search-word')
-      fireEvent.change(textField, { target: { value: keyword } })
-      await userEvent.type(textField, '{enter}')
+      await user.clear(textField)
+      await user.type(textField, `${keyword}{enter}`)
 
       expect(mockUseNavigate).toHaveBeenCalledWith(
         '/app/file-id/belongings?keyword=' + encodeURIComponent(keyword)
@@ -105,16 +105,17 @@ describe('AppBar', () => {
 
     it('will navigate to belongings without keywords when the keyword is blank', async () => {
       const textField = screen.getByLabelText('search-word')
-      fireEvent.change(textField, { target: { value: '' } })
-      await userEvent.type(textField, '{enter}')
+      await user.clear(textField)
+      await user.type(textField, '{enter}')
 
       expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id/belongings')
     })
   })
 
   describe('search box', () => {
-    let push
+    let push, user
     beforeEach(() => {
+      user = userEvent.setup()
       renderIt('keyword=searchword')
     })
 
@@ -122,9 +123,9 @@ describe('AppBar', () => {
       screen.getByLabelText('clear search word')
     })
 
-    it('should clean searchword', () => {
+    it('should clean searchword', async () => {
       const btn = screen.getByLabelText('clear search word')
-      userEvent.click(btn)
+      await user.click(btn)
       expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id/belongings')
     })
   })
@@ -134,15 +135,14 @@ describe('AppBar', () => {
       klass: 'belonging',
       id: 'belonginguuid',
     })
+    let user
 
     beforeEach(async () => {
+      user = userEvent.setup()
       // async を追加
       renderIt('')
       const button = screen.getByLabelText('scan')
-      // クリックイベントを act でラップ
-      await act(async () => {
-        await userEvent.click(button)
-      })
+      await user.click(button)
     })
 
     describe('code is of belonging', () => {

@@ -56,8 +56,9 @@ jest.mock('react-router-dom', () => ({
 }))
 
 describe('Belongings', () => {
-  let sheetInit, searchThunk
+  let sheetInit, searchThunk, user
   beforeEach(() => {
+    user = userEvent.setup()
     sheetInit = jest.spyOn(Sheet, 'init').mockReturnValue('hogehoge')
     jest.spyOn(Sheet.belongings, 'search').mockResolvedValue([])
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
@@ -190,11 +191,11 @@ describe('Belongings', () => {
       }
 
       let addThunk
-      beforeEach(() => {
+      beforeEach(async () => {
         addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
         renderIt()
         const fab = screen.getByLabelText('add')
-        userEvent.click(fab)
+        await user.click(fab)
       })
 
       it('should add desired items', async () => {
@@ -203,7 +204,7 @@ describe('Belongings', () => {
         await waitFor(() => screen.findByText('数量'))
         const amount = screen.getByLabelText('amount').querySelector('input')
         fireEvent.change(amount, { target: { value: String(num) } })
-        userEvent.click(screen.getByLabelText('add bulk'))
+        await user.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
@@ -212,8 +213,8 @@ describe('Belongings', () => {
       it('should add nothing when the input is invalid', async () => {
         await waitFor(() => screen.findByText('数量'))
         const amount = screen.getByLabelText('amount').querySelector('input')
-        userEvent.type(amount, 'hogehoge') // invalid input
-        userEvent.click(screen.getByLabelText('add bulk'))
+        await user.type(amount, 'hogehoge') // invalid input
+        await user.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).not.toHaveBeenCalled()
@@ -222,7 +223,7 @@ describe('Belongings', () => {
 
     describe('filter button', () => {
       describe('without keywords', () => {
-        it('should apply deadline filter', () => {
+        it('should apply deadline filter', async () => {
           setMockState({
             keyword: '',
             belongings: [],
@@ -230,14 +231,14 @@ describe('Belongings', () => {
           renderIt()
 
           const chip = screen.getByLabelText('search-by-deadline')
-          userEvent.click(chip)
+          await user.click(chip)
 
           expect(mockUseNavigate).toHaveBeenCalledWith(
             '/app/file-id/belongings?deadline=true'
           )
         })
 
-        it('should clear filter when its already applied', () => {
+        it('should clear filter when its already applied', async () => {
           setMockState({
             keyword: '',
             deadline: true,
@@ -246,7 +247,7 @@ describe('Belongings', () => {
           renderIt('/app/file-id/belongings?deadline=true')
 
           const chip = screen.getByLabelText('search-by-deadline')
-          userEvent.click(chip)
+          await user.click(chip)
 
           expect(mockUseNavigate).toHaveBeenCalledWith(
             '/app/file-id/belongings'
@@ -255,7 +256,7 @@ describe('Belongings', () => {
       })
 
       describe('with keywords', () => {
-        it('should apply deadline filter', () => {
+        it('should apply deadline filter', async () => {
           setMockState({
             keyword: 'word',
             belongings: [],
@@ -263,14 +264,14 @@ describe('Belongings', () => {
           renderIt('/app/file-id/belongings?keyword=word')
 
           const chip = screen.getByLabelText('search-by-deadline')
-          userEvent.click(chip)
+          await user.click(chip)
 
           expect(mockUseNavigate).toHaveBeenCalledWith(
             '/app/file-id/belongings?keyword=word&deadline=true'
           )
         })
 
-        it('should clear filter when its already applied', () => {
+        it('should clear filter when its already applied', async () => {
           setMockState({
             keyword: 'word',
             deadline: true,
@@ -279,7 +280,7 @@ describe('Belongings', () => {
           renderIt('/app/file-id/belongings?keyword=word&deadline=true')
 
           const chip = screen.getByLabelText('search-by-deadline')
-          userEvent.click(chip)
+          await user.click(chip)
 
           expect(mockUseNavigate).toHaveBeenCalledWith(
             '/app/file-id/belongings?keyword=word'

@@ -13,14 +13,14 @@ const SignInButton = (props) => {
   const [loaded, setLoaded] = useState(false)
   let [signedIn, setSignedIn] = useState(false)
 
-  useEffect(async () => {
+  useEffect(() => {
     const init = async () => {
       const authStatus = await initAuth()
       setSignedIn(authStatus)
       setLoaded(true)
     }
 
-    init()
+    init().catch((e) => console.error(e))
 
     window.addEventListener('focus', () => setSignedIn(isSignedIn()), false)
   }, [])

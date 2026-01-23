@@ -1,6 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { act } from '@testing-library/react-hooks'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 const fetchMock = require('fetch-mock-jest')
 
@@ -118,28 +117,31 @@ describe('Belonging', () => {
 
   describe('update operation', () => {
     it('should update with the dialog', async () => {
+      const user = userEvent.setup()
       const updateThunk = jest.spyOn(belongingsAsyncThunk, 'update')
       renderIt(mockItem.id)
       const editButton = screen.getByLabelText('edit')
-      userEvent.click(editButton)
+      await user.click(editButton)
       await waitFor(() => screen.findByText('物品の編集'))
 
       const nameField = screen.getByLabelText('name').querySelector('input')
-      userEvent.type(nameField, 'addedname')
+      await user.clear(nameField)
+      await user.type(nameField, 'addedname')
 
       const descriptionField = screen
         .getByLabelText('description')
         .querySelector('input')
-      userEvent.type(descriptionField, 'addeddescription')
+      await user.clear(descriptionField)
+      await user.type(descriptionField, 'addeddescription')
 
       const updateButton = screen.getByLabelText('done')
-      userEvent.click(updateButton)
+      await user.click(updateButton)
 
       expect(updateThunk).toHaveBeenCalledWith([
         {
           ...mockItem,
-          name: mockItem.name + 'addedname',
-          description: mockItem.description + 'addeddescription',
+          name: 'addedname',
+          description: 'addeddescription',
           deadline: '',
         },
       ])
@@ -176,13 +178,14 @@ describe('Belonging', () => {
       id: 'storageuuid',
     }
 
-    let thunk
+    let thunk, user
     beforeEach(async () => {
+      user = userEvent.setup()
       thunk = jest.spyOn(belongingsAsyncThunk, 'update')
       setMockState(mockItem)
       renderIt(mockItem.id)
       const scanButton = screen.getByLabelText('set storage')
-      userEvent.click(scanButton)
+      await user.click(scanButton)
     })
 
     it('should set storage ID', () => {
@@ -226,11 +229,12 @@ describe('Belonging', () => {
       screen.getByLabelText('done')
     })
 
-    it('should add the item as a new belonging', () => {
+    it('should add the item as a new belonging', async () => {
+      const user = userEvent.setup()
       const button = screen.getByLabelText('done')
       const addThunk = jest.spyOn(belongingsAsyncThunk, 'add')
       const getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
-      userEvent.click(button)
+      await user.click(button)
 
       expect(addThunk).toHaveBeenCalledWith([
         {
@@ -246,9 +250,10 @@ describe('Belonging', () => {
       ])
     })
 
-    it('should navigate to AppMenu when it has cancelled', () => {
+    it('should navigate to AppMenu when it has cancelled', async () => {
+      const user = userEvent.setup()
       const button = screen.getByLabelText('cancel')
-      userEvent.click(button)
+      await user.click(button)
 
       expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id')
     })
@@ -256,17 +261,18 @@ describe('Belonging', () => {
 
   describe('remove button', () => {
     it('should remove item and redirect to belongings', async () => {
+      const user = userEvent.setup()
       const removeThunk = jest.spyOn(belongingsAsyncThunk, 'remove')
 
       renderIt(mockItem.id)
 
       const removeButton = screen.getByLabelText('remove')
-      userEvent.click(removeButton)
+      await user.click(removeButton)
 
       await waitFor(() => screen.findByText('物品の削除'))
 
       const okButton = screen.getByLabelText('proceed-remove')
-      userEvent.click(okButton)
+      await user.click(okButton)
 
       expect(removeThunk).toHaveBeenCalledWith(mockItem)
       expect(mockUseNavigate).toHaveBeenCalledWith('/app/file-id/belongings')
@@ -291,6 +297,7 @@ describe('Belonging', () => {
       afterEach(() => fetchMock.restore())
 
       it('should call backend and fill when something has returned', async () => {
+        const user = userEvent.setup()
         const autofillSource = {
           name: 'autofill item name',
           url: 'autofill item url',
@@ -305,7 +312,7 @@ describe('Belonging', () => {
         renderIt('barcode1145141841842')
         const button = screen.getByLabelText('autofill-button')
 
-        userEvent.click(button)
+        await user.click(button)
 
         const nameField = screen.getByLabelText('name').querySelector('input')
         const descriptionField = screen
@@ -319,6 +326,7 @@ describe('Belonging', () => {
       })
 
       it('should show notice when therere no autofill values', async () => {
+        const user = userEvent.setup()
         fetchMock.get(autoFillEndpoint + '1145141841842', {
           status: 404,
           body: 'not found',
@@ -328,12 +336,13 @@ describe('Belonging', () => {
         renderIt('barcode1145141841842')
         const button = screen.getByLabelText('autofill-button')
 
-        userEvent.click(button)
+        await user.click(button)
 
         await waitFor(() => screen.getByText('自動入力できませんでした'))
       })
 
       it('should call OpenBD for ISBN', async () => {
+        const user = userEvent.setup()
         const autofillSource = [
           {
             onix: {
@@ -366,7 +375,7 @@ describe('Belonging', () => {
         renderIt('barcode9783161484100')
         const button = screen.getByLabelText('autofill-button')
 
-        userEvent.click(button)
+        await user.click(button)
 
         const nameField = screen.getByLabelText('name').querySelector('input')
         const descriptionField = screen

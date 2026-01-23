@@ -69,9 +69,10 @@ describe('AppMenu', () => {
   })
 
   describe('navigation', () => {
-    it('should be a menu to let user sign out', () => {
+    it('should be a menu to let user sign out', async () => {
+      const user = userEvent.setup()
       const button = screen.getByText('ログアウト')
-      userEvent.click(button)
+      await user.click(button)
       expect(signOut).toHaveBeenCalled()
     })
   })
