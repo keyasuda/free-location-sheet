@@ -39,7 +39,7 @@ jobs:
       - name: build
         run: |
           ruby settings_writer.rb
-          npm i && npm run build:staging
+          npm i --legacy-peer-deps && npm run build:staging
 
       - name: deploy
         uses: FirebaseExtended/action-hosting-deploy@v0.7.1

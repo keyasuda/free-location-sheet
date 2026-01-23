@@ -25,5 +25,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: |
           ruby settings_writer.rb
-          npm install
+          npm install --legacy-peer-deps
           npm run test src/
