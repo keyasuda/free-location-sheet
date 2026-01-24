@@ -11,9 +11,8 @@ import * as ReactRedux from 'react-redux'
 
 import Belongings from './Belongings'
 import * as auth from '../../authentication'
-import { store, history } from '../../../state/store'
-import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
+import { Sheet } from '../../../api/sheet'
 Sheet.init = jest.fn()
 
 const setMockState = (params) => {
@@ -35,9 +34,11 @@ const setMockState = (params) => {
     },
   }
 
-  jest
-    .spyOn(ReactRedux, 'useSelector')
-    .mockImplementation((selector) => selector(mockState))
+  return {
+    getState: () => mockState,
+    subscribe: jest.fn(),
+    dispatch: jest.fn(),
+  }
 }
 
 const mockItem = {
@@ -74,11 +75,20 @@ describe('Belongings', () => {
     jest.clearAllMocks()
   })
 
-  const renderIt = (initialPath = '/app/file-id/belongings') => {
+  const renderIt = (store, initialPath = '/app/file-id/belongings') => {
+    // Check if store is actually a path string (legacy call support or convenience)
+    let actualStore = store
+    let actualPath = initialPath
+
+    if (typeof store === 'string' || store === undefined) {
+       actualPath = store || '/app/file-id/belongings'
+       actualStore = setMockState({ keyword: '', belongings: [], deadline: null })
+    }
+
     render(
       <MuiThemeProvider theme={theme}>
-          <Provider store={store}>
-            <MemoryRouter initialEntries={[initialPath]}>
+          <Provider store={actualStore}>
+            <MemoryRouter initialEntries={[actualPath]}>
               <Routes>
                 <Route path="/app/:fileId/belongings" element={<Belongings />} />
               </Routes>
@@ -91,8 +101,8 @@ describe('Belongings', () => {
   describe('data to show', () => {
     describe('without keywords', () => {
       beforeEach(() => {
-        setMockState({ keyword: '', belongings: [], deadline: null })
-        renderIt()
+        const store = setMockState({ keyword: '', belongings: [], deadline: null })
+        renderIt(store)
       })
 
       it('initializes Sheet API accessor', () => {
@@ -110,8 +120,8 @@ describe('Belongings', () => {
 
     describe('with keywords', () => {
       beforeEach(() => {
-        setMockState({ keyword: 'searchword', belongings: [], deadline: null })
-        renderIt('/app/file-id/belongings?keyword=searchword')
+        const store = setMockState({ keyword: 'searchword', belongings: [], deadline: null })
+        renderIt(store, '/app/file-id/belongings?keyword=searchword')
       })
 
       it('dispatch search action with keywords', async () => {
@@ -126,12 +136,12 @@ describe('Belongings', () => {
     describe('search by deadline', () => {
       describe('with keyword', () => {
         it('should dispatch search action with keywords and deadline=true', () => {
-          setMockState({
+          const store = setMockState({
             keyword: 'searchword',
             belongings: [],
             deadline: true,
           })
-          renderIt('/app/file-id/belongings?keyword=searchword&deadline=true')
+          renderIt(store, '/app/file-id/belongings?keyword=searchword&deadline=true')
           expect(searchThunk).toHaveBeenCalledWith({
             keyword: 'searchword',
             page: 0,
@@ -142,8 +152,8 @@ describe('Belongings', () => {
 
       describe('without keywords', () => {
         it('should dispatch search action with keywords and deadline=true', () => {
-          setMockState({ keyword: '', belongings: [], deadline: true })
-          renderIt('/app/file-id/belongings?deadline=true')
+          const store = setMockState({ keyword: '', belongings: [], deadline: true })
+          renderIt(store, '/app/file-id/belongings?deadline=true')
           expect(searchThunk).toHaveBeenCalledWith({
             keyword: '',
             page: 0,
@@ -161,8 +171,8 @@ describe('Belongings', () => {
         { ...mockItem, id: uuidv4(), name: 'itemname2' },
       ]
       beforeEach(() => {
-        setMockState({ keyword: '', belongings: items })
-        renderIt()
+        const store = setMockState({ keyword: '', belongings: items })
+        renderIt(store)
       })
 
       it('should show item names', () => {
@@ -172,11 +182,11 @@ describe('Belongings', () => {
 
     describe('item without name', () => {
       beforeEach(() => {
-        setMockState({
+        const store = setMockState({
           keyword: '',
           belongings: [{ ...mockItem, id: uuidv4() }],
         })
-        renderIt()
+        renderIt(store)
       })
 
       it('should show "(名称未設定)"', () => {
@@ -233,11 +243,11 @@ describe('Belongings', () => {
     describe('filter button', () => {
       describe('without keywords', () => {
         it('should apply deadline filter', async () => {
-          setMockState({
+          const store = setMockState({
             keyword: '',
             belongings: [],
           })
-          renderIt()
+          renderIt(store)
 
           const chip = screen.getByLabelText('search-by-deadline')
           await user.click(chip)
@@ -248,12 +258,12 @@ describe('Belongings', () => {
         })
 
         it('should clear filter when its already applied', async () => {
-          setMockState({
+          const store = setMockState({
             keyword: '',
             deadline: true,
             belongings: [],
           })
-          renderIt('/app/file-id/belongings?deadline=true')
+          renderIt(store, '/app/file-id/belongings?deadline=true')
 
           const chip = screen.getByLabelText('search-by-deadline')
           await user.click(chip)
@@ -266,11 +276,11 @@ describe('Belongings', () => {
 
       describe('with keywords', () => {
         it('should apply deadline filter', async () => {
-          setMockState({
+          const store = setMockState({
             keyword: 'word',
             belongings: [],
           })
-          renderIt('/app/file-id/belongings?keyword=word')
+          renderIt(store, '/app/file-id/belongings?keyword=word')
 
           const chip = screen.getByLabelText('search-by-deadline')
           await user.click(chip)
@@ -281,12 +291,12 @@ describe('Belongings', () => {
         })
 
         it('should clear filter when its already applied', async () => {
-          setMockState({
+          const store = setMockState({
             keyword: 'word',
             deadline: true,
             belongings: [],
           })
-          renderIt('/app/file-id/belongings?keyword=word&deadline=true')
+          renderIt(store, '/app/file-id/belongings?keyword=word&deadline=true')
 
           const chip = screen.getByLabelText('search-by-deadline')
           await user.click(chip)

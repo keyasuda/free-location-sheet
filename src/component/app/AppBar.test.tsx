@@ -6,8 +6,6 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
-
-import { store, history } from '../../state/store'
 import AppBar from './AppBar'
 import CodeReader from './CodeReader'
 
@@ -46,16 +44,19 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 const theme = createTheme()
 
 const renderIt = (search) => {
-  jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) =>
-    selector({
-      router: {
-        location: {
-          search,
-          pathname: '/app/file-id/',
-        },
+  const mockState = {
+    router: {
+      location: {
+        search,
+        pathname: '/app/file-id/',
       },
-    })
-  )
+    },
+  }
+  const mockStore = {
+    getState: () => mockState,
+    subscribe: jest.fn(),
+    dispatch: jest.fn(),
+  }
 
   let path = '/file-id'
   if (search.length > 0) {
@@ -64,8 +65,8 @@ const renderIt = (search) => {
 
   render(
     <ThemeProvider theme={theme}>
-      <Provider store={store}>
-        <MemoryRouter initialEntries={[path]} history={history}>
+      <Provider store={mockStore}>
+        <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route path="/:fileId" element={<AppBar />} />
           </Routes>
@@ -91,10 +92,9 @@ describe('AppBar', () => {
   })
 
   describe('keyword search', () => {
-    let push, user
+    let user
     beforeEach(() => {
       user = userEvent.setup()
-      push = jest.spyOn(history, 'push')
       renderIt('')
     })
 
@@ -119,7 +119,7 @@ describe('AppBar', () => {
   })
 
   describe('search box', () => {
-    let push, user
+    let user
     beforeEach(() => {
       user = userEvent.setup()
       renderIt('keyword=searchword')
