@@ -13,7 +13,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Snackbar from '@mui/material/Snackbar'
 import MuiAlert from '@mui/material/Alert'
-import { format, parse } from 'date-fns'
+import { format, parse, isValid } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -88,7 +88,8 @@ const EditDialog = (props) => {
   }
 
   const submit = () => {
-    const deadlineStr = deadline ? format(deadline, 'yyyy/MM/dd') : ''
+    const deadlineStr =
+      deadline && isValid(deadline) ? format(deadline, 'yyyy/MM/dd') : ''
 
     onSubmit({
       name: nameRef.current.value,
