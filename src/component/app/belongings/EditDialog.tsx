@@ -13,7 +13,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
 import Snackbar from '@mui/material/Snackbar'
 import MuiAlert from '@mui/material/Alert'
-import { format, parse } from 'date-fns'
+import { format, parse, isValid } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
@@ -47,7 +47,9 @@ const EditDialog = (props) => {
 
   const [printed, setPrinted] = useState(item.printed)
   const [alert, setAlert] = useState(false)
-  const [deadline, setDeadline] = useState(item.deadline ? item.deadline : null)
+  const [deadline, setDeadline] = useState(
+    item.deadline ? parse(item.deadline, 'yyyy/MM/dd', new Date()) : null
+  )
 
   const { classes: clearButtonClass } = makeStyles()({
     clear: {
@@ -86,15 +88,8 @@ const EditDialog = (props) => {
   }
 
   const submit = () => {
-    let deadlineStr = ''
-    if (typeof deadline == 'object') {
-      deadlineStr = deadline ? format(deadline, 'yyyy/MM/dd') : ''
-    } else {
-      deadlineStr = format(
-        parse(deadline, 'yyyy/MM/dd', new Date()),
-        'yyyy/MM/dd'
-      )
-    }
+    const deadlineStr =
+      deadline && isValid(deadline) ? format(deadline, 'yyyy/MM/dd') : ''
 
     onSubmit({
       name: nameRef.current.value,
