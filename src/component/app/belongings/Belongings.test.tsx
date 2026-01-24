@@ -56,7 +56,6 @@ jest.mock('react-router-dom', () => ({
 }))
 
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
-import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
 
 const theme = createTheme()
 
@@ -78,7 +77,6 @@ describe('Belongings', () => {
   const renderIt = (initialPath = '/app/file-id/belongings') => {
     render(
       <MuiThemeProvider theme={theme}>
-        <StylesThemeProvider theme={theme}>
           <Provider store={store}>
             <MemoryRouter initialEntries={[initialPath]}>
               <Routes>
@@ -86,7 +84,6 @@ describe('Belongings', () => {
               </Routes>
             </MemoryRouter>
           </Provider>
-        </StylesThemeProvider>
       </MuiThemeProvider>
     )
   }

@@ -5,7 +5,6 @@ import {
   StyledEngineProvider,
   ThemeProvider as MuiThemeProvider,
 } from '@mui/material/styles'
-import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
 
 import theme from './theme'
 import App from './component/App'
@@ -16,11 +15,9 @@ const IndexApp: React.FC = () => {
   return (
     <StyledEngineProvider injectFirst>
       <MuiThemeProvider theme={theme}>
-        <StylesThemeProvider theme={theme}>
-          <SignInButton>
-            <SheetList gapi={(window as any).gapi} />
-          </SignInButton>
-        </StylesThemeProvider>
+        <SignInButton>
+          <SheetList gapi={(window as any).gapi} />
+        </SignInButton>
       </MuiThemeProvider>
     </StyledEngineProvider>
   )

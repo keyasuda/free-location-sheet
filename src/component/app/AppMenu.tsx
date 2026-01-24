@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import Button from '@mui/material/Button'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import Icon from '@mui/material/Icon'
 
 import AppBar from './AppBar'
@@ -14,7 +14,7 @@ const AppMenu = (props) => {
   const navigate = useNavigate()
 
   const basePath = `/app/${fileId}`
-  const classes = makeStyles({
+  const { classes } = makeStyles()({
     menu: {
       display: 'flex',
       flexDirection: 'column',

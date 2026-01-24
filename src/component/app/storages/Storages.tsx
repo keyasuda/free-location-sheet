@@ -36,7 +36,7 @@ const Storages = (props) => {
   const page = useSelector((s) => s.storages.page)
   const bulkAmountRef = useRef()
   const keyword = useSearchword()
-  const classes = makeListStyles()
+  const { classes } = makeListStyles()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())

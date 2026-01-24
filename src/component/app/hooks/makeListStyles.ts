@@ -1,6 +1,6 @@
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
-const makeListStyles = makeStyles({
+const makeListStyles = makeStyles()({
   header: {
     display: 'flex',
     justifyContent: 'center',

@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import ReactToPrint from 'react-to-print'
 import Button from '@mui/material/Button'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import { useReactToPrint } from 'react-to-print'
 import Fab from '@mui/material/Fab'
 import Icon from '@mui/material/Icon'
@@ -54,7 +54,7 @@ const PrintQueue = (props) => {
   const dispatch = useDispatch()
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const classes = makeStyles({
+  const { classes } = makeStyles()({
     fab: {
       position: 'fixed',
       right: '20px',

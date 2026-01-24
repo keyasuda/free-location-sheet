@@ -1,64 +1,30 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import { BrowserMultiFormatReader } from '@zxing/library'
-import { makeStyles } from '@mui/styles'
-import IconButton from '@mui/material/IconButton'
-import Icon from '@mui/material/Icon'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import Snackbar from '@mui/material/Snackbar'
-import MuiAlert from '@mui/material/Alert'
+import { makeStyles } from 'tss-react/mui'
 
-const reader = new BrowserMultiFormatReader()
-const COOKIE_NAME = 'PREVIOUS_DEVICE_ID'
-
-const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
-
-const Reader = (props: Props) => {
-  const { onRead, deviceId, close, className } = props
-  const videoRef = useRef()
-
-  let previous
-  useEffect(() => {
-    reader.reset()
-
-    if (deviceId) {
-      reader.decodeFromVideoDevice(deviceId, videoRef.current, (r, e) => {
-        if (r) {
-          let read = r.text
-          if (read.match(/^[0-9]+$/)) {
-            read = `barcode${read}`
-          }
-          if (read != previous) {
-            window.navigator.vibrate(500)
-            previous = read
-            onRead(read)
-          }
-        }
-      })
-    }
-
-    return () => {
-      reader.reset()
-      previous = null
-    }
-  }, [deviceId])
-
-  return (
-    <video
-      ref={videoRef}
-      onCanPlay={() => {
-        if (videoRef.current) {
-          videoRef.current.play()
-        }
-      }}
-      autoPlay
-      playsInline
-      muted
-      className={className}
-    />
-  )
-}
+const useStyles = makeStyles()({
+  container: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'white',
+    zIndex: 1,
+  },
+  video: {
+    margin: 'auto',
+    width: '100vw',
+    maxHeight: 'calc(100vh - 32px)',
+  },
+  closeButton: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    zIndex: 1000,
+  },
+})
 
 const CodeReader = (props: Props) => {
   const { onRead, closeFunc } = props
@@ -67,28 +33,7 @@ const CodeReader = (props: Props) => {
   const [alert, setAlert] = useState(false)
   const deviceRef = useRef()
 
-  const classes = makeStyles({
-    container: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: 'white',
-      zIndex: 1,
-    },
-    video: {
-      margin: 'auto',
-      width: '100vw',
-      maxHeight: 'calc(100vh - 32px)',
-    },
-    closeButton: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      zIndex: 1000,
-    },
-  })()
+  const { classes } = useStyles()
 
   const selectDevice = (device) => {
     setSelectedDevice(device)

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { makeStyles } from '@mui/styles'
 import Snackbar from '@mui/material/Snackbar'
 import MuiAlert from '@mui/material/Alert'
 
@@ -53,7 +52,7 @@ const Belonging = (props) => {
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
   const [openScanner, setOpenScanner] = useState(false)
 
-  const classes = makeCardStyles()
+  const { classes } = makeCardStyles()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())

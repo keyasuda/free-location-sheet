@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { alpha } from '@mui/material/styles'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import { default as MUIAppBar } from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import InputBase from '@mui/material/InputBase'
@@ -13,7 +13,7 @@ import CodeReader from './CodeReader'
 
 import useSearchword from './hooks/useSearchword'
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles()((theme) => ({
   search: {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -63,7 +63,7 @@ const AppBar = (props) => {
 
   const basePath = `/app/${fileId}`
 
-  const classes = useStyles()
+  const { classes } = useStyles()
 
   const search = (w) => {
     if (w && w.length > 0) {

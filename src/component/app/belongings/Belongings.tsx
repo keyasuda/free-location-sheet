@@ -56,7 +56,7 @@ const Belongings = (props) => {
   const bulkAmountRef = useRef()
   const navigate = useNavigate()
   const keyword = useSearchword()
-  const classes = makeListStyles()
+  const { classes } = makeListStyles()
 
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
