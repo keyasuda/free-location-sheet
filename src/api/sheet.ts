@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { split } from 'shellwords'
 import { Belonging } from '../state/types'
 import _ from 'lodash'
-import format from 'date-fns/format'
+import { format } from 'date-fns'
 
 const header = {
   storages: ['row', 'id', 'name', 'description', 'printed'],
