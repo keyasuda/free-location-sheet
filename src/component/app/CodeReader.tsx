@@ -2,6 +2,63 @@ import React, { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import { BrowserMultiFormatReader } from '@zxing/library'
 import { makeStyles } from 'tss-react/mui'
+import IconButton from '@mui/material/IconButton'
+import Icon from '@mui/material/Icon'
+import Select from '@mui/material/Select'
+import MenuItem from '@mui/material/MenuItem'
+import Snackbar from '@mui/material/Snackbar'
+import MuiAlert from '@mui/material/Alert'
+
+const reader = new BrowserMultiFormatReader()
+const COOKIE_NAME = 'PREVIOUS_DEVICE_ID'
+
+const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
+
+const Reader = (props: any) => {
+  const { onRead, deviceId, className } = props
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    let previous: string | null = null
+    reader.reset()
+
+    if (deviceId) {
+      reader.decodeFromVideoDevice(deviceId, videoRef.current, (r, e) => {
+        if (r) {
+          let read = r.text
+          if (read.match(/^[0-9]+$/)) {
+            read = `barcode${read}`
+          }
+          if (read != previous) {
+            window.navigator.vibrate(500)
+            previous = read
+            onRead(read)
+          }
+        }
+      })
+    }
+
+    return () => {
+      reader.reset()
+      previous = null
+    }
+  }, [deviceId, onRead])
+
+  return (
+    <video
+      ref={videoRef}
+      onCanPlay={() => {
+        if (videoRef.current) {
+          videoRef.current.play()
+        }
+      }}
+      autoPlay
+      playsInline
+      muted
+      className={className}
+    />
+  )
+}
 
 const useStyles = makeStyles()({
   container: {
@@ -26,12 +83,11 @@ const useStyles = makeStyles()({
   },
 })
 
-const CodeReader = (props: Props) => {
+const CodeReader = (props: any) => {
   const { onRead, closeFunc } = props
-  const [devices, setDevices] = useState([])
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([])
   const [selectedDevice, setSelectedDevice] = useState('')
   const [alert, setAlert] = useState(false)
-  const deviceRef = useRef()
 
   const { classes } = useStyles()
 
@@ -76,13 +132,18 @@ const CodeReader = (props: Props) => {
       </Snackbar>
       {devices.length > 0 && (
         <div className={classes.container}>
-          <IconButton aria-label="close" onClick={closeFunc}>
+          <IconButton
+            aria-label="close"
+            onClick={closeFunc}
+            className={classes.closeButton}
+          >
             <Icon>close</Icon>
           </IconButton>
           <Select
             aria-label="camera selector"
             value={selectedDevice}
             onChange={(e) => selectDevice(e.target.value)}
+            sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1001 }}
           >
             {devices.map((d) => (
               <MenuItem value={d.deviceId} key={d.deviceId}>
