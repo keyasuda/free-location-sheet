@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
+import Cookies from 'js-cookie'
 import { BrowserMultiFormatReader } from '@zxing/library'
 import { makeStyles } from '@material-ui/styles'
 import IconButton from '@material-ui/core/IconButton'
@@ -47,7 +48,9 @@ const Reader = (props: Props) => {
     <video
       ref={videoRef}
       onCanPlay={() => {
-        videoRef.current.play()
+        if (videoRef.current) {
+          videoRef.current.play()
+        }
       }}
       autoPlay
       playsInline
@@ -89,26 +92,29 @@ const CodeReader = (props: Props) => {
 
   const selectDevice = (device) => {
     setSelectedDevice(device)
-    cookieStore.set(COOKIE_NAME, device)
+    Cookies.set(COOKIE_NAME, device)
   }
 
-  useEffect(async () => {
-    const previousDeviceId = await cookieStore.get(COOKIE_NAME)
-    const devices = await reader.listVideoInputDevices()
-    setDevices(devices)
+  useEffect(() => {
+    const init = async () => {
+      const previousDeviceId = Cookies.get(COOKIE_NAME)
+      const devices = await reader.listVideoInputDevices()
+      setDevices(devices)
 
-    if (devices.length > 0) {
-      if (
-        previousDeviceId &&
-        devices.map((d) => d.deviceId).some((i) => i == previousDeviceId.value)
-      ) {
-        setSelectedDevice(previousDeviceId.value)
+      if (devices.length > 0) {
+        if (
+          previousDeviceId &&
+          devices.map((d) => d.deviceId).some((i) => i == previousDeviceId)
+        ) {
+          setSelectedDevice(previousDeviceId)
+        } else {
+          setSelectedDevice(devices[0].deviceId)
+        }
       } else {
-        setSelectedDevice(devices[0].deviceId)
+        setAlert(true)
       }
-    } else {
-      setAlert(true)
     }
+    init()
   }, [])
 
   return (
@@ -142,7 +148,6 @@ const CodeReader = (props: Props) => {
           <Reader
             onRead={onRead}
             deviceId={selectedDevice}
-            close={() => setScanning(false)}
             className={classes.video}
           />
         </div>
