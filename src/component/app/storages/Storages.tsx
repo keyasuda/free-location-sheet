@@ -121,6 +121,7 @@ const Storages = (props) => {
               aria-label="amount"
               inputRef={bulkAmountRef}
               defaultValue={1}
+              margin="normal"
             />
           </DialogContentText>
         </DialogContent>

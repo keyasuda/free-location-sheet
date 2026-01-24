@@ -36,6 +36,7 @@ const EditDialog = (props) => {
             inputRef={nameRef}
             defaultValue={item.name}
             className={classes.input}
+            margin="normal"
           />
           <TextField
             aria-label="description"
@@ -43,6 +44,7 @@ const EditDialog = (props) => {
             inputRef={descriptionRef}
             defaultValue={item.description}
             className={classes.input}
+            margin="normal"
           />
           <FormGroup row>
             <FormControlLabel

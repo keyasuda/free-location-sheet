@@ -133,6 +133,7 @@ const EditDialog = (props) => {
                   label="名称"
                   inputRef={nameRef}
                   className={classes.input}
+                  margin="normal"
                 />
               )}
             />
@@ -147,6 +148,7 @@ const EditDialog = (props) => {
                   label="説明"
                   inputRef={descriptionRef}
                   className={classes.input}
+                  margin="normal"
                 />
               )}
             />
@@ -156,6 +158,7 @@ const EditDialog = (props) => {
               aria-label="quantities"
               inputRef={quantitiesRef}
               defaultValue={item.quantities}
+              margin="normal"
             />
 
             <div>
