@@ -32,11 +32,31 @@ The system treats a Google Sheet as a relational database.
 - **Querying**: Uses Google Visualization API Query Language (SQL-like) via `Sheet.query()` in `src/api/sheet.ts`.
 - **Updates**: Uses Google Sheets API `batchUpdate` and `values.append`.
 - **Schema**:
-  - `Belonging`: `[row, id, name, description, quantities, storageId, printed, deadline]`
-  - `Storage`: `[row, id, name, description, printed]`
+  The schema for `Belonging` and `Storage` is as follows:
+
+  #### `Belonging`
+  | Field       | Type    | Description                            |
+  |-------------|---------|----------------------------------------|
+  | `row`       | number  | The row number in the Google Sheet.    |
+  | `id`        | string  | Unique identifier (UUID).              |
+  | `name`      | string  | Name of the item.                      |
+  | `description` | string  | Description of the item.               |
+  | `quantities`| number  | Quantity of the item.                  |
+  | `storageId` | string  | Foreign key to the `storages` table.   |
+  | `printed`   | boolean | `true` if a label has been printed.    |
+  | `deadline`  | string  | Deadline date in 'yyyy/MM/dd' format.  |
+
+  #### `Storage`
+  | Field       | Type    | Description                               |
+  |-------------|---------|-------------------------------------------|
+  | `row`       | number  | The row number in the Google Sheet.       |
+  | `id`        | string  | Unique identifier (UUID).                 |
+  | `name`      | string  | Name of the storage location.             |
+  | `description` | string  | Description of the storage location.      |
+  | `printed`   | boolean | `true` if a label has been printed.       |
 
 ### 2. Frontend Architecture
-- **State Management**: Redux Toolkit manages the application state (`belongings`, `storages`, `list`).
+- **State Management**: Redux Toolkit manages the application state (`belongings`, `storages`).
 - **Routing**: React Router (`react-router-dom`).
 - **Styling**: Emotion (`@emotion/react`) and MUI system.
 
