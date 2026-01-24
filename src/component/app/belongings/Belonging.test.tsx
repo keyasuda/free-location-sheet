@@ -10,7 +10,6 @@ import * as ReactRedux from 'react-redux'
 
 import Belonging from './Belonging'
 import * as auth from '../../authentication'
-import { store, history } from '../../../state/store'
 import { Sheet } from '../../../api/sheet'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
@@ -36,9 +35,11 @@ const setMockState = (belonging) => {
     },
   }
 
-  jest
-    .spyOn(ReactRedux, 'useSelector')
-    .mockImplementation((selector) => selector(mockState))
+  return {
+    getState: () => mockState,
+    subscribe: jest.fn(),
+    dispatch: jest.fn(),
+  }
 }
 
 const mockItem = {
@@ -51,11 +52,11 @@ const mockItem = {
   printed: false,
 }
 
-const renderIt = (itemId) => {
+const renderIt = (store, itemId) => {
   render(
     <MuiThemeProvider theme={theme}>
         <Provider store={store}>
-          <MemoryRouter initialEntries={[`/file-id/${itemId}`]} history={history}>
+          <MemoryRouter initialEntries={[`/file-id/${itemId}`]}>
             <Routes>
               <Route path="/:fileId/:itemId" element={<Belonging />} />
             </Routes>
@@ -103,6 +104,7 @@ const theme = createTheme()
 
 describe('Belonging', () => {
   let getThunk
+  let mockStore
 
   beforeAll(() => {
     CodeReader.mockImplementation(MockCodeReader)
@@ -113,7 +115,7 @@ describe('Belonging', () => {
     jest.spyOn(auth, 'authorizedClient').mockReturnValue(jest.fn())
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
     getThunk = jest.spyOn(belongingsAsyncThunk, 'get')
-    setMockState(mockItem)
+    mockStore = setMockState(mockItem)
   })
 
   afterEach(() => {
@@ -122,7 +124,7 @@ describe('Belonging', () => {
 
   describe('initialize', () => {
     it('should get belonging by provided ID', () => {
-      renderIt(mockItem.id)
+      renderIt(mockStore, mockItem.id)
       expect(getThunk).toHaveBeenCalledWith(mockItem.id)
     })
   })
@@ -131,7 +133,7 @@ describe('Belonging', () => {
     it('should update with the dialog', async () => {
       const user = userEvent.setup()
       const updateThunk = jest.spyOn(belongingsAsyncThunk, 'update')
-      renderIt(mockItem.id)
+      renderIt(mockStore, mockItem.id)
       const editButton = screen.getByLabelText('edit')
       await user.click(editButton)
       await waitFor(() => screen.findByText('物品の編集'))
@@ -162,24 +164,24 @@ describe('Belonging', () => {
 
   describe('when it has storageId', () => {
     beforeEach(() => {
-      setMockState({ ...mockItem, storageId: 'storageid' })
+      mockStore = setMockState({ ...mockItem, storageId: 'storageid' })
     })
 
     it('should get the storage', () => {
       const thunk = jest.spyOn(storagesAsyncThunk, 'get')
-      renderIt(mockItem.id)
+      renderIt(mockStore, mockItem.id)
       expect(thunk).toHaveBeenCalledWith('storageid')
     })
   })
 
   describe('when it doesnt have storageId', () => {
     beforeEach(() => {
-      setMockState(mockItem)
+      mockStore = setMockState(mockItem)
     })
 
     it('should get the storage', () => {
       const thunk = jest.spyOn(storagesAsyncThunk, 'get')
-      renderIt(mockItem.id)
+      renderIt(mockStore, mockItem.id)
       expect(thunk).not.toHaveBeenCalled()
     })
   })
@@ -194,8 +196,8 @@ describe('Belonging', () => {
     beforeEach(async () => {
       user = userEvent.setup()
       thunk = jest.spyOn(belongingsAsyncThunk, 'update')
-      setMockState(mockItem)
-      renderIt(mockItem.id)
+      mockStore = setMockState(mockItem)
+      renderIt(mockStore, mockItem.id)
       const scanButton = screen.getByLabelText('set storage')
       await user.click(scanButton)
     })
@@ -232,8 +234,8 @@ describe('Belonging', () => {
 
   describe('unknown ID', () => {
     beforeEach(() => {
-      setMockState(null, true)
-      renderIt('itemid')
+      mockStore = setMockState(null, true)
+      renderIt(mockStore, 'itemid')
     })
 
     it('should show a register dialog', () => {
@@ -276,7 +278,7 @@ describe('Belonging', () => {
       const user = userEvent.setup()
       const removeThunk = jest.spyOn(belongingsAsyncThunk, 'remove')
 
-      renderIt(mockItem.id)
+      renderIt(mockStore, mockItem.id)
 
       const removeButton = screen.getByLabelText('remove')
       await user.click(removeButton)
@@ -293,15 +295,15 @@ describe('Belonging', () => {
 
   describe('autofill button', () => {
     it('shouldnt appear for existing item', () => {
-      setMockState(mockItem)
-      renderIt(mockItem.id)
+      mockStore = setMockState(mockItem)
+      renderIt(mockStore, mockItem.id)
       const button = screen.queryByLabelText('autofill-button')
       expect(button).toEqual(null)
     })
 
     it('should appear for new item', () => {
-      setMockState(null)
-      renderIt('new-item')
+      mockStore = setMockState(null)
+      renderIt(mockStore, 'new-item')
       screen.getByLabelText('autofill-button')
     })
 
@@ -320,8 +322,8 @@ describe('Belonging', () => {
           body: JSON.stringify(autofillSource),
         })
 
-        setMockState(null)
-        renderIt('barcode1145141841842')
+        mockStore = setMockState(null)
+        renderIt(mockStore, 'barcode1145141841842')
         const button = screen.getByLabelText('autofill-button')
 
         await user.click(button)
@@ -344,8 +346,8 @@ describe('Belonging', () => {
           body: 'not found',
         })
 
-        setMockState(null)
-        renderIt('barcode1145141841842')
+        mockStore = setMockState(null)
+        renderIt(mockStore, 'barcode1145141841842')
         const button = screen.getByLabelText('autofill-button')
 
         await user.click(button)
@@ -383,8 +385,8 @@ describe('Belonging', () => {
           body: JSON.stringify(autofillSource),
         })
 
-        setMockState(null)
-        renderIt('barcode9783161484100')
+        mockStore = setMockState(null)
+        renderIt(mockStore, 'barcode9783161484100')
         const button = screen.getByLabelText('autofill-button')
 
         await user.click(button)

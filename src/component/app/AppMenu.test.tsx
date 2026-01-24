@@ -48,10 +48,6 @@ describe('AppMenu', () => {
       dispatch: jest.fn(),
     }
 
-    jest
-      .spyOn(ReactRedux, 'useSelector')
-      .mockImplementation((selector) => selector(mockState))
-
     render(
       <ThemeProvider theme={theme}>
         <Provider store={mockStore}>

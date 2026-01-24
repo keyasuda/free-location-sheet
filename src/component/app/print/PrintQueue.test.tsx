@@ -11,7 +11,6 @@ import { Sheet } from '../../../api/sheet'
 import PrintQueue from './PrintQueue'
 import { belongingsAsyncThunk } from '../../../state/belongingsSlice'
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
-import { store, history } from '../../../state/store'
 import * as auth from '../../authentication'
 import AppBar from '../AppBar'
 
@@ -29,9 +28,11 @@ const setMockState = (belongings, storages) => {
     },
   }
 
-  jest
-    .spyOn(ReactRedux, 'useSelector')
-    .mockImplementation((selector) => selector(mockState))
+  return {
+    getState: () => mockState,
+    subscribe: jest.fn(),
+    dispatch: jest.fn(),
+  }
 }
 
 const mockBelonging = {
@@ -57,11 +58,11 @@ const renderIt = (
   storages,
   initialPath = '/app/file-id/itemid'
 ) => {
-  setMockState(belongings, storages)
+  const mockStore = setMockState(belongings, storages)
 
   render(
-    <Provider store={store}>
-      <MemoryRouter initialEntries={[initialPath]} history={history}>
+    <Provider store={mockStore}>
+      <MemoryRouter initialEntries={[initialPath]}>
         <Routes>
           <Route path="/app/:fileId/:itemId" element={<PrintQueue />} />
         </Routes>
