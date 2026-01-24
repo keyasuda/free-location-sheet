@@ -1,39 +1,29 @@
 import React, { useRef, useState } from 'react'
-import TextField from '@material-ui/core/TextField'
-import IconButton from '@material-ui/core/IconButton'
-import Icon from '@material-ui/core/Icon'
-import Typography from '@material-ui/core/Typography'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import FormGroup from '@material-ui/core/FormGroup'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Checkbox from '@material-ui/core/Checkbox'
-import Snackbar from '@material-ui/core/Snackbar'
-import MuiAlert from '@material-ui/lab/Alert'
-import DateFnsUtils from '@date-io/date-fns'
-import format from 'date-fns/format'
-import parse from 'date-fns/parse'
-import jaLocale from 'date-fns/locale/ja'
-import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers'
+import TextField from '@mui/material/TextField'
+import IconButton from '@mui/material/IconButton'
+import Icon from '@mui/material/Icon'
+import Typography from '@mui/material/Typography'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import FormGroup from '@mui/material/FormGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
+import Snackbar from '@mui/material/Snackbar'
+import MuiAlert from '@mui/material/Alert'
+import { format, parse } from 'date-fns'
+import { ja } from 'date-fns/locale'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { useForm, Controller } from 'react-hook-form'
-import { makeStyles } from '@material-ui/core/styles'
+import { makeStyles } from '@mui/styles'
 
 import { autoFillEndpoint } from '../../../settings'
 
 const OpenBD = 'https://api.openbd.jp/v1/get?isbn='
-
-export class JaDateFnsUtils extends DateFnsUtils {
-  getCalendarHeaderText(date: Date) {
-    return format(date, 'yyyy MMM', { locale: this.locale })
-  }
-
-  getDatePickerHeaderText(date: Date) {
-    return format(date, 'MMMd日', { locale: this.locale })
-  }
-}
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
@@ -143,6 +133,7 @@ const EditDialog = (props) => {
                   label="名称"
                   inputRef={nameRef}
                   className={classes.input}
+                  margin="normal"
                 />
               )}
             />
@@ -157,6 +148,7 @@ const EditDialog = (props) => {
                   label="説明"
                   inputRef={descriptionRef}
                   className={classes.input}
+                  margin="normal"
                 />
               )}
             />
@@ -166,21 +158,19 @@ const EditDialog = (props) => {
               aria-label="quantities"
               inputRef={quantitiesRef}
               defaultValue={item.quantities}
+              margin="normal"
             />
 
             <div>
-              <MuiPickersUtilsProvider utils={JaDateFnsUtils} locale={jaLocale}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
                 <DatePicker
-                  margin="normal"
-                  aria-label="deadline"
                   label="期限"
-                  okLabel="確定"
-                  cancelLabel="キャンセル"
                   format="yyyy/MM/dd"
                   value={deadline}
                   onChange={setDeadline}
+                  slotProps={{ textField: { margin: 'normal' } }}
                 />
-              </MuiPickersUtilsProvider>
+              </LocalizationProvider>
               {deadline && (
                 <IconButton
                   onClick={() => setDeadline(null)}

@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
@@ -55,6 +55,11 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockUseNavigate,
 }))
 
+import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
+
+const theme = createTheme()
+
 describe('Belongings', () => {
   let sheetInit, searchThunk, user
   beforeEach(() => {
@@ -72,13 +77,17 @@ describe('Belongings', () => {
 
   const renderIt = (initialPath = '/app/file-id/belongings') => {
     render(
-      <Provider store={store}>
-        <MemoryRouter initialEntries={[initialPath]}>
-          <Routes>
-            <Route path="/app/:fileId/belongings" element={<Belongings />} />
-          </Routes>
-        </MemoryRouter>
-      </Provider>
+      <MuiThemeProvider theme={theme}>
+        <StylesThemeProvider theme={theme}>
+          <Provider store={store}>
+            <MemoryRouter initialEntries={[initialPath]}>
+              <Routes>
+                <Route path="/app/:fileId/belongings" element={<Belongings />} />
+              </Routes>
+            </MemoryRouter>
+          </Provider>
+        </StylesThemeProvider>
+      </MuiThemeProvider>
     )
   }
 
@@ -201,21 +210,24 @@ describe('Belongings', () => {
       it('should add desired items', async () => {
         const num = 5
 
-        await waitFor(() => screen.findByText('数量'))
+        const fab = screen.getByLabelText('add')
+        await user.click(fab)
+
+        await screen.findByRole('dialog')
         const amount = screen.getByLabelText('amount').querySelector('input')
         fireEvent.change(amount, { target: { value: String(num) } })
         await user.click(screen.getByLabelText('add bulk'))
-        await waitFor(() => screen.findByText('数量'))
+        await waitForElementToBeRemoved(() => screen.queryByRole('dialog'))
 
         expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
       })
 
       it('should add nothing when the input is invalid', async () => {
-        await waitFor(() => screen.findByText('数量'))
+        await screen.findByRole('dialog')
         const amount = screen.getByLabelText('amount').querySelector('input')
         await user.type(amount, 'hogehoge') // invalid input
         await user.click(screen.getByLabelText('add bulk'))
-        await waitFor(() => screen.findByText('数量'))
+        await waitForElementToBeRemoved(() => screen.queryByRole('dialog'))
 
         expect(addThunk).not.toHaveBeenCalled()
       })

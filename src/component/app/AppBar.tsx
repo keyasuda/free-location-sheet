@@ -1,16 +1,57 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { alpha, makeStyles } from '@material-ui/core/styles'
-import { default as MUIAppBar } from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import InputBase from '@material-ui/core/InputBase'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
+import { alpha } from '@mui/material/styles'
+import { makeStyles } from '@mui/styles'
+import { default as MUIAppBar } from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import InputBase from '@mui/material/InputBase'
+import Icon from '@mui/material/Icon'
+import IconButton from '@mui/material/IconButton'
 
 import CodeReader from './CodeReader'
 
 import useSearchword from './hooks/useSearchword'
+
+const useStyles = makeStyles((theme) => ({
+  search: {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginRight: 0,
+    marginLeft: 0,
+    width: '100%',
+  },
+  searchIcon: {
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inputRoot: {
+    color: 'inherit',
+    width: '100%',
+  },
+  inputInput: {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+  },
+  clearSearchButton: {
+    color: 'white',
+    width: '32px',
+    height: '32px',
+    marginRight: '10px',
+  },
+}))
 
 const AppBar = (props) => {
   const { fileId } = useParams()
@@ -22,45 +63,7 @@ const AppBar = (props) => {
 
   const basePath = `/app/${fileId}`
 
-  const classes = makeStyles((theme) => ({
-    search: {
-      position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      backgroundColor: alpha(theme.palette.common.white, 0.15),
-      '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-      },
-      marginRight: 0,
-      marginLeft: 0,
-      width: '100%',
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 2),
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    inputRoot: {
-      color: 'inherit',
-      width: '100%',
-    },
-    inputInput: {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create('width'),
-      width: '100%',
-    },
-    clearSearchButton: {
-      color: 'white',
-      width: '32px',
-      height: '32px',
-      marginRight: '10px',
-    },
-  }))()
+  const classes = useStyles()
 
   const search = (w) => {
     if (w && w.length > 0) {

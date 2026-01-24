@@ -53,13 +53,17 @@ const mockItem = {
 
 const renderIt = (itemId) => {
   render(
-    <Provider store={store}>
-      <MemoryRouter initialEntries={[`/file-id/${itemId}`]} history={history}>
-        <Routes>
-          <Route path="/:fileId/:itemId" element={<Belonging />} />
-        </Routes>
-      </MemoryRouter>
-    </Provider>
+    <MuiThemeProvider theme={theme}>
+      <StylesThemeProvider theme={theme}>
+        <Provider store={store}>
+          <MemoryRouter initialEntries={[`/file-id/${itemId}`]} history={history}>
+            <Routes>
+              <Route path="/:fileId/:itemId" element={<Belonging />} />
+            </Routes>
+          </MemoryRouter>
+        </Provider>
+      </StylesThemeProvider>
+    </MuiThemeProvider>
   )
 }
 
@@ -88,6 +92,17 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockUseNavigate,
 }))
+
+jest.mock('@mui/material/Snackbar', () => {
+  return ({ open, children }) => {
+    return open ? <div>{children}</div> : null
+  }
+})
+
+import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
+
+const theme = createTheme()
 
 describe('Belonging', () => {
   let getThunk

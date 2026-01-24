@@ -1,16 +1,28 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
+import {
+  StyledEngineProvider,
+  ThemeProvider as MuiThemeProvider,
+} from '@mui/material/styles'
+import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
 
+import theme from './theme'
 import App from './component/App'
 import SignInButton from './component/SignInButton'
 import SheetList from './component/SheetList'
 
 const IndexApp: React.FC = () => {
   return (
-    <SignInButton>
-      <SheetList gapi={(window as any).gapi} />
-    </SignInButton>
+    <StyledEngineProvider injectFirst>
+      <MuiThemeProvider theme={theme}>
+        <StylesThemeProvider theme={theme}>
+          <SignInButton>
+            <SheetList gapi={(window as any).gapi} />
+          </SignInButton>
+        </StylesThemeProvider>
+      </MuiThemeProvider>
+    </StyledEngineProvider>
   )
 }
 
