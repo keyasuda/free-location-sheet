@@ -75,14 +75,16 @@ describe('Belongings', () => {
     jest.clearAllMocks()
   })
 
-  const renderIt = (store, initialPath = '/app/file-id/belongings') => {
-    // Check if store is actually a path string (legacy call support or convenience)
-    let actualStore = store
-    let actualPath = initialPath
+  const renderIt = (storeOrPath, initialPath = '/app/file-id/belongings') => {
+    let actualStore
+    let actualPath
 
-    if (typeof store === 'string' || store === undefined) {
-       actualPath = store || '/app/file-id/belongings'
-       actualStore = setMockState({ keyword: '', belongings: [], deadline: null })
+    if (typeof storeOrPath === 'string' || storeOrPath === undefined) {
+      actualPath = storeOrPath || '/app/file-id/belongings'
+      actualStore = setMockState({ keyword: '', belongings: [], deadline: null })
+    } else {
+      actualStore = storeOrPath
+      actualPath = initialPath
     }
 
     render(
