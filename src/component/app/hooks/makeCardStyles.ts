@@ -1,6 +1,6 @@
 import { makeStyles } from 'tss-react/mui'
 
-const makeListStyles = makeStyles()({
+const makeCardStyles = makeStyles()({
   card: {
     margin: '10px',
   },
@@ -17,4 +17,4 @@ const makeListStyles = makeStyles()({
     margin: '0 0.5em 0 0',
   },
 })
-export default makeListStyles
+export default makeCardStyles
