@@ -3,13 +3,11 @@ import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import {
   StyledEngineProvider,
-  createTheme,
   ThemeProvider as MuiThemeProvider,
 } from '@mui/material/styles'
 import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
 
-const theme = createTheme()
-
+import theme from './theme'
 import App from './component/App'
 import SignInButton from './component/SignInButton'
 import SheetList from './component/SheetList'

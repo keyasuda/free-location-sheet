@@ -15,12 +15,11 @@ import SignInButton from './SignInButton'
 import { initAuth, isSignedIn } from './authentication'
 import {
   StyledEngineProvider,
-  createTheme,
   ThemeProvider as MuiThemeProvider,
 } from '@mui/material/styles'
 import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
 
-const theme = createTheme()
+import theme from '../theme'
 
 const App: React.FC = () => {
   const [loaded, setLoaded] = useState(false)
