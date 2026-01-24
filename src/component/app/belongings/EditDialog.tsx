@@ -17,7 +17,7 @@ import { format, parse } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { useForm, Controller } from 'react-hook-form'
 import { makeStyles } from 'tss-react/mui'
 
