@@ -47,16 +47,17 @@ describe('Storages', () => {
       printed: false,
     }
 
-    let addThunk
-    beforeEach(() => {
+    let addThunk, user
+    beforeEach(async () => {
+      user = userEvent.setup()
       addThunk = jest.spyOn(storagesAsyncThunk, 'add')
       renderIt()
     })
 
     describe('bulk add button', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         const fab = screen.getByLabelText('add')
-        userEvent.click(fab)
+        await user.click(fab)
       })
 
       it('should add desired items', async () => {
@@ -65,7 +66,7 @@ describe('Storages', () => {
         await waitFor(() => screen.findByText('数量'))
         const amount = screen.getByLabelText('amount').querySelector('input')
         fireEvent.change(amount, { target: { value: String(num) } })
-        userEvent.click(screen.getByLabelText('add bulk'))
+        await user.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
@@ -74,8 +75,8 @@ describe('Storages', () => {
       it('should add nothing when the input is invalid', async () => {
         await waitFor(() => screen.findByText('数量'))
         const amount = screen.getByLabelText('amount').querySelector('input')
-        userEvent.type(amount, 'hogehoge') // invalid input
-        userEvent.click(screen.getByLabelText('add bulk'))
+        await user.type(amount, 'hogehoge') // invalid input
+        await user.click(screen.getByLabelText('add bulk'))
         await waitFor(() => screen.findByText('数量'))
 
         expect(addThunk).not.toHaveBeenCalled()

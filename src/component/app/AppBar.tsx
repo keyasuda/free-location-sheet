@@ -136,7 +136,7 @@ const AppBar = (props) => {
               }
               inputProps={{ 'aria-label': 'search-word', ref: keywordRef }}
               onKeyDown={(e) => {
-                if (e.keyCode == 13) {
+                if (e.key === 'Enter') {
                   search(e.target.value)
                 }
               }}

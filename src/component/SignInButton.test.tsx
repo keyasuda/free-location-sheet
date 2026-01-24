@@ -41,13 +41,12 @@ describe('SignInButton', () => {
     })
 
     it('should kick signIn() when the buttton has clicked', async () => {
+      const user = userEvent.setup()
       initAuth.mockImplementationOnce(() => false)
       isSignedIn.mockImplementationOnce(() => true)
       await renderIt()
 
-      await act(async () => {
-        await userEvent.click(screen.getByRole('button'))
-      })
+      await user.click(screen.getByRole('button'))
 
       expect(signIn).toHaveBeenCalled()
     })

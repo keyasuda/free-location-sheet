@@ -22,20 +22,22 @@ const SheetList = (props) => {
     setLoading(false)
   }
 
-  useEffect(async () => {
-    setLoading(true)
-    Sheet.init(null, authorizedClient(), authorizedSheet())
+  useEffect(() => {
+    ;(async () => {
+      setLoading(true)
+      Sheet.init(null, authorizedClient(), authorizedSheet())
 
-    const list = (
-      await gapi.client.drive.files.list({
-        q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
-        fields: 'files(id, name)',
-        orderBy: 'modifiedTime desc',
-      })
-    ).result.files
+      const list = (
+        await gapi.client.drive.files.list({
+          q: "mimeType='application/vnd.google-apps.spreadsheet' and trashed=false",
+          fields: 'files(id, name)',
+          orderBy: 'modifiedTime desc',
+        })
+      ).result.files
 
-    setSheetList(list)
-    setLoading(false)
+      setSheetList(list)
+      setLoading(false)
+    })()
   }, [])
 
   return (

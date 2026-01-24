@@ -97,14 +97,15 @@ describe('PrintQueue', () => {
   })
 
   describe('actions', () => {
-    it('set as printed button should update enqueued items as printed', () => {
+    it('set as printed button should update enqueued items as printed', async () => {
+      const user = userEvent.setup()
       const belongingsUpdate = jest.spyOn(belongingsAsyncThunk, 'update')
       const storagesUpdate = jest.spyOn(storagesAsyncThunk, 'update')
 
       renderIt([mockBelonging], [mockStorage])
-      userEvent.click(screen.getByLabelText('print'))
+      await user.click(screen.getByLabelText('print'))
       const btn = screen.getByLabelText('mark as printed')
-      userEvent.click(btn)
+      await user.click(btn)
 
       expect(belongingsUpdate).toHaveBeenCalledWith([
         { ...mockBelonging, printed: true },
