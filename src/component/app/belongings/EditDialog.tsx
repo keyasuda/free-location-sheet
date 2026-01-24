@@ -17,9 +17,9 @@ import { format, parse } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import { useForm, Controller } from 'react-hook-form'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 
 import { autoFillEndpoint } from '../../../settings'
 
@@ -49,7 +49,7 @@ const EditDialog = (props) => {
   const [alert, setAlert] = useState(false)
   const [deadline, setDeadline] = useState(item.deadline ? item.deadline : null)
 
-  const clearButtonClass = makeStyles({
+  const { classes: clearButtonClass } = makeStyles()({
     clear: {
       margin: '20px 0 0 0',
     },

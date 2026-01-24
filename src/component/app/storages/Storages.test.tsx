@@ -17,7 +17,6 @@ import { storagesAsyncThunk } from '../../../state/storagesSlice'
 Sheet.init = jest.fn()
 
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
-import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
 
 const theme = createTheme()
 
@@ -35,7 +34,6 @@ describe('Storages', () => {
   const renderIt = (initialPath = '/app/file-id/storages') => {
     render(
       <MuiThemeProvider theme={theme}>
-        <StylesThemeProvider theme={theme}>
           <Provider store={store}>
             <MemoryRouter initialEntries={[initialPath]}>
               <Routes>
@@ -43,7 +41,6 @@ describe('Storages', () => {
               </Routes>
             </MemoryRouter>
           </Provider>
-        </StylesThemeProvider>
       </MuiThemeProvider>
     )
   }

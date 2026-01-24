@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import IconButton from '@mui/material/IconButton'
 import { default as MuiCard } from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
@@ -15,13 +15,15 @@ import { UrlMatcher } from 'interweave-autolink'
 
 import { storagesAsyncThunk } from '../../../state/storagesSlice'
 
+const useStorageNameStyles = makeStyles()({ link: { cursor: 'pointer' } })
+
 const StorageName = (props) => {
   const { id, className, fileId } = props
   const item = useSelector((s) => s.storages.list[0])
   const pending = useSelector((s) => s.storages.pending)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const classes = makeStyles({ link: { cursor: 'pointer' } })()
+  const { classes } = useStorageNameStyles()
 
   useEffect(() => {
     if (id) {

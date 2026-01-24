@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import Cookies from 'js-cookie'
 import { BrowserMultiFormatReader } from '@zxing/library'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import IconButton from '@mui/material/IconButton'
 import Icon from '@mui/material/Icon'
 import Select from '@mui/material/Select'
@@ -14,12 +14,12 @@ const COOKIE_NAME = 'PREVIOUS_DEVICE_ID'
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
-const Reader = (props: Props) => {
-  const { onRead, deviceId, close, className } = props
-  const videoRef = useRef()
+const Reader = (props: any) => {
+  const { onRead, deviceId, className } = props
+  const videoRef = useRef<HTMLVideoElement>(null)
 
-  let previous
   useEffect(() => {
+    let previous: string | null = null
     reader.reset()
 
     if (deviceId) {
@@ -42,7 +42,7 @@ const Reader = (props: Props) => {
       reader.reset()
       previous = null
     }
-  }, [deviceId])
+  }, [deviceId, onRead])
 
   return (
     <video
@@ -60,35 +60,36 @@ const Reader = (props: Props) => {
   )
 }
 
-const CodeReader = (props: Props) => {
+const useStyles = makeStyles()({
+  container: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    backgroundColor: 'white',
+    zIndex: 1,
+  },
+  video: {
+    margin: 'auto',
+    width: '100vw',
+    maxHeight: 'calc(100vh - 32px)',
+  },
+  closeButton: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    zIndex: 1000,
+  },
+})
+
+const CodeReader = (props: any) => {
   const { onRead, closeFunc } = props
-  const [devices, setDevices] = useState([])
+  const [devices, setDevices] = useState<MediaDeviceInfo[]>([])
   const [selectedDevice, setSelectedDevice] = useState('')
   const [alert, setAlert] = useState(false)
-  const deviceRef = useRef()
 
-  const classes = makeStyles({
-    container: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: 'white',
-      zIndex: 1,
-    },
-    video: {
-      margin: 'auto',
-      width: '100vw',
-      maxHeight: 'calc(100vh - 32px)',
-    },
-    closeButton: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      zIndex: 1000,
-    },
-  })()
+  const { classes } = useStyles()
 
   const selectDevice = (device) => {
     setSelectedDevice(device)
@@ -131,13 +132,18 @@ const CodeReader = (props: Props) => {
       </Snackbar>
       {devices.length > 0 && (
         <div className={classes.container}>
-          <IconButton aria-label="close" onClick={closeFunc}>
+          <IconButton
+            aria-label="close"
+            onClick={closeFunc}
+            className={classes.closeButton}
+          >
             <Icon>close</Icon>
           </IconButton>
           <Select
             aria-label="camera selector"
             value={selectedDevice}
             onChange={(e) => selectDevice(e.target.value)}
+            sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1001 }}
           >
             {devices.map((d) => (
               <MenuItem value={d.deviceId} key={d.deviceId}>

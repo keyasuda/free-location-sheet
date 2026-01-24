@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, memo } from 'react'
 import { BrowserQRCodeSvgWriter } from '@zxing/library'
-import { makeStyles } from '@mui/styles'
+import { makeStyles } from 'tss-react/mui'
 import Icon from '@mui/material/Icon'
 
 const ItemElement = (props) => {
@@ -12,7 +12,7 @@ const ItemElement = (props) => {
     id: item.id,
   }
 
-  const classes = makeStyles({
+  const { classes } = makeStyles()({
     container: {
       border: '1px solid black',
       boxSizing: 'border-box',

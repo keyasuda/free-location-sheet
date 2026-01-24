@@ -5,8 +5,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import * as ReactRedux from 'react-redux'
 import { Provider } from 'react-redux'
-import { createTheme } from '@mui/material/styles'
-import { ThemeProvider } from '@mui/styles'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { createMemoryHistory } from 'history'
 
 const theme = createTheme()
