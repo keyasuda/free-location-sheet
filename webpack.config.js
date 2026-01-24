@@ -9,6 +9,12 @@ const rules = [
     test: /\.(png|jpg|gif)$/,
     type: 'asset/resource',
   },
+  {
+    test: /\.m?js$/,
+    resolve: {
+      fullySpecified: false,
+    },
+  },
 ]
 
 module.exports = {

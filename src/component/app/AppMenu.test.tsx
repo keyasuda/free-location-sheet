@@ -5,7 +5,11 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ReactRouter from 'react-router'
 import * as ReactRedux from 'react-redux'
 import { Provider } from 'react-redux'
+import { createTheme } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/styles'
 import { createMemoryHistory } from 'history'
+
+const theme = createTheme()
 import AppMenu from './AppMenu'
 import CodeReader from './CodeReader'
 import * as auth from '../authentication'
@@ -50,13 +54,15 @@ describe('AppMenu', () => {
       .mockImplementation((selector) => selector(mockState))
 
     render(
-      <Provider store={mockStore}>
-        <MemoryRouter initialEntries={['/app/file-id']} initialIndex={0}>
-          <Routes>
-            <Route path="/app/:fileId" element={<AppMenu />} />
-          </Routes>
-        </MemoryRouter>
-      </Provider>
+      <ThemeProvider theme={theme}>
+        <Provider store={mockStore}>
+          <MemoryRouter initialEntries={['/app/file-id']} initialIndex={0}>
+            <Routes>
+              <Route path="/app/:fileId" element={<AppMenu />} />
+            </Routes>
+          </MemoryRouter>
+        </Provider>
+      </ThemeProvider>
     )
   })
 

@@ -13,6 +13,14 @@ import PrintQueue from './app/print/PrintQueue'
 import AppBar from './app/AppBar'
 import SignInButton from './SignInButton'
 import { initAuth, isSignedIn } from './authentication'
+import {
+  StyledEngineProvider,
+  createTheme,
+  ThemeProvider as MuiThemeProvider,
+} from '@mui/material/styles'
+import { ThemeProvider as StylesThemeProvider } from '@mui/styles'
+
+const theme = createTheme()
 
 const App: React.FC = () => {
   const [loaded, setLoaded] = useState(false)
@@ -27,23 +35,35 @@ const App: React.FC = () => {
   }, [])
 
   return (
-    <SignInButton styles={{ marginTop: 'calc(50vh - 29px)' }}>
-      <Provider store={store}>
-        <Router history={history}>
-          <Routes>
-            <Route path="/app/:fileId/print" element={<PrintQueue />} />
-            <Route path="/app/:fileId/storages/:itemId" element={<Storage />} />
-            <Route path="/app/:fileId/storages" element={<Storages />} />
-            <Route
-              path="/app/:fileId/belongings/:itemId"
-              element={<Belonging />}
-            />
-            <Route path="/app/:fileId/belongings" element={<Belongings />} />
-            <Route path="/app/:fileId/" element={<AppMenu />} />
-          </Routes>
-        </Router>
-      </Provider>
-    </SignInButton>
+    <StyledEngineProvider injectFirst>
+      <MuiThemeProvider theme={theme}>
+        <StylesThemeProvider theme={theme}>
+          <SignInButton styles={{ marginTop: 'calc(50vh - 29px)' }}>
+            <Provider store={store}>
+              <Router history={history}>
+                <Routes>
+                  <Route path="/app/:fileId/print" element={<PrintQueue />} />
+                  <Route
+                    path="/app/:fileId/storages/:itemId"
+                    element={<Storage />}
+                  />
+                  <Route path="/app/:fileId/storages" element={<Storages />} />
+                  <Route
+                    path="/app/:fileId/belongings/:itemId"
+                    element={<Belonging />}
+                  />
+                  <Route
+                    path="/app/:fileId/belongings"
+                    element={<Belongings />}
+                  />
+                  <Route path="/app/:fileId/" element={<AppMenu />} />
+                </Routes>
+              </Router>
+            </Provider>
+          </SignInButton>
+        </StylesThemeProvider>
+      </MuiThemeProvider>
+    </StyledEngineProvider>
   )
 }
 

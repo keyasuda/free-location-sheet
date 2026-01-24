@@ -41,6 +41,11 @@ jest.mock('./CodeReader', () => ({
   default: jest.fn(),
 }))
 
+import { createTheme } from '@mui/material/styles'
+import { ThemeProvider } from '@mui/styles'
+
+const theme = createTheme()
+
 const renderIt = (search) => {
   jest.spyOn(ReactRedux, 'useSelector').mockImplementation((selector) =>
     selector({
@@ -59,13 +64,15 @@ const renderIt = (search) => {
   }
 
   render(
-    <Provider store={store}>
-      <MemoryRouter initialEntries={[path]} history={history}>
-        <Routes>
-          <Route path="/:fileId" element={<AppBar />} />
-        </Routes>
-      </MemoryRouter>
-    </Provider>
+    <ThemeProvider theme={theme}>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[path]} history={history}>
+          <Routes>
+            <Route path="/:fileId" element={<AppBar />} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>
+    </ThemeProvider>
   )
 }
 

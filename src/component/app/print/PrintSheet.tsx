@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, memo } from 'react'
 import { BrowserQRCodeSvgWriter } from '@zxing/library'
-import { makeStyles } from '@material-ui/styles'
-import Icon from '@material-ui/core/Icon'
+import { makeStyles } from '@mui/styles'
+import Icon from '@mui/material/Icon'
 
 const ItemElement = (props) => {
   const { item } = props

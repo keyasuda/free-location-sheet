@@ -1,5 +1,5 @@
 import React from 'react'
-import LinearProgress from '@material-ui/core/LinearProgress'
+import LinearProgress from '@mui/material/LinearProgress'
 
 const Loader = (props) => {
   const { loading, updating, children, header } = props
