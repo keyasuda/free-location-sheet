@@ -43,15 +43,14 @@ export const Sheet = {
   },
 
   init: async (documentId: string, auth, sheetsService) => {
-    if (Sheet.documentId == documentId) {
-      Sheet.auth = auth
-      Sheet.service = sheetsService
+    Sheet.auth = auth
+    Sheet.service = sheetsService
+
+    if (Sheet.documentId === documentId) {
       return
     }
 
     Sheet.documentId = documentId
-    Sheet.auth = auth
-    Sheet.service = sheetsService
 
     if (documentId) await Sheet.format()
   },
