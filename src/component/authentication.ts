@@ -6,7 +6,6 @@ import authorizedResource from '../api/authorizedResource'
 import Cookies from 'js-cookie'
 
 const COOKIE_NAME = 'wms-session'
-Cookies.set('G_AUTH2_MIGRATION', 'enforced')
 
 const getSession = () => JSON.parse(Cookies.get(COOKIE_NAME) || '{}')
 
