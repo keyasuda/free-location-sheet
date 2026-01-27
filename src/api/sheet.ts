@@ -43,6 +43,12 @@ export const Sheet = {
   },
 
   init: async (documentId: string, auth, sheetsService) => {
+    if (Sheet.documentId == documentId) {
+      Sheet.auth = auth
+      Sheet.service = sheetsService
+      return
+    }
+
     Sheet.documentId = documentId
     Sheet.auth = auth
     Sheet.service = sheetsService

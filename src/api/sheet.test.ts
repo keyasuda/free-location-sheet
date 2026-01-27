@@ -49,6 +49,30 @@ describe('Sheet', () => {
       })
     })
 
+    describe('init', () => {
+      const sheetFormat = Sheet.format
+
+      beforeEach(() => {
+        Sheet.format = jest.fn()
+      })
+
+      afterEach(() => {
+        Sheet.format = sheetFormat
+      })
+
+      it('should call format if documentId changes', async () => {
+        Sheet.documentId = 'oldId'
+        await Sheet.init('newId', {}, {})
+        expect(Sheet.format).toHaveBeenCalled()
+      })
+
+      it('should not call format if documentId is same', async () => {
+        Sheet.documentId = 'sameId'
+        await Sheet.init('sameId', {}, {})
+        expect(Sheet.format).not.toHaveBeenCalled()
+      })
+    })
+
     describe('validators', () => {
       describe('missingSheets', () => {
         it('should return empty when required sheets are there', async () => {
