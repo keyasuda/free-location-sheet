@@ -19,7 +19,7 @@
   "author": "Kenichiro Yasuda",
   "license": "MIT",
   "engines": {
-    "node": ">=14"
+    "node": ">=18.20.0"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
