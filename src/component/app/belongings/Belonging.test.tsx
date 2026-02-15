@@ -16,7 +16,7 @@ import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import CodeReader from '../CodeReader'
 import AppBar from '../AppBar'
 
-import { autoFillEndpoint } from '../../../settings'
+
 
 Sheet.init = jest.fn()
 
@@ -301,53 +301,30 @@ describe('Belonging', () => {
       expect(button).toEqual(null)
     })
 
-    it('should appear for new item', () => {
+    it('should appear for new item with ISBN barcode', () => {
       mockStore = setMockState(null)
-      renderIt(mockStore, 'new-item')
+      renderIt(mockStore, 'barcode9783161484100')
       screen.getByLabelText('autofill-button')
+    })
+
+    it('should not appear for new item with non-ISBN barcode', () => {
+      mockStore = setMockState(null)
+      renderIt(mockStore, 'barcode1145141841842')
+      expect(screen.queryByLabelText('autofill-button')).toBeNull()
     })
 
     describe('clicks', () => {
       afterEach(() => fetchMock.restore())
 
-      it('should call backend and fill when something has returned', async () => {
+      it('should show notice when OpenBD returns no data', async () => {
         const user = userEvent.setup()
-        const autofillSource = {
-          name: 'autofill item name',
-          url: 'autofill item url',
-        }
-
-        fetchMock.get(autoFillEndpoint + '1145141841842', {
-          status: 200,
-          body: JSON.stringify(autofillSource),
-        })
-
-        mockStore = setMockState(null)
-        renderIt(mockStore, 'barcode1145141841842')
-        const button = screen.getByLabelText('autofill-button')
-
-        await user.click(button)
-
-        const nameField = screen.getByLabelText('name').querySelector('input')
-        const descriptionField = screen
-          .getByLabelText('description')
-          .querySelector('input')
-
-        await waitFor(() =>
-          expect(nameField.value).toEqual(autofillSource.name)
-        )
-        expect(descriptionField.value).toEqual(autofillSource.url)
-      })
-
-      it('should show notice when therere no autofill values', async () => {
-        const user = userEvent.setup()
-        fetchMock.get(autoFillEndpoint + '1145141841842', {
+        fetchMock.get('https://api.openbd.jp/v1/get?isbn=9783161484100', {
           status: 404,
           body: 'not found',
         })
 
         mockStore = setMockState(null)
-        renderIt(mockStore, 'barcode1145141841842')
+        renderIt(mockStore, 'barcode9783161484100')
         const button = screen.getByLabelText('autofill-button')
 
         await user.click(button)

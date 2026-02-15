@@ -21,8 +21,6 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { useForm, Controller } from 'react-hook-form'
 import { makeStyles } from 'tss-react/mui'
 
-import { autoFillEndpoint } from '../../../settings'
-
 const OpenBD = 'https://api.openbd.jp/v1/get?isbn='
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
@@ -57,10 +55,14 @@ const EditDialog = (props) => {
     },
   })()
 
+  const isIsbn = (ean: string): boolean => {
+    return /^97[89][0-9]{10}$/.test(ean)
+  }
+
   const autofill = async () => {
     const ean = itemId.replace('barcode', '')
 
-    if (ean.match(/97[89][0-9]{10}/)) {
+    if (isIsbn(ean)) {
       const ret = await fetch(OpenBD + ean)
 
       if (ret.ok) {
@@ -71,16 +73,6 @@ const EditDialog = (props) => {
         const author =
           src[0].onix.DescriptiveDetail.Contributor[0].PersonName.content
         setValue('name', title + ' ' + author)
-      } else {
-        setAlert(true)
-      }
-    } else {
-      const ret = await fetch(autoFillEndpoint + ean)
-
-      if (ret.ok) {
-        const src = await ret.json()
-        setValue('name', src.name)
-        setValue('description', src.url)
       } else {
         setAlert(true)
       }
@@ -197,7 +189,7 @@ const EditDialog = (props) => {
             <Icon>close</Icon>
           </IconButton>
 
-          {newItem && (
+          {newItem && isIsbn(itemId.replace('barcode', '')) && (
             <IconButton aria-label="autofill-button" onClick={autofill}>
               <Icon>auto_fix_normal</Icon>
             </IconButton>
