@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -57,7 +57,7 @@ const Belonging = (props) => {
   useEffect(() => {
     Sheet.init(fileId, authorizedClient(), authorizedSheet())
     dispatch(belongingsAsyncThunk.get(itemId))
-  }, [itemId])
+  }, [itemId, fileId])
 
   const add = async (item) => {
     await dispatch(belongingsAsyncThunk.add([item]))
@@ -81,19 +81,22 @@ const Belonging = (props) => {
     dispatch(belongingsAsyncThunk.update([updatedItem]))
   }
 
-  const onCodeRead = (code, closeFunc) => {
-    try {
-      const payload = JSON.parse(code)
-      if (payload.klass == 'storage') {
-        setOpenScanner(false)
-        setStorageId(payload.id)
-      } else {
+  const onCodeRead = useCallback(
+    (code) => {
+      try {
+        const payload = JSON.parse(code)
+        if (payload.klass == 'storage') {
+          setOpenScanner(false)
+          setStorageId(payload.id)
+        } else {
+          setAlertOpen(true)
+        }
+      } catch (e) {
         setAlertOpen(true)
       }
-    } catch (e) {
-      setAlertOpen(true)
-    }
-  }
+    },
+    [item]
+  )
 
   const alertClose = (_, reason) => {
     if (reason === 'clickaway') {
