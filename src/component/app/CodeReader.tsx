@@ -17,6 +17,11 @@ const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 const Reader = (props: any) => {
   const { onRead, deviceId, className } = props
   const videoRef = useRef<HTMLVideoElement>(null)
+  const onReadRef = useRef(onRead)
+
+  useEffect(() => {
+    onReadRef.current = onRead
+  }, [onRead])
 
   useEffect(() => {
     let previous: string | null = null
@@ -32,7 +37,7 @@ const Reader = (props: any) => {
           if (read != previous) {
             window.navigator.vibrate(500)
             previous = read
-            onRead(read)
+            onReadRef.current(read)
           }
         }
       })
@@ -42,7 +47,7 @@ const Reader = (props: any) => {
       reader.reset()
       previous = null
     }
-  }, [deviceId, onRead])
+  }, [deviceId])
 
   return (
     <video
