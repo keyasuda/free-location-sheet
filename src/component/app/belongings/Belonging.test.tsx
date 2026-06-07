@@ -16,7 +16,8 @@ import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import CodeReader from '../CodeReader'
 import AppBar from '../AppBar'
 
-import { autoFillEndpoint } from '../../../settings'
+import { searchItemByEan } from '../../../api/rakuten'
+jest.mock('../../../api/rakuten')
 
 Sheet.init = jest.fn()
 
@@ -317,10 +318,7 @@ describe('Belonging', () => {
           url: 'autofill item url',
         }
 
-        fetchMock.get(autoFillEndpoint + '1145141841842', {
-          status: 200,
-          body: JSON.stringify(autofillSource),
-        })
+        ;(searchItemByEan as jest.Mock).mockResolvedValue(autofillSource)
 
         mockStore = setMockState(null)
         renderIt(mockStore, 'barcode1145141841842')
@@ -341,10 +339,7 @@ describe('Belonging', () => {
 
       it('should show notice when therere no autofill values', async () => {
         const user = userEvent.setup()
-        fetchMock.get(autoFillEndpoint + '1145141841842', {
-          status: 404,
-          body: 'not found',
-        })
+        ;(searchItemByEan as jest.Mock).mockResolvedValue(null)
 
         mockStore = setMockState(null)
         renderIt(mockStore, 'barcode1145141841842')
