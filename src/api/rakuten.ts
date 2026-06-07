@@ -19,8 +19,8 @@ export async function searchItemByEan(
 
   const data = await response.json()
 
-  if (data.items && data.items.length > 0) {
-    const item = data.items[0]
+  if (data.Items && data.Items.length > 0) {
+    const item = data.Items[0]
     return { name: item.itemName, url: item.itemUrl }
   }
 
