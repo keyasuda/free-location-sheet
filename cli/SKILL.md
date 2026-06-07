@@ -110,7 +110,7 @@ The path is stored at `~/.config/free-location-sheet/config.json` and persisted 
 
 ## Notes
 
-- Each command invocation fetches the spreadsheet via rclone, so there is network latency
+- Downloaded spreadsheets are cached for 5 minutes under `~/.cache/free-location-sheet/` to avoid rclone rate limits. The output indicates whether data was "Fetched" (downloaded) or "Loaded from cache"
 - Keyword search is case-insensitive substring matching
 - Multiple keywords are AND-combined (all must match)
 - If `--with-storage` shows "(not found)", the belonging's storageId references a storage that doesn't exist in the storages sheet

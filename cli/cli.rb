@@ -104,8 +104,13 @@ module FreeLocationSheet
         abort
       end
       db = Database.new(remote_path: remote_path)
-      say "Fetching spreadsheet from #{remote_path}...", :cyan
       db.fetch
+      if db.from_cache?
+        say "Loaded spreadsheet from cache", :cyan
+      else
+        say "Fetched spreadsheet from #{remote_path}", :cyan
+      end
+      db
     end
 
     def display_belongings_table(belongings, with_storage: false)

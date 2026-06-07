@@ -1,26 +1,34 @@
 require "roo"
 require "tmpdir"
 require "open3"
+require "digest"
 
 module FreeLocationSheet
 class Database
-attr_reader :spreadsheet_path
+  CACHE_DIR = File.join(Dir.home, ".cache", "free-location-sheet")
+  CACHE_TTL = 5 * 60
 
-def initialize(remote_path:)
-      @remote_path = remote_path
-      @spreadsheet_path = nil
-      @workbook = nil
-      @storages_cache = nil
-      @belongings_cache = nil
-    end
+  attr_reader :spreadsheet_path
 
-    def fetch
-      @spreadsheet_path = download_via_rclone
-      @workbook = Roo::Excelx.new(@spreadsheet_path)
-      @storages_cache = nil
-      @belongings_cache = nil
-      self
-    end
+  def from_cache?
+    @from_cache
+  end
+
+  def initialize(remote_path:)
+    @remote_path = remote_path
+    @spreadsheet_path = nil
+    @workbook = nil
+    @storages_cache = nil
+    @belongings_cache = nil
+  end
+
+  def fetch
+    @spreadsheet_path, @from_cache = cached_download
+    @workbook = Roo::Excelx.new(@spreadsheet_path)
+    @storages_cache = nil
+    @belongings_cache = nil
+    self
+  end
 
     def belongings
       @belongings_cache ||= parse_belongings
@@ -87,6 +95,26 @@ def initialize(remote_path:)
       end
 
       downloaded
+    end
+
+    def cached_download
+      cache_key = Digest::SHA256.hexdigest(@remote_path)
+      cache_path = File.join(CACHE_DIR, "#{cache_key}.xlsx")
+      meta_path = File.join(CACHE_DIR, "#{cache_key}.meta")
+
+      FileUtils.mkdir_p(CACHE_DIR)
+
+      if File.exist?(cache_path) && File.exist?(meta_path)
+        mtime = File.mtime(meta_path)
+        if Time.now - mtime < CACHE_TTL
+          return [cache_path, true]
+        end
+      end
+
+      tmp = download_via_rclone
+      FileUtils.cp(tmp, cache_path)
+      FileUtils.touch(meta_path)
+      [cache_path, false]
     end
 
     BELONGINGS_HEADER = %w[row id name description quantities storageId printed deadline].freeze
