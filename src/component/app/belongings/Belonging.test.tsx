@@ -56,13 +56,13 @@ const mockItem = {
 const renderIt = (store, itemId) => {
   render(
     <MuiThemeProvider theme={theme}>
-        <Provider store={store}>
-          <MemoryRouter initialEntries={[`/file-id/${itemId}`]}>
-            <Routes>
-              <Route path="/:fileId/:itemId" element={<Belonging />} />
-            </Routes>
-          </MemoryRouter>
-        </Provider>
+      <Provider store={store}>
+        <MemoryRouter initialEntries={[`/file-id/${itemId}`]}>
+          <Routes>
+            <Route path="/:fileId/:itemId" element={<Belonging />} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>
     </MuiThemeProvider>
   )
 }
@@ -99,7 +99,10 @@ jest.mock('@mui/material/Snackbar', () => {
   }
 })
 
-import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import {
+  createTheme,
+  ThemeProvider as MuiThemeProvider,
+} from '@mui/material/styles'
 
 const theme = createTheme()
 

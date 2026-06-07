@@ -1,6 +1,7 @@
 import { rakutenApplicationId, rakutenAccessKey } from '../settings'
 
-const RAKUTEN_ENDPOINT = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260401'
+const RAKUTEN_ENDPOINT =
+  'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20260401'
 
 export async function searchItemByEan(
   ean: string

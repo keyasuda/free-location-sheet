@@ -156,7 +156,10 @@ const EditDialog = (props) => {
             />
 
             <div>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={ja}
+              >
                 <DatePicker
                   label="期限"
                   format="yyyy/MM/dd"
