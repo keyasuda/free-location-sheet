@@ -8,7 +8,8 @@ jobs:
     env:
       API_KEY: ${{ secrets.API_KEY }}
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      AUTO_FILL_ENDPOINT: ${{ secrets.AUTO_FILL_ENDPOINT }}
+      RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
+      RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
 
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
 

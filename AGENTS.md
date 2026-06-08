@@ -7,9 +7,8 @@ This file provides context for AI agents working on the "Free Location Sheet" pr
 
 ## Technology Stack
 - **Frontend**: React 19, Redux Toolkit, Material UI (MUI) v7.
-- **Backend**: Ruby (Google Cloud Functions Framework).
 - **Database**: Google Sheets (via Google Sheets API v4 and Google Visualization API).
-- **Deployment**: Firebase Hosting (frontend), Google Cloud Functions (backend).
+- **Deployment**: Firebase Hosting (frontend).
 - **Build System**: Webpack 5.
 - **Testing**: Jest, React Testing Library.
 
@@ -19,8 +18,6 @@ This file provides context for AI agents working on the "Free Location Sheet" pr
     - `sheet.ts`: **CRITICAL**. Handles all CRUD operations with Google Sheets. Implements a custom ORM-like layer over the Sheets API.
   - `component/`: React UI components.
   - `state/`: Redux slices and store configuration.
-- `backend/`: Backend serverless functions.
-  - `app.rb`: Defines the `ichiba_proxy` Cloud Function which searches Rakuten Ichiba for product details (used for barcode scanning).
 - `__mocks__/`: Jest mocks.
 - `apiTest/`: Integration tests for the API layer.
 
@@ -60,9 +57,6 @@ The system treats a Google Sheet as a relational database.
 - **Routing**: React Router (`react-router-dom`).
 - **Styling**: Emotion (`@emotion/react`) and MUI system.
 
-### 3. Backend Services
-- **Ichiba Proxy**: A Ruby function (`backend/app.rb`) that takes an EAN (barcode) and returns product metadata (name, URL) from the Rakuten Web Service API.
-
 ## Development Commands
 - `npm start`: Start local development server (Webpack Dev Server).
 - `npm test`: Run unit tests.
@@ -73,4 +67,3 @@ The system treats a Google Sheet as a relational database.
 ## Common Tasks for Agents
 - **Modifying Data Access**: Check `src/api/sheet.ts`. This file manually maps array rows to objects. Ensure index alignment if schema changes.
 - **UI Changes**: Components use MUI. Check `src/component/`.
-- **Backend Logic**: Modify `backend/app.rb`. This is a stateless function.

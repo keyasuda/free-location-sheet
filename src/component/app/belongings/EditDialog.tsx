@@ -21,7 +21,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { useForm, Controller } from 'react-hook-form'
 import { makeStyles } from 'tss-react/mui'
 
-import { autoFillEndpoint } from '../../../settings'
+import { searchItemByEan } from '../../../api/rakuten'
 
 const OpenBD = 'https://api.openbd.jp/v1/get?isbn='
 
@@ -75,12 +75,11 @@ const EditDialog = (props) => {
         setAlert(true)
       }
     } else {
-      const ret = await fetch(autoFillEndpoint + ean)
+      const result = await searchItemByEan(ean)
 
-      if (ret.ok) {
-        const src = await ret.json()
-        setValue('name', src.name)
-        setValue('description', src.url)
+      if (result) {
+        setValue('name', result.name)
+        setValue('description', result.url)
       } else {
         setAlert(true)
       }
@@ -157,7 +156,10 @@ const EditDialog = (props) => {
             />
 
             <div>
-              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={ja}
+              >
                 <DatePicker
                   label="期限"
                   format="yyyy/MM/dd"

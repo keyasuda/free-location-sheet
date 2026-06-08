@@ -9,7 +9,7 @@
 Run following ruby script to write settings.
 
 ```
-API_KEY=<Google API key> CLIENT_ID=<Google API client ID> AUTO_FILL_ENDPOINT=<auto complete backend endpoint> ruby settings_writer.rb
+API_KEY=<Google API key> CLIENT_ID=<Google API client ID> RAKUTEN_APPLICATION_ID=<Rakuten Application ID> RAKUTEN_ACCESS_KEY=<Rakuten access key> ruby settings_writer.rb
 ```
 
 ## Deployment
@@ -24,14 +24,6 @@ For other hosting infrastructure, build with following command and publish files
 
 ```
 npm run build-prod
-```
-
-### Auto complete feature backend
-
-For Cloud Function use the following command inside backend/:
-
-```
-gcloud functions deploy ichiba_proxy --project=PROJECT_ID --runtime ruby32 --memory=128MB --trigger-http --allow-unauthenticated --region=asia-northeast1 --set-env-vars RWS_APPLICATION_ID=APPLICATION_ID,ALLOW_ORIGIN=ORIGIN --entry-point=ichiba_proxy
 ```
 
 ## Usage
