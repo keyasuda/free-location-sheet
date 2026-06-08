@@ -1,6 +1,10 @@
-import uuid from 'uuid'
 import _ from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
 import { Sheet } from './sheet'
+
+jest.mock('uuid', () => ({
+  v4: jest.fn(),
+}))
 
 const spreadsheetId = 'spreadsheetid'
 
@@ -342,7 +346,7 @@ describe('Sheet', () => {
     describe('setInitialItems', () => {
       it('should append initial items', async () => {
         const generateduuid = 'generateduuid'
-        jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
+        uuidv4.mockReturnValue(generateduuid)
 
         await Sheet.setInitialItems()
 
@@ -382,7 +386,7 @@ describe('Sheet', () => {
     describe('add', () => {
       it('should add new storages', async () => {
         const generateduuid = 'generateduuid'
-        jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
+        uuidv4.mockReturnValue(generateduuid)
 
         const newItems = [
           { name: 'item 1', description: 'desc 1' },
@@ -637,7 +641,7 @@ describe('Sheet', () => {
     describe('add', () => {
       it('should add new belongings', async () => {
         const generateduuid = 'b-generateduuid'
-        jest.spyOn(uuid, 'v4').mockReturnValue(generateduuid)
+        uuidv4.mockReturnValue(generateduuid)
 
         const newItems = [
           {
@@ -686,8 +690,6 @@ describe('Sheet', () => {
       })
 
       it('should add new belongings with fields', async () => {
-        const uuidgen = jest.spyOn(uuid, 'v4')
-
         const newItem = {
           id: 'definedid',
           name: 'item 1',
