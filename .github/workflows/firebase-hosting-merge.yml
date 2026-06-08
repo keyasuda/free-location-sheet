@@ -33,10 +33,10 @@ jobs:
 
       - name: Setup Ruby, JRuby and TruffleRuby
         uses: ruby/setup-ruby@v1.206.0
-      - name: Use Node.js 16.x
+      - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: build
         run: |
