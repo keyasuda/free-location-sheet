@@ -1,0 +1,254 @@
+name: OpenCodeReview PR Review
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request_target:
+    types: [ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenCodeReview
+        run: npm install -g @alibaba-group/open-code-review
+
+      - name: Configure OCR
+        env:
+          OCR_LLM_URL: ${{ secrets.OCR_LLM_URL }}
+          OCR_LLM_TOKEN: ${{ secrets.OCR_LLM_AUTH_TOKEN }}
+          OCR_LLM_MODEL: ${{ secrets.OCR_LLM_MODEL }}
+          OCR_USE_ANTHROPIC: ${{ secrets.OCR_LLM_USE_ANTHROPIC }}
+        run: |
+          ocr config set llm.url "${OCR_LLM_URL}"
+          ocr config set llm.auth_token "${OCR_LLM_TOKEN}"
+          ocr config set llm.model "${OCR_LLM_MODEL:-gpt-4o}"
+          ocr config set llm.use_anthropic "${OCR_USE_ANTHROPIC:-false}"
+          ocr config set language "Japanese"
+          ocr config set llm.extra_body '{"thinking": {"type": "disabled"}}'
+
+      - name: Get PR description
+        id: pr-description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = context.payload.pull_request.body || '';
+            fs.writeFileSync('/tmp/pr-body.txt', body, 'utf8');
+
+      - name: Run OpenCodeReview
+        id: review
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          PR_BODY=$(cat /tmp/pr-body.txt)
+
+          echo "Reviewing PR #${{ github.event.pull_request.number }}: ${HEAD_SHA} against origin/${BASE_REF}"
+
+          ocr review \
+            --rule .opencodereview/rule.json \
+            --background "${PR_BODY}" \
+            --from "origin/${BASE_REF}" \
+            --to "${HEAD_SHA}" \
+            --format json \
+            > /tmp/ocr-result.json 2>/tmp/ocr-stderr.log || true
+
+          echo "OCR review completed."
+          cat /tmp/ocr-result.json
+
+      - name: Post review comments to PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = '/tmp/ocr-result.json';
+
+            let result;
+            try {
+              const raw = fs.readFileSync(path, 'utf8');
+              result = JSON.parse(raw);
+            } catch (e) {
+              console.log('Failed to parse OCR output:', e.message);
+              const stderr = fs.readFileSync('/tmp/ocr-stderr.log', 'utf8').trim();
+              if (stderr) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: `⚠️ **OpenCodeReview** でエラーが発生しました:\n\`\`\`\n${stderr}\n\`\`\``
+                });
+              }
+              return;
+            }
+
+            const comments = result.comments || [];
+            const warnings = result.warnings || [];
+
+            if (comments.length === 0) {
+              const message = result.message || '問題は見つかりませんでした。良好です。';
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `✅ **OpenCodeReview**: ${message}`
+              });
+              return;
+            }
+
+            const prNumber = context.issue.number;
+            let commitSha;
+
+            if (context.eventName === 'pull_request_target') {
+              commitSha = context.payload.pull_request.head.sha;
+            } else {
+              const { data: pullRequest } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber
+              });
+              commitSha = pullRequest.head.sha;
+            }
+
+            const reviewComments = [];
+            const commentsWithoutLine = [];
+
+            for (const comment of comments) {
+              const body = formatComment(comment);
+              const hasValidLine = (comment.start_line >= 1) || (comment.end_line >= 1);
+              if (!hasValidLine) {
+                commentsWithoutLine.push({ comment, body });
+                continue;
+              }
+
+              const reviewComment = {
+                path: comment.path,
+                body: body
+              };
+
+              if (comment.start_line >= 1 && comment.end_line >= 1 && comment.start_line !== comment.end_line) {
+                reviewComment.start_line = comment.start_line;
+                reviewComment.line = comment.end_line;
+                reviewComment.start_side = 'RIGHT';
+                reviewComment.side = 'RIGHT';
+              } else if (comment.end_line >= 1) {
+                reviewComment.line = comment.end_line;
+                reviewComment.side = 'RIGHT';
+              } else if (comment.start_line >= 1) {
+                reviewComment.line = comment.start_line;
+                reviewComment.side = 'RIGHT';
+              }
+
+              reviewComments.push(reviewComment);
+            }
+
+            const totalCount = comments.length;
+            const inlineCount = reviewComments.length;
+            const summaryCount = commentsWithoutLine.length;
+            let summaryBody = `🔍 **OpenCodeReview** が **${totalCount}** 件の指摘を検出しました。`;
+            if (totalCount > 0) {
+              summaryBody += `\n- ✅ ${inlineCount} 件をインラインコメントとして投稿`;
+              summaryBody += `\n- 📝 ${summaryCount} 件をサマリーに表示（行情報なし）`;
+            }
+            if (warnings.length > 0) {
+              summaryBody += `\n\n⚠️ レビュー中に ${warnings.length} 件の警告が発生しました。`;
+            }
+
+            for (const { comment, body } of commentsWithoutLine) {
+              summaryBody += '\n\n---\n\n';
+              summaryBody += formatCommentMarkdown(comment);
+            }
+
+            try {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+                commit_id: commitSha,
+                body: summaryBody,
+                event: 'COMMENT',
+                comments: reviewComments
+              });
+            } catch (e) {
+              console.log('Failed to post review with inline comments:', e.message);
+              console.log('Falling back to individual comments...');
+
+              let successCount = 0;
+              let failedCount = 0;
+              for (const reviewComment of reviewComments) {
+                try {
+                  await github.rest.pulls.createReview({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: prNumber,
+                    commit_id: commitSha,
+                    body: '',
+                    event: 'COMMENT',
+                    comments: [reviewComment]
+                  });
+                  successCount++;
+                } catch (innerE) {
+                  failedCount++;
+                  console.log(`Failed: ${reviewComment.path}: ${innerE.message}`);
+                }
+              }
+
+              let finalBody = summaryBody;
+              finalBody += `\n\n📊 **投稿結果:**`;
+              finalBody += `\n- ✅ 成功: ${successCount} 件`;
+              if (failedCount > 0) {
+                finalBody += `\n- ❌ 失敗: ${failedCount} 件`;
+              }
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: finalBody
+              });
+            }
+
+            function formatComment(comment) {
+              let body = comment.content || '';
+              if (comment.suggestion_code && comment.existing_code) {
+                body += '\n\n**提案:**\n';
+                body += '```suggestion\n';
+                body += comment.suggestion_code;
+                if (!comment.suggestion_code.endsWith('\n')) body += '\n';
+                body += '```';
+              }
+              return body;
+            }
+
+            function formatCommentMarkdown(comment) {
+              let md = `### 📄 \`${comment.path}\``;
+              if (comment.start_line && comment.end_line) {
+                md += ` (L${comment.start_line}-L${comment.end_line})`;
+              }
+              md += '\n\n';
+              md += comment.content || '';
+              if (comment.suggestion_code && comment.existing_code) {
+                md += '\n\n<details><summary>💡 修正提案</summary>\n\n';
+                md += '**変更前:**\n```\n' + comment.existing_code + '\n```\n\n';
+                md += '**変更後:**\n```\n' + comment.suggestion_code + '\n```\n\n';
+                md += '</details>';
+              }
+              return md;
+            }
