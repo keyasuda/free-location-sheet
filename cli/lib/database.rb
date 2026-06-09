@@ -1,5 +1,6 @@
 require "roo"
 require "tmpdir"
+require "fileutils"
 require "open3"
 require "digest"
 
@@ -45,10 +46,9 @@ class Database
     def search_storages(keyword)
       return storages if keyword.nil? || keyword.strip.empty?
 
-      words = keyword.strip.split(/\s+/)
+      patterns = keyword.strip.split(/\s+/).map { |w| /#{Regexp.escape(w)}/i }
       storages.select do |s|
-        words.all? do |w|
-          pattern = /#{Regexp.escape(w)}/i
+        patterns.all? do |pattern|
           (s[:name]&.match?(pattern) || s[:description]&.match?(pattern))
         end
       end
@@ -57,10 +57,9 @@ class Database
     def search_belongings(keyword)
       return belongings if keyword.nil? || keyword.strip.empty?
 
-      words = keyword.strip.split(/\s+/)
+      patterns = keyword.strip.split(/\s+/).map { |w| /#{Regexp.escape(w)}/i }
       belongings.select do |b|
-        words.all? do |w|
-          pattern = /#{Regexp.escape(w)}/i
+        patterns.all? do |pattern|
           (b[:name]&.match?(pattern) || b[:description]&.match?(pattern))
         end
       end
@@ -78,25 +77,6 @@ class Database
 
     private
 
-    def download_via_rclone
-      dir = Dir.mktmpdir("free-location-sheet-")
-      remote_basename = @remote_path.split("/").last
-      local_path = File.join(dir, remote_basename)
-
-      cmd = ["rclone", "copy", @remote_path, dir]
-      stdout, stderr, status = Open3.capture3(*cmd)
-      unless status.success?
-        abort "rclone copy failed: #{stderr}"
-      end
-
-      downloaded = Dir.glob(File.join(dir, "*.xlsx")).first
-      unless downloaded
-        abort "No .xlsx file found after rclone copy"
-      end
-
-      downloaded
-    end
-
     def cached_download
       cache_key = Digest::SHA256.hexdigest(@remote_path)
       cache_path = File.join(CACHE_DIR, "#{cache_key}.xlsx")
@@ -111,9 +91,25 @@ class Database
         end
       end
 
-      tmp = download_via_rclone
-      FileUtils.cp(tmp, cache_path)
-      FileUtils.touch(meta_path)
+      tmp_dir = Dir.mktmpdir("free-location-sheet-")
+      begin
+        cmd = ["rclone", "copy", @remote_path, tmp_dir]
+        stdout, stderr, status = Open3.capture3(*cmd)
+        unless status.success?
+          abort "rclone copy failed: #{stderr}"
+        end
+
+        tmp_file = Dir.glob(File.join(tmp_dir, "*.xlsx")).first
+        unless tmp_file
+          abort "No .xlsx file found after rclone copy"
+        end
+
+        FileUtils.cp(tmp_file, cache_path)
+        FileUtils.touch(meta_path)
+      ensure
+        FileUtils.rm_rf(tmp_dir)
+      end
+
       [cache_path, false]
     end
 
@@ -124,6 +120,8 @@ class Database
       return [] unless @workbook.sheets.include?("belongings")
 
       sheet = @workbook.sheet("belongings")
+      return [] if sheet.last_row.nil? || sheet.last_row < 2
+
       header_row = sheet.row(1).map { |v| v&.to_s&.strip }
       col_map = build_column_map(header_row, BELONGINGS_HEADER)
 
@@ -152,6 +150,8 @@ class Database
       return [] unless @workbook.sheets.include?("storages")
 
       sheet = @workbook.sheet("storages")
+      return [] if sheet.last_row.nil? || sheet.last_row < 2
+
       header_row = sheet.row(1).map { |v| v&.to_s&.strip }
       col_map = build_column_map(header_row, STORAGES_HEADER)
 
