@@ -1,4 +1,5 @@
 require "fileutils"
+require "json"
 
 module FreeLocationSheet
   module Config
@@ -9,6 +10,8 @@ module FreeLocationSheet
       ensure_dir
       return {} unless File.exist?(CONFIG_FILE)
       JSON.parse(File.read(CONFIG_FILE))
+    rescue JSON::ParserError
+      {}
     end
 
     def self.save(config)

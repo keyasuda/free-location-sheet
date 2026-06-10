@@ -5,6 +5,8 @@ require "open3"
 require "digest"
 
 module FreeLocationSheet
+  class FetchError < StandardError; end
+
 class Database
   CACHE_DIR = File.join(Dir.home, ".cache", "free-location-sheet")
   CACHE_TTL = 5 * 60
@@ -96,12 +98,12 @@ class Database
         cmd = ["rclone", "copy", @remote_path, tmp_dir]
         stdout, stderr, status = Open3.capture3(*cmd)
         unless status.success?
-          abort "rclone copy failed: #{stderr}"
+          raise FetchError, "rclone copy failed: #{stderr}"
         end
 
         tmp_file = Dir.glob(File.join(tmp_dir, "*.xlsx")).first
         unless tmp_file
-          abort "No .xlsx file found after rclone copy"
+          raise FetchError, "No .xlsx file found after rclone copy"
         end
 
         FileUtils.cp(tmp_file, cache_path)

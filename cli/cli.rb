@@ -101,7 +101,7 @@ module FreeLocationSheet
       remote_path = resolve_remote_path
       unless remote_path
         say "Error: No remote path configured. Run `fls setup` first.", :red
-        abort
+        exit 1
       end
       db = Database.new(remote_path: remote_path)
       db.fetch
@@ -111,6 +111,9 @@ module FreeLocationSheet
         say "Fetched spreadsheet from #{remote_path}", :cyan
       end
       db
+    rescue FetchError => e
+      say "Error: #{e.message}", :red
+      exit 1
     end
 
     def display_belongings_table(belongings, with_storage: false)
