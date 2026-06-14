@@ -95,7 +95,7 @@ class Database
 
       tmp_dir = Dir.mktmpdir("free-location-sheet-")
       begin
-        cmd = ["rclone", "copy", @remote_path, tmp_dir]
+        cmd = ["rclone", "copy", "--", @remote_path, tmp_dir]
         stdout, stderr, status = Open3.capture3(*cmd)
         unless status.success?
           raise FetchError, "rclone copy failed: #{stderr}"
@@ -196,9 +196,11 @@ class Database
     end
 
     def to_boolean(value)
-      return true if value == true || value == "TRUE" || value == "true"
-      return false if value == false || value == "FALSE" || value == "false"
-      nil
+      case value
+      when true, "TRUE", "true", "True", "YES", "yes", "Yes", "Y", "y", 1, "1" then true
+      when false, "FALSE", "false", "False", "NO", "no", "No", "N", "n", 0, "0" then false
+      else nil
+      end
     end
 
     def safe_to_i(value)

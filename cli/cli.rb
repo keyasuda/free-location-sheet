@@ -23,6 +23,9 @@ module FreeLocationSheet
         end
         return
       end
+      unless path.match?(%r{\A[^:]+:.+})
+        say "Warning: Remote path should follow the format 'remote:path' (e.g. 'drive:/sheet.xlsx')", :yellow
+      end
       Config.remote_path = path
       say "Remote path saved: #{path}", :green
     end
@@ -43,7 +46,11 @@ module FreeLocationSheet
         return
       end
 
-      results = keyword ? db.search_belongings(keyword) : db.belongings
+      results = if keyword && !keyword.strip.empty?
+        db.search_belongings(keyword)
+      else
+        db.belongings
+      end
 
       if results.empty?
         say "No belongings found", :yellow
@@ -100,8 +107,7 @@ module FreeLocationSheet
     def load_database
       remote_path = resolve_remote_path
       unless remote_path
-        say "Error: No remote path configured. Run `fls setup` first.", :red
-        exit 1
+          raise Thor::Error, "Error: No remote path configured. Run `fls setup` first."
       end
       db = Database.new(remote_path: remote_path)
       db.fetch
@@ -111,7 +117,7 @@ module FreeLocationSheet
         say "Fetched spreadsheet from #{remote_path}", :cyan
       end
       db
-    rescue FetchError => e
+    rescue StandardError => e
       say "Error: #{e.message}", :red
       exit 1
     end
