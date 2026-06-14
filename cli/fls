@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+dir="$(cd "$(dirname "$0")" && pwd)"
+export BUNDLE_GEMFILE="$dir/Gemfile"
+if [ -f "$dir/.ruby-version" ] && command -v rbenv &>/dev/null; then
+  export RBENV_VERSION="$(cat "$dir/.ruby-version")"
+fi
+exec bundle exec ruby "$dir/cli.rb" "$@"
