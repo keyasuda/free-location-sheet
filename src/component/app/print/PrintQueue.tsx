@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { createSelector } from '@reduxjs/toolkit'
 import ReactToPrint from 'react-to-print'
 import Button from '@mui/material/Button'
 import { makeStyles } from 'tss-react/mui'
@@ -40,13 +41,14 @@ const Sheets = React.forwardRef((props, ref) => {
   )
 })
 
+const selectItems = createSelector(
+  [(s) => s.belongings.list, (s) => s.storages.list],
+  (belongings, storages) => [...belongings, ...storages]
+)
+
 const PrintQueue = (props) => {
   const { fileId } = useParams()
-  const items = useSelector((s) => {
-    const belongings = s.belongings.list
-    const storages = s.storages.list
-    return [...belongings, ...storages]
-  })
+  const items = useSelector(selectItems)
   const sheetRef = useRef()
   const print = useReactToPrint({
     content: () => sheetRef.current,

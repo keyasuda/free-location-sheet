@@ -90,7 +90,10 @@ describe('Belongings', () => {
     render(
       <MuiThemeProvider theme={theme}>
           <Provider store={actualStore}>
-            <MemoryRouter initialEntries={[actualPath]}>
+            <MemoryRouter
+              initialEntries={[actualPath]}
+              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+            >
               <Routes>
                 <Route path="/app/:fileId/belongings" element={<Belongings />} />
               </Routes>

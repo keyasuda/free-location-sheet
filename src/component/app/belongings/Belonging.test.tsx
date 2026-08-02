@@ -57,7 +57,10 @@ const renderIt = (store, itemId) => {
   render(
     <MuiThemeProvider theme={theme}>
       <Provider store={store}>
-        <MemoryRouter initialEntries={[`/file-id/${itemId}`]}>
+        <MemoryRouter
+          initialEntries={[`/file-id/${itemId}`]}
+          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+        >
           <Routes>
             <Route path="/:fileId/:itemId" element={<Belonging />} />
           </Routes>
@@ -104,7 +107,16 @@ import {
   ThemeProvider as MuiThemeProvider,
 } from '@mui/material/styles'
 
-const theme = createTheme()
+const theme = createTheme({
+  components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+        disableTouchRipple: true,
+      },
+    },
+  },
+})
 
 describe('Belonging', () => {
   let getThunk

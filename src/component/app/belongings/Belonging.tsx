@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { createSelector } from '@reduxjs/toolkit'
 import Snackbar from '@mui/material/Snackbar'
 import MuiAlert from '@mui/material/Alert'
 
@@ -19,14 +20,10 @@ import RemoveDialog from './RemoveDialog'
 
 const Alert = (props) => <MuiAlert elevation={6} variant="filled" {...props} />
 
-const Belonging = (props) => {
-  const { fileId, itemId } = useParams()
-  const dispatch = useDispatch()
-
-  const pending = useSelector((s) => s.belongings.pending)
-  const updating = useSelector((s) => s.belongings.updating)
-  const { item, notFound } = useSelector((s) => {
-    const inState = s.belongings.list.find((i) => i && i.id == itemId)
+const selectItem = createSelector(
+  [(s) => s.belongings.list, (s, itemId) => itemId],
+  (list, itemId) => {
+    const inState = list.find((i) => i && i.id == itemId)
     if (inState) {
       return { item: inState, notFound: false }
     } else {
@@ -43,7 +40,16 @@ const Belonging = (props) => {
         notFound: true,
       }
     }
-  })
+  }
+)
+
+const Belonging = (props) => {
+  const { fileId, itemId } = useParams()
+  const dispatch = useDispatch()
+
+  const pending = useSelector((s) => s.belongings.pending)
+  const updating = useSelector((s) => s.belongings.updating)
+  const { item, notFound } = useSelector((s) => selectItem(s, itemId))
 
   const navigate = useNavigate()
 
