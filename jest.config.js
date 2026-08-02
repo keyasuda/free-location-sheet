@@ -13,6 +13,6 @@ module.exports = {
     '\\.mjs$': 'babel-jest',
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(google-auth-library|googleapis|googleapis-common|uuid|gaxios|gcp-metadata|google-gax|proto3-json-serializer|duplexify|google-p12-pem|jws|ms|arrify|retry-request|extend|is-stream|node-fetch|whatwg-url|url-template|google-p12-pem|p-limit|p-queue|abort-controller|stream-events|teeny-request|@babel/runtime|@google-cloud/promisify|@google-cloud/projectify|@google-cloud/resolve-extensions|react-router|cookie-es)/)'
+    '/node_modules/(?!(google-auth-library|googleapis|googleapis-common|uuid|gaxios|gcp-metadata|google-gax|proto3-json-serializer|duplexify|google-p12-pem|jws|ms|arrify|retry-request|extend|is-stream|node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|whatwg-url|url-template|google-p12-pem|p-limit|p-queue|abort-controller|stream-events|teeny-request|@babel/runtime|@google-cloud/promisify|@google-cloud/projectify|@google-cloud/resolve-extensions|react-router|cookie-es)/)'
   ]
 }
