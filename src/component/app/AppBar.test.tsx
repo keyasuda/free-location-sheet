@@ -66,10 +66,7 @@ const renderIt = (search) => {
   render(
     <ThemeProvider theme={theme}>
       <Provider store={mockStore}>
-        <MemoryRouter
-          initialEntries={[path]}
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
+        <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route path="/:fileId" element={<AppBar />} />
           </Routes>

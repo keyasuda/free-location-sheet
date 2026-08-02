@@ -51,11 +51,7 @@ describe('AppMenu', () => {
     render(
       <ThemeProvider theme={theme}>
         <Provider store={mockStore}>
-          <MemoryRouter
-            initialEntries={['/app/file-id']}
-            initialIndex={0}
-            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-          >
+          <MemoryRouter initialEntries={['/app/file-id']} initialIndex={0}>
             <Routes>
               <Route path="/app/:fileId" element={<AppMenu />} />
             </Routes>
