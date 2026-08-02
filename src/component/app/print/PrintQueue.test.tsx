@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { MemoryRouter, Routes, Route } from 'react-router'
@@ -13,10 +13,16 @@ import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import * as auth from '../../authentication'
 import AppBar from '../AppBar'
 
+let mockPrint
+let mockReactToPrintOptions
+
 jest.mock('react-to-print', () => ({
   __esModule: true,
   default: () => null,
-  useReactToPrint: () => jest.fn(),
+  useReactToPrint: (options) => {
+    mockReactToPrintOptions = options
+    return mockPrint
+  },
 }))
 
 Sheet.init = jest.fn()
@@ -94,12 +100,44 @@ describe('PrintQueue', () => {
     jest.spyOn(auth, 'authorizedSheet').mockReturnValue(jest.fn())
     bFindByPrinted = jest.spyOn(belongingsAsyncThunk, 'findByPrinted')
     sFindByPrinted = jest.spyOn(storagesAsyncThunk, 'findByPrinted')
+    mockPrint = jest.fn()
+    mockReactToPrintOptions = undefined
   })
 
   it('should retreive unprinted items', () => {
     renderIt([mockBelonging], [mockStorage])
     expect(bFindByPrinted).toHaveBeenCalledWith(false)
     expect(sFindByPrinted).toHaveBeenCalledWith(false)
+  })
+
+  describe('react-to-print v3', () => {
+    it('should pass contentRef (not content) to useReactToPrint', () => {
+      renderIt([mockBelonging], [mockStorage])
+
+      expect(mockReactToPrintOptions).toBeDefined()
+      expect(mockReactToPrintOptions.content).toBeUndefined()
+      expect(mockReactToPrintOptions.contentRef).toBeDefined()
+      expect(mockReactToPrintOptions.contentRef.current).not.toBeNull()
+    })
+
+    it('should render print content into the contentRef node', () => {
+      renderIt([mockBelonging], [mockStorage])
+
+      const contentNode = mockReactToPrintOptions.contentRef.current
+      expect(contentNode).not.toBeNull()
+      expect(
+        within(contentNode).getAllByText('itemname').length
+      ).toBeGreaterThan(0)
+    })
+
+    it('should call print function when the print button is clicked', async () => {
+      const user = userEvent.setup()
+      renderIt([mockBelonging], [mockStorage])
+
+      await user.click(screen.getByLabelText('print'))
+
+      expect(mockPrint).toHaveBeenCalled()
+    })
   })
 
   describe('actions', () => {
