@@ -4,8 +4,7 @@ import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
-import ReactRouter from 'react-router'
+import { MemoryRouter, Routes, Route } from 'react-router'
 import { Provider } from 'react-redux'
 
 import Storages from './Storages'

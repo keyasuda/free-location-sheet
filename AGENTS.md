@@ -54,7 +54,7 @@ The system treats a Google Sheet as a relational database.
 
 ### 2. Frontend Architecture
 - **State Management**: Redux Toolkit manages the application state (`belongings`, `storages`).
-- **Routing**: React Router (`react-router-dom`).
+- **Routing**: React Router (`react-router`).
 - **Styling**: Emotion (`@emotion/react`) and MUI system.
 
 ## Development Commands

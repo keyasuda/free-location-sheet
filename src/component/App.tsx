@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router'
 import { HistoryRouter as Router } from 'redux-first-history/rr6'
 
 import { store, history } from '../state/store'

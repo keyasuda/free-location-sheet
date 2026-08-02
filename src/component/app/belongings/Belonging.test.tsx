@@ -3,8 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 const fetchMock = require('fetch-mock-jest')
 
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
-import ReactRouter from 'react-router'
+import { MemoryRouter, Routes, Route } from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
 
@@ -88,8 +87,8 @@ jest.mock('../AppBar', () => ({
 }))
 
 const mockUseNavigate = jest.fn()
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   useNavigate: () => mockUseNavigate,
 }))
 

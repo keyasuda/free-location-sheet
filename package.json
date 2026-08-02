@@ -19,7 +19,7 @@
   "author": "Kenichiro Yasuda",
   "license": "MIT",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.22.0"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -41,12 +41,12 @@
     "js-cookie": "^3.0.5",
     "lodash": "^4.18.1",
     "loose-envify": "^1.4.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "react-helmet": "^6.1.0",
     "react-hook-form": "^7.69.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.18.2",
+    "react-router": "^8.3.0",
     "react-to-print": "^3.2.0",
     "redux-first-history": "^5.2.0",
     "shellwords": "^0.1.1",

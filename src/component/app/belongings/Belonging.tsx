@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { createSelector } from '@reduxjs/toolkit'
 import Snackbar from '@mui/material/Snackbar'

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { alpha } from '@mui/material/styles'
 import { makeStyles } from 'tss-react/mui'

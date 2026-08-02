@@ -2,8 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { MemoryRouter, Routes, Route } from 'react-router-dom'
-import ReactRouter from 'react-router'
+import { MemoryRouter, Routes, Route } from 'react-router'
 import { Provider } from 'react-redux'
 import * as ReactRedux from 'react-redux'
 import AppBar from './AppBar'
@@ -77,8 +76,8 @@ const renderIt = (search) => {
 }
 
 const mockUseNavigate = jest.fn()
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   useNavigate: () => mockUseNavigate,
 }))
 
