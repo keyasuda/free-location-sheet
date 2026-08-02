@@ -20,7 +20,24 @@ const authorize = (credentials) => {
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client)
-    oAuth2Client.setCredentials(JSON.parse(token))
+    const storedToken = JSON.parse(token)
+    oAuth2Client.setCredentials(storedToken)
+
+    // Refresh the token if it has expired.
+    if (storedToken.expiry_date && storedToken.expiry_date < Date.now()) {
+      console.log('The stored token has expired. Refreshing...')
+      oAuth2Client.refreshAccessToken((err) => {
+        if (err) return getNewToken(oAuth2Client)
+        fs.writeFile(
+          TOKEN_PATH,
+          JSON.stringify(oAuth2Client.credentials),
+          (err) => {
+            if (err) return console.error(err)
+            console.log('Token refreshed and stored to', TOKEN_PATH)
+          }
+        )
+      })
+    }
   })
 }
 
