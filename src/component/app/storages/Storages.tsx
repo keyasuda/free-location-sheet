@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'

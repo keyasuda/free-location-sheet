@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import { makeStyles } from 'tss-react/mui'
 import IconButton from '@mui/material/IconButton'

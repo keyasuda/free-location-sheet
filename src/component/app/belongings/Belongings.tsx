@@ -6,7 +6,7 @@ import {
   Link,
   useLocation,
   useSearchParams,
-} from 'react-router-dom'
+} from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 import TextField from '@mui/material/TextField'
 import Icon from '@mui/material/Icon'

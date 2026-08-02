@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { authorizedClient, authorizedSheet } from '../../authentication'
