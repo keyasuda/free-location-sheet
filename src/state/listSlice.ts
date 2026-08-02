@@ -61,6 +61,9 @@ export const listSliceAndThunks = (params) => {
 
   const thunks = { add, get, search, searchNext, findByPrinted, update, remove }
 
+  // state.list は必ず新しい配列参照として差し替えること。
+  // 配列要素を参照のまま in-place で変更すると、メモ化されたセレクタ
+  // （例: Belonging.tsx / PrintQueue.tsx の createSelector）が stale な値を返し続ける。
   const pend = (state, _) => {
     state.pending = true
   }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
@@ -35,7 +35,10 @@ describe('Storages', () => {
     render(
       <MuiThemeProvider theme={theme}>
           <Provider store={store}>
-            <MemoryRouter initialEntries={[initialPath]}>
+            <MemoryRouter
+              initialEntries={[initialPath]}
+              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+            >
               <Routes>
                 <Route path="/app/:fileId/storages" element={<Storages />} />
               </Routes>
@@ -56,7 +59,12 @@ describe('Storages', () => {
     let addThunk, user
     beforeEach(async () => {
       user = userEvent.setup()
-      addThunk = jest.spyOn(storagesAsyncThunk, 'add')
+      addThunk = jest
+        .spyOn(storagesAsyncThunk, 'add')
+        .mockImplementation(() => () => {})
+      jest
+        .spyOn(storagesAsyncThunk, 'search')
+        .mockImplementation(() => () => {})
       renderIt()
     })
 
@@ -73,7 +81,7 @@ describe('Storages', () => {
         const amount = screen.getByLabelText('amount').querySelector('input')
         fireEvent.change(amount, { target: { value: String(num) } })
         await user.click(screen.getByLabelText('add bulk'))
-        await waitForElementToBeRemoved(() => screen.queryByRole('dialog'))
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 
         expect(addThunk).toHaveBeenCalledWith(_.times(num, () => item))
       })
@@ -83,7 +91,7 @@ describe('Storages', () => {
         const amount = screen.getByLabelText('amount').querySelector('input')
         await user.type(amount, 'hogehoge') // invalid input
         await user.click(screen.getByLabelText('add bulk'))
-        await waitForElementToBeRemoved(() => screen.queryByRole('dialog'))
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 
         expect(addThunk).not.toHaveBeenCalled()
       })

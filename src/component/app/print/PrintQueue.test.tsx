@@ -14,6 +14,12 @@ import { storagesAsyncThunk } from '../../../state/storagesSlice'
 import * as auth from '../../authentication'
 import AppBar from '../AppBar'
 
+jest.mock('react-to-print', () => ({
+  __esModule: true,
+  default: () => null,
+  useReactToPrint: () => jest.fn(),
+}))
+
 Sheet.init = jest.fn()
 
 const setMockState = (belongings, storages) => {
@@ -62,7 +68,10 @@ const renderIt = (
 
   render(
     <Provider store={mockStore}>
-      <MemoryRouter initialEntries={[initialPath]}>
+      <MemoryRouter
+        initialEntries={[initialPath]}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <Routes>
           <Route path="/app/:fileId/:itemId" element={<PrintQueue />} />
         </Routes>
