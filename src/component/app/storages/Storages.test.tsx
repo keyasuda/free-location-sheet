@@ -35,10 +35,7 @@ describe('Storages', () => {
     render(
       <MuiThemeProvider theme={theme}>
           <Provider store={store}>
-            <MemoryRouter
-              initialEntries={[initialPath]}
-              future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-            >
+            <MemoryRouter initialEntries={[initialPath]}>
               <Routes>
                 <Route path="/app/:fileId/storages" element={<Storages />} />
               </Routes>

@@ -57,10 +57,7 @@ const renderIt = (store, itemId) => {
   render(
     <MuiThemeProvider theme={theme}>
       <Provider store={store}>
-        <MemoryRouter
-          initialEntries={[`/file-id/${itemId}`]}
-          future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-        >
+        <MemoryRouter initialEntries={[`/file-id/${itemId}`]}>
           <Routes>
             <Route path="/:fileId/:itemId" element={<Belonging />} />
           </Routes>
