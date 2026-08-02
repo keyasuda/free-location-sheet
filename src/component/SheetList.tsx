@@ -3,16 +3,17 @@ import Icon from '@mui/material/Icon'
 import Button from '@mui/material/Button'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
-import ListItemText from '@mui/material/ListItemText'
 
 import { authorizedClient, authorizedSheet } from './authentication'
 import { Sheet } from '../api/sheet'
 import Loader from './app/Loader'
+import makeListStyles from './app/hooks/makeListStyles'
 
 const SheetList = (props) => {
   const { gapi } = props
   const [loading, setLoading] = useState(false)
   const [sheetList, setSheetList] = useState(null)
+  const { classes } = makeListStyles()
 
   const create = async () => {
     setLoading(true)
@@ -46,11 +47,12 @@ const SheetList = (props) => {
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <List component="nav">
             {sheetList.map((s) => (
-              <ListItem key={s.id} button>
-                <ListItemText
-                  primary={s.name}
-                  onClick={() => (location.href = `/app/${s.id}/`)}
-                />
+              <ListItem key={s.id}>
+                <div className={classes.linkContainer}>
+                  <a href={`/app/${s.id}/`} className={classes.link}>
+                    {s.name}
+                  </a>
+                </div>
               </ListItem>
             ))}
           </List>
