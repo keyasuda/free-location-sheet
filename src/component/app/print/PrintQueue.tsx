@@ -51,7 +51,7 @@ const PrintQueue = (props) => {
   const items = useSelector(selectItems)
   const sheetRef = useRef()
   const print = useReactToPrint({
-    content: () => sheetRef.current,
+    contentRef: sheetRef,
   })
   const dispatch = useDispatch()
   const [dialogOpen, setDialogOpen] = useState(false)
