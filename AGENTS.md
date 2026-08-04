@@ -6,7 +6,7 @@ This file provides context for AI agents working on the "Free Location Sheet" pr
 **Free Location Sheet** is a home belongings management system that uses Google Spreadsheets as its database. It allows users to track items ("belongings") and where they are stored ("storages").
 
 ## Technology Stack
-- **Frontend**: React 19, Redux Toolkit, Material UI (MUI) v7.
+- **Frontend**: React 19, Redux Toolkit, Material UI (MUI) v9.
 - **Database**: Google Sheets (via Google Sheets API v4 and Google Visualization API).
 - **Deployment**: Firebase Hosting (frontend).
 - **Build System**: Webpack 5.
