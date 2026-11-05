@@ -10,6 +10,10 @@ jobs:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
       RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+      # Dependabot-triggered runs cannot read repository secrets. Deploy only
+      # when the service account is actually available, otherwise the build
+      # still runs and the workflow does not fail on the missing secret.
+      HAS_DEPLOY_SECRETS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_QUICKSTART_1614336716847 != '' }}
 
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
 
@@ -23,6 +27,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Create GitHub deployment
+        if: env.HAS_DEPLOY_SECRETS == 'true'
         uses: chrnorm/deployment-action@v2.0.5
         id: deployment
         with:
@@ -31,7 +36,11 @@ jobs:
           environment: staging
 
       - name: Setup Ruby, JRuby and TruffleRuby
-        uses: ruby/setup-ruby@v1.206.0
+        uses: ruby/setup-ruby@v1
+        with:
+          # ubuntu-26.04 only provides prebuilt binaries for the latest patch
+          # of each series, so ask for the series instead of a fixed patch.
+          ruby-version: '3.4'
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
@@ -43,6 +52,7 @@ jobs:
           npm i --legacy-peer-deps && npm run build:staging
 
       - name: deploy
+        if: env.HAS_DEPLOY_SECRETS == 'true'
         uses: FirebaseExtended/action-hosting-deploy@v0.7.1
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
@@ -52,7 +62,7 @@ jobs:
           projectId: quickstart-1614336716847
 
       - name: Update deployment status (success)
-        if: success()
+        if: success() && env.HAS_DEPLOY_SECRETS == 'true'
         uses: chrnorm/deployment-status@v2.0.1
         with:
           token: '${{ secrets.GITHUB_TOKEN }}'

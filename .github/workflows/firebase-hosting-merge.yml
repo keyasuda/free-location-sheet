@@ -32,7 +32,11 @@ jobs:
           environment: production
 
       - name: Setup Ruby, JRuby and TruffleRuby
-        uses: ruby/setup-ruby@v1.206.0
+        uses: ruby/setup-ruby@v1
+        with:
+          # ubuntu-26.04 only provides prebuilt binaries for the latest patch
+          # of each series, so ask for the series instead of a fixed patch.
+          ruby-version: '3.4'
       - name: Use Node.js 22
         uses: actions/setup-node@v4
         with:
